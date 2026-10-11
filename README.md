@@ -62,7 +62,7 @@ Các trang đăng nhập, đăng ký, quên mật khẩu và hồ sơ được t
 Ứng dụng có thành phần DevTools dành cho môi trường phát triển cục bộ:
 
 - Truy cập nhanh giữa các trang.
-- Theo dõi nhật ký thao tác và các request HTTP.
+- Theo dõi nhật ký thao tác và request HTTP.
 - Lưu trạng thái nhật ký bằng `localStorage` khi điều hướng giữa các trang.
 - Chỉ hiển thị khi thành phần tương ứng tồn tại và ứng dụng đang chạy trong môi trường phát triển.
 
