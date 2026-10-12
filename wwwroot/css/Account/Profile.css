@@ -1,0 +1,471 @@
+/* Profile page styles */
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: #513b22;
+    background: #fffaf2;
+    font-family: "Segoe UI", sans-serif;
+}
+
+html body .profile-brand,
+html body .profile-identity h1,
+html body .profile-panel h2,
+html body .profile-stat strong { color: #513b22; }
+html body .profile-nav a:hover,
+html body .profile-nav__active,
+html body .profile-panel__link,
+html body .profile-progress-value { color: #b56a16; }
+html body .profile-nav,
+html body .profile-logout,
+html body .profile-email,
+html body .profile-stat__label,
+html body .profile-stat__note,
+html body .profile-panel__description { color: #806b50; }
+html body .profile-hero,
+html body .profile-stat,
+html body .profile-panel { border-color: #eadfcf; background: #fff; }
+html body .profile-hero { box-shadow: 0 14px 36px rgb(105 75 31 / 8%); }
+html body .profile-avatar { background: #d88920; }
+html body .profile-edit-button { border-color: #d9c5a7; color: #b56a16; background: #fff; }
+html body .profile-edit-button:hover { border-color: #d88920; background: #fff8eb; }
+html body .profile-progress-track { background: #f0e6d2; }
+html body .profile-progress-track span { background: #d88920; }
+html body .profile-activity-icon--blue,
+html body .profile-activity-icon--orange { color: #b56a16; background: #fff1d9; }
+html body .profile-activity-list strong { color: #513b22; }
+html body .profile-activity-list small { color: #806b50; }
+html body .profile-activity-list b { color: #b56a16; }
+
+body {
+    color: var(--text-primary);
+    background: var(--bg-main);
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    line-height: var(--lh-body);
+}
+
+html body .profile-brand,
+html body .profile-identity h1,
+html body .profile-panel h2,
+html body .profile-stat strong,
+html body .profile-activity-list strong {
+    color: var(--text-primary);
+}
+
+html body .profile-nav a:hover,
+html body .profile-nav__active,
+html body .profile-panel__link,
+html body .profile-progress-value,
+html body .profile-activity-list b {
+    color: var(--color-primary);
+}
+
+html body .profile-nav,
+html body .profile-logout,
+html body .profile-email,
+html body .profile-stat__label,
+html body .profile-stat__note,
+html body .profile-panel__description,
+html body .profile-activity-list small {
+    color: var(--text-secondary);
+}
+
+html body .profile-hero,
+html body .profile-stat,
+html body .profile-panel {
+    border-color: var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+}
+
+html body .profile-hero {
+    box-shadow: var(--shadow-lg);
+}
+
+html body .profile-avatar {
+    background: var(--color-brand);
+}
+
+html body .profile-edit-button {
+    border-color: var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary);
+    background: var(--bg-card);
+}
+
+html body .profile-edit-button:hover {
+    border-color: var(--color-primary);
+    background: var(--bg-soft);
+}
+
+html body .profile-progress-track {
+    background: var(--bg-soft);
+}
+
+html body .profile-progress-track span {
+    background: var(--color-primary);
+}
+
+html body .profile-activity-icon--blue,
+html body .profile-activity-icon--orange {
+    color: var(--color-primary);
+    background: var(--bg-soft);
+}
+
+html body .profile-activity-icon--green {
+    color: var(--status-success);
+    background: var(--status-success-soft);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+}
+
+.profile-page {
+    width: min(1120px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 24px 0 56px;
+}
+
+.profile-topbar {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+.profile-brand {
+    color: #17345f;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+}
+
+.profile-nav {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 28px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.profile-nav a:hover,
+.profile-logout:hover,
+.profile-panel__link:hover {
+    color: #2563eb;
+}
+
+.profile-nav__active {
+    color: #2563eb;
+}
+
+.profile-logout {
+    color: #526581;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 30px 34px;
+    border: 1px solid #dbe5f5;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 14px 36px rgb(28 57 99 / 8%);
+}
+
+.profile-avatar {
+    display: grid;
+    width: 76px;
+    height: 76px;
+    flex: 0 0 76px;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: #2563eb;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.profile-identity {
+    flex: 1;
+}
+
+.profile-eyebrow {
+    margin: 0 0 5px;
+    color: #6480a4;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.profile-identity h1,
+.profile-panel h2 {
+    margin: 0;
+    color: #17345f;
+}
+
+.profile-identity h1 {
+    font-size: clamp(1.7rem, 3vw, 2.25rem);
+}
+
+.profile-email {
+    margin: 4px 0 0;
+    color: #64748b;
+}
+
+.profile-edit-button {
+    min-height: 42px;
+    padding: 0.65rem 1rem;
+    border: 1px solid #b9c9e2;
+    border-radius: 8px;
+    color: #2563eb;
+    background: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.profile-edit-button:hover {
+    border-color: #2563eb;
+    background: #f5f8ff;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+}
+
+.profile-stat {
+    min-height: 132px;
+    padding: 22px 24px;
+    border: 1px solid #dbe5f5;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.profile-stat__label,
+.profile-stat__note {
+    display: block;
+    color: #64748b;
+    font-size: 0.85rem;
+}
+
+.profile-stat strong {
+    display: inline-block;
+    margin-top: 12px;
+    color: #17345f;
+    font-size: 1.9rem;
+}
+
+.profile-stat__note {
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.profile-content {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 18px;
+}
+
+.profile-panel {
+    padding: 26px;
+    border: 1px solid #dbe5f5;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.profile-panel__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.profile-panel h2 {
+    font-size: 1.15rem;
+}
+
+.profile-progress-value {
+    color: #2563eb;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.profile-progress-track {
+    height: 10px;
+    margin-top: 28px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #e7eef9;
+}
+
+.profile-progress-track span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #2563eb;
+}
+
+.profile-panel__description {
+    margin: 14px 0 22px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.profile-panel__link {
+    color: #2563eb;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.profile-activity-list {
+    display: grid;
+    gap: 18px;
+    margin: 25px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.profile-activity-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.profile-activity-list li > span:nth-child(2) {
+    display: grid;
+    flex: 1;
+    gap: 3px;
+}
+
+.profile-activity-list strong {
+    color: #304766;
+    font-size: 0.9rem;
+}
+
+.profile-activity-list small {
+    color: #8291a5;
+    font-size: 0.78rem;
+}
+
+.profile-activity-list b {
+    color: #2563eb;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.profile-activity-icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    place-items: center;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.profile-activity-icon--blue {
+    color: #2563eb;
+    background: #eaf1ff;
+}
+
+.profile-activity-icon--green {
+    color: #16805b;
+    background: #e7f7f0;
+}
+
+.profile-activity-icon--orange {
+    color: #b56a16;
+    background: #fff2dc;
+}
+
+@media (max-width: 760px) {
+    .profile-page {
+        width: min(100% - 24px, 1120px);
+    }
+
+    .profile-topbar {
+        flex-wrap: wrap;
+        gap: 14px 20px;
+        margin-bottom: 28px;
+    }
+
+    .profile-nav {
+        order: 3;
+        flex-basis: 100%;
+        gap: 18px;
+        overflow-x: auto;
+    }
+
+    .profile-hero {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        padding: 24px;
+    }
+
+    .profile-edit-button {
+        width: 100%;
+    }
+
+    .profile-stats,
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+    .profile-hero {
+        gap: 14px;
+    }
+
+    .profile-avatar {
+        width: 58px;
+        height: 58px;
+        flex-basis: 58px;
+        font-size: 1rem;
+    }
+
+    .profile-identity h1 {
+        font-size: 1.5rem;
+    }
+
+    .profile-panel,
+    .profile-stat {
+        padding: 20px;
+    }
+}
+
+body { color: #513b22; background: #fffaf2; }
+.profile-brand, .profile-identity h1, .profile-panel h2, .profile-stat strong, .profile-activity-list strong { color: #513b22; }
+.profile-nav, .profile-logout, .profile-email, .profile-stat__label, .profile-stat__note, .profile-panel__description, .profile-activity-list small { color: #806b50; }
+.profile-nav a:hover, .profile-logout:hover, .profile-panel__link:hover, .profile-nav__active, .profile-panel__link, .profile-activity-list b { color: #b56a16; }
+.profile-eyebrow { color: #a66a25; }
+.profile-hero, .profile-stat, .profile-panel { border-color: #eadfcf; background: #fff; box-shadow: 0 10px 28px rgb(105 75 31 / 6%); }
+.profile-avatar { background: #d88920; }
+.profile-edit-button { border-color: #d9c5a7; color: #b56a16; background: #fff; }
+.profile-edit-button:hover { border-color: #d88920; background: #fff8eb; }
+.profile-progress-value { color: #b56a16; }
+.profile-progress-track { background: #f0e6d2; }
+.profile-progress-track span { background: #d88920; }
+.profile-activity-icon--blue, .profile-activity-icon--orange { color: #a66a25; background: #fff1d9; }
+.profile-activity-icon--green { color: #16805b; background: #e7f7f0; }

@@ -1,0 +1,178 @@
+/* Legacy login page styles */
+body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #eef4ff;
+
+    .login-card {
+        box-sizing: border-box;
+        width: min(92vw, 420px);
+        padding: 2rem;
+        border: 1px solid #dbe5f5;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 18px 45px rgb(28 57 99 / 14%);
+
+        h2 {
+            margin: 0 0 1.5rem;
+            color: #17345f;
+            text-align: center;
+        }
+
+        form {
+            gap: 0.55rem;
+
+            > button {
+                min-height: 44px;
+                padding: 0.65rem 1rem;
+                cursor: pointer;
+                font-weight: 700;
+
+                &:hover {
+                    filter: brightness(0.94);
+                }
+            }
+        }
+
+        input {
+            box-sizing: border-box;
+            min-height: 44px;
+            padding: 0.65rem 0.8rem;
+            border: 1px solid #b9c9e2;
+            border-radius: 8px;
+            color: #17345f;
+            background: #f8fbff;
+
+            &:focus {
+                outline: 3px solid rgb(37 99 235 / 18%);
+                border-color: #2563eb;
+            }
+        }
+
+        hr {
+            height: 1px;
+            margin: 1.5rem 0 1rem;
+            background: #dbe5f5;
+        }
+
+        > p {
+            margin: 0 0 0.8rem;
+            color: #526581;
+            text-align: center;
+        }
+    }
+
+    .other-login-button-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .other-login-button {
+        min-height: 44px;
+        cursor: pointer;
+        border: 0;
+        border-radius: 8px;
+        background: #fff;
+        color: #17345f;
+        font-weight: 700;
+        position: relative;
+
+        &:hover {
+            filter: brightness(0.94);
+        }
+
+        img {
+            position: absolute;
+            right: 1rem;
+            top: auto;
+            bottom: auto;
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .login-message {
+        margin-top: 1rem;
+        color: #b42318;
+        text-align: center;
+    }
+
+    .account-switch {
+        margin: 1.25rem 0 0;
+        color: #806b50;
+        text-align: center;
+        font-size: .88rem;
+    }
+
+    .account-switch a {
+        color: #b56a16;
+        font-weight: 800;
+    }
+
+    .login-actions {
+        display: grid;
+        gap: 10px;
+        margin-top: 1.25rem;
+    }
+
+    .login-action-button {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #eadfcf;
+        border-radius: 8px;
+        font-weight: 800;
+    }
+
+    .login-action-button--primary {
+        color: #fffaf2;
+        background: #d88920;
+    }
+
+    .login-action-button--secondary {
+        color: #b56a16;
+        background: #fffdf9;
+    }
+}
+
+body { color: #513b22; background: #fffaf2; }
+body .login-card { border-color: #eadfcf; background: #fff; box-shadow: 0 18px 45px rgb(105 75 31 / 12%); }
+body .login-card h2 { color: #513b22; }
+body .login-card input { border-color: #d9c5a7; color: #513b22; background: #fffdf9; }
+body .login-card input:focus { outline-color: rgb(216 137 32 / 20%); border-color: #d88920; }
+body .login-card form > button, body .login-card button { color: #fffaf2; background: #d88920; }
+body .login-card form > button:hover, body .login-card button:hover { background: #b56a16; }
+body .login-card hr { background: #eadfcf; }
+body .login-card > p { color: #806b50; }
+body .other-login-button { border: 1px solid #eadfcf; color: #513b22; background: #fff; }
+
+body .login-actions {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+body .login-action-button {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #eadfcf;
+    border-radius: 8px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+body .login-action-button--primary {
+    color: #fffaf2;
+    background: #d88920;
+}
+
+body .login-action-button--secondary {
+    color: #b56a16;
+    background: #fffdf9;
+}

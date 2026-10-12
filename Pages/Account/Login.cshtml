@@ -10,13 +10,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title data-i18n="global.login">Đăng nhập</title>
-        <link rel="stylesheet" href="~/css/LoginBranch.css"/>
-        <link rel="stylesheet" href="~/css/Login.css"/>
+        <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
+        <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <script src="~/js/login.js" defer></script>
     </head>
     <body>
-        <div class="login-card">
-            <h2 data-i18n="global.login">Đăng nhập</h2>
+        <main class="account-page">
+        <section class="login-card" aria-labelledby="login-title">
+            <h2 id="login-title" data-i18n="global.login">Đăng nhập</h2>
             <form method="get" action="/Account/Login">
                 <label for="username" data-i18n="global.username">Tên đăng nhập</label>
                 <input
@@ -54,20 +55,21 @@
                 </button>
             </div>
 
-            <nav class="login-actions" aria-label="Tùy chọn tài khoản">
-                <a
-                    class="login-action-button login-action-button--primary"
-                    href="/Account/Signup"
-                    role="button">
-                    Đăng ký
-                </a>
-                <a
-                    class="login-action-button login-action-button--secondary"
-                    href="/Account/ForgetPassword"
-                    role="button">
-                    Quên mật khẩu?
-                </a>
-            </nav>
-        </div>
+                <nav class="login-actions" aria-label="Tùy chọn tài khoản">
+                    <a
+                        class="login-action-button login-action-button--primary"
+                        href="/Account/Signup"
+                        role="button">
+                        Đăng ký
+                    </a>
+                    <a
+                        class="login-action-button login-action-button--secondary"
+                        href="/Account/ForgetPassword"
+                        role="button">
+                        Quên mật khẩu?
+                    </a>
+                </nav>
+            </section>
+        </main>
     </body>
 </html>

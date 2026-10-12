@@ -1,0 +1,259 @@
+/* Shared account page styles */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text-primary);
+    background: var(--bg-main);
+    font-family: var(--font-sans);
+    font-size: var(--fs-md);
+    line-height: var(--lh-body);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.account-page {
+    display: grid;
+    width: min(100% - var(--space-6), 480px);
+    min-height: 100vh;
+    align-content: center;
+    margin: 0 auto;
+    padding: var(--space-7) 0;
+}
+
+.account-brand {
+    display: block;
+    margin-bottom: var(--space-5);
+    color: var(--color-secondary-dark);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+    text-align: center;
+}
+
+.account-card,
+.login-card {
+    padding: var(--space-6);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+}
+
+.account-card__heading,
+.login-card > h2 {
+    text-align: center;
+}
+
+.account-eyebrow {
+    margin: 0 0 var(--space-2);
+    color: var(--color-primary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-heavy);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.account-card h1,
+.login-card > h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: var(--fs-2xl);
+    line-height: var(--lh-tight);
+}
+
+.account-card__heading > p:last-child,
+.login-card > p {
+    margin: var(--space-2) 0 var(--space-5);
+    color: var(--text-secondary);
+}
+
+.account-form,
+.login-card form {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.account-form label,
+.login-card form label {
+    display: grid;
+    gap: var(--space-2);
+    color: var(--text-primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+}
+
+.account-form input:not([type="checkbox"]),
+.login-card form input {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    background: var(--bg-surface);
+}
+
+.account-form input:not([type="checkbox"]):focus,
+.login-card form input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: var(--focus-ring);
+}
+
+.account-form button,
+.login-card form > button {
+    min-height: 44px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--text-on-primary);
+    background: var(--color-primary);
+    font-weight: var(--fw-heavy);
+}
+
+.account-form button:hover,
+.login-card form > button:hover {
+    background: var(--color-primary-hover);
+}
+
+.account-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    color: var(--text-secondary) !important;
+    font-size: var(--fs-xs) !important;
+    font-weight: var(--fw-regular) !important;
+}
+
+.account-checkbox input {
+    flex: 0 0 auto;
+    margin-top: 3px;
+}
+
+.account-switch {
+    margin: var(--space-5) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    text-align: center;
+}
+
+.account-switch a,
+.login-actions a {
+    color: var(--color-primary);
+    font-weight: var(--fw-heavy);
+}
+
+.verification-code {
+    text-align: center;
+    letter-spacing: .35em;
+    font-size: var(--fs-lg) !important;
+}
+
+.login-card {
+    width: min(100% - var(--space-6), 420px);
+    margin: auto;
+}
+
+.login-card > h2 {
+    margin-bottom: var(--space-5);
+}
+
+.login-card hr {
+    height: 1px;
+    margin: var(--space-5) 0 var(--space-4);
+    border: 0;
+    background: var(--border-color);
+}
+
+.login-card > p {
+    text-align: center;
+}
+
+.other-login-button-container,
+.login-actions {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.other-login-button,
+.login-action-button {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    font-weight: var(--fw-heavy);
+}
+
+.other-login-button:hover,
+.login-action-button:hover {
+    border-color: var(--color-primary);
+}
+
+.other-login-button {
+    position: relative;
+}
+
+.login-button-logo {
+    position: absolute;
+    right: var(--space-4);
+    width: 20px;
+    height: 20px;
+}
+
+.login-actions {
+    margin-top: var(--space-5);
+}
+
+.login-action-button--primary {
+    color: var(--text-on-primary);
+    background: var(--color-primary);
+}
+
+.login-action-button--secondary {
+    color: var(--color-primary);
+    background: var(--bg-surface);
+}
+
+.login-message,
+.form-message {
+    margin: var(--space-4) 0 0;
+    color: var(--status-error);
+    font-size: var(--fs-sm);
+    text-align: center;
+}
+
+@media (max-width: 520px) {
+    .account-page {
+        width: min(100% - var(--space-4), 480px);
+        padding: var(--space-6) 0;
+    }
+
+    .account-card,
+    .login-card {
+        padding: var(--space-5);
+    }
+}

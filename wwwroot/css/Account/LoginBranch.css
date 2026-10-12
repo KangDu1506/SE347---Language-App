@@ -1,0 +1,37 @@
+/* Legacy login branch styles */
+body {
+    box-sizing: border-box;
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+
+    .login-card {
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 0.35rem;
+            color: #304766;
+            font-size: 0.95rem;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #fff;
+        }
+    }
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+body { color: #513b22; background: #fffaf2; }
+body .login-card label { color: #806b50; }
+body .login-card button { color: #fffaf2; background: #d88920; }
+body .login-card button:hover { background: #b56a16; }
