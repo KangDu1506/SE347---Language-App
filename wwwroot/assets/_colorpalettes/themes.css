@@ -45,6 +45,7 @@
     --text-primary: #513b22;     /* 10.1:1 */
     --text-secondary: #806b50;   /* 4.9:1 */
     --text-on-primary: #fffaf2;
+    --text-on-brand: #fffaf2;      /* chữ trên hero/gradient, đặt ở nửa tối */
 
     /* Màu chính - cam */
     --color-primary: #a65f12;        /* nút, link, tab active - 4.7:1 */
@@ -60,7 +61,7 @@
 
     /* Trạng thái */
     --status-success: #16805b;
-    --status-success-soft: #e7f7f0;
+    --status-success-soft: #f0faf5;
     --status-error: #b42318;
     --status-error-soft: #fdecea;
     --status-warning: #b45309;
@@ -89,6 +90,7 @@
     --text-primary: #fbf3e6;     /* 16.6:1 */
     --text-secondary: #d9c5a7;
     --text-on-primary: #1a140d;
+    --text-on-brand: #fffaf2;
 
     --color-primary: #f0a440;        /* 8.8:1 */
     --color-primary-hover: #f5b660;
