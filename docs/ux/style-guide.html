@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<!-- Style guide preview (SCRUM-46). Mở trực tiếp file này bằng trình duyệt, không cần chạy app. -->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style Guide - SE347 Language App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="../../wwwroot/assets/_colorpalettes/themes.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; color: var(--text-primary); background: var(--bg-main); font-family: var(--font-sans); font-size: var(--fs-md); line-height: var(--lh-body); }
+        .sg { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: var(--space-7) 0 var(--space-8); }
+        .sg-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-6); }
+        .sg-header h1 { margin: 0; font-size: var(--fs-2xl); line-height: var(--lh-tight); }
+        .sg-header p { margin: var(--space-1) 0 0; color: var(--text-secondary); }
+        section { margin-top: var(--space-7); }
+        h2 { margin: 0 0 var(--space-4); font-size: var(--fs-xl); }
+        h3 { margin: var(--space-5) 0 var(--space-3); color: var(--text-secondary); font-size: var(--fs-sm); font-weight: var(--fw-heavy); letter-spacing: .06em; text-transform: uppercase; }
+        code { padding: 1px 6px; border-radius: 6px; background: var(--bg-soft); font-size: .85em; }
+
+        .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: var(--space-3); }
+        .swatch { overflow: hidden; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); }
+        .swatch__color { display: grid; height: 72px; place-items: center; font-weight: var(--fw-heavy); }
+        .swatch__meta { display: grid; gap: 2px; padding: var(--space-2) var(--space-3); font-size: var(--fs-xs); }
+        .swatch__meta strong { font-size: var(--fs-sm); }
+        .swatch__meta span { color: var(--text-secondary); }
+        .badge { display: inline-block; padding: 0 6px; border-radius: var(--radius-pill); font-weight: var(--fw-bold); }
+        .badge--pass { color: var(--status-success); background: var(--status-success-soft); }
+        .badge--large { color: var(--status-warning); background: var(--status-warning-soft); }
+        .badge--fail { color: var(--status-error); background: var(--status-error-soft); }
+
+        .type-row { display: grid; grid-template-columns: 120px 1fr; align-items: baseline; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--border-color); }
+        .type-row span { color: var(--text-secondary); font-size: var(--fs-xs); }
+
+        .radius-row { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+        .radius-box { display: grid; width: 120px; height: 90px; place-items: center; border: 2px solid var(--color-brand); background: var(--bg-soft); font-size: var(--fs-xs); font-weight: var(--fw-bold); text-align: center; }
+
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+        .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-5); border: 1px solid transparent; border-radius: var(--radius-sm); font: inherit; font-weight: var(--fw-heavy); cursor: pointer; transition: background var(--transition-fast), transform var(--transition-fast); }
+        .btn:hover { transform: translateY(-1px); }
+        .btn:focus-visible, .input:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+        .btn--primary { color: var(--text-on-primary); background: var(--color-primary); }
+        .btn--primary:hover { background: var(--color-primary-hover); }
+        .btn--secondary { border-color: var(--border-strong); color: var(--text-primary); background: var(--bg-card); }
+        .btn--link { color: var(--color-secondary); background: none; }
+        .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        .btn--bad { color: #fffaf2; background: #d88920; }
+
+        .field { display: grid; gap: var(--space-1); max-width: 340px; }
+        .field label { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+        .input { min-height: 44px; padding: 0 var(--space-3); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--bg-card); font: inherit; }
+        .input--error { border-color: var(--status-error); }
+        .field small { color: var(--text-secondary); font-size: var(--fs-xs); }
+        .field small.error { color: var(--status-error); }
+
+        .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-4); }
+        .card { display: grid; gap: var(--space-2); padding: var(--space-5); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); box-shadow: var(--shadow-md); }
+        .card__icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; color: #fff; background: var(--color-brand); font-weight: var(--fw-heavy); }
+        .card small { color: var(--text-secondary); }
+        .hero { padding: var(--space-7) var(--space-6); border-radius: var(--radius-lg); color: var(--text-on-brand); background: var(--gradient-hero); box-shadow: var(--shadow-lg); }
+        .hero h3 { margin: 0; color: inherit; font-size: var(--fs-hero); letter-spacing: 0; text-transform: none; }
+
+        .alert { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-weight: var(--fw-semibold); }
+        .alert--success { color: var(--status-success); background: var(--status-success-soft); }
+        .alert--error { color: var(--status-error); background: var(--status-error-soft); }
+        .alert--warning { color: var(--status-warning); background: var(--status-warning-soft); }
+
+        table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+        th, td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--border-color); text-align: left; }
+        .table-wrap { overflow-x: auto; }
+    </style>
+</head>
+<body>
+<main class="sg">
+    <header class="sg-header">
+        <div>
+            <h1>Style Guide</h1>
+            <p>SE347 Language App · SCRUM-46 · token nằm trong <code>wwwroot/assets/_colorpalettes/themes.css</code></p>
+        </div>
+        <button class="btn btn--secondary" id="theme-toggle" type="button">Đổi sang Dark</button>
+    </header>
+
+    <section>
+        <h2>1. Màu sắc</h2>
+        <p>Tỉ lệ tương phản tính trực tiếp trên trình duyệt theo WCAG 2.1. <span class="badge badge--pass">AA</span> ≥ 4.5 dùng được cho chữ thường; <span class="badge badge--large">AA lớn</span> ≥ 3 chỉ cho chữ ≥ 24px hoặc ≥ 19px đậm; <span class="badge badge--fail">Không đạt</span> &lt; 3.</p>
+        <h3>Màu chính · cam</h3>
+        <div class="swatches" data-swatches="--color-primary:--text-on-primary,--color-primary-hover:--text-on-primary,--color-brand:--text-on-brand,--color-brand-dark:--text-on-brand"></div>
+        <h3>Màu phụ · xanh</h3>
+        <div class="swatches" data-swatches="--color-secondary:--bg-card,--color-secondary-dark:--bg-card,--color-secondary-soft:--text-primary"></div>
+        <h3>Nền, viền, chữ</h3>
+        <div class="swatches" data-swatches="--bg-main:--text-primary,--bg-surface:--text-primary,--bg-card:--text-primary,--bg-soft:--text-primary,--border-color:--text-primary,--border-strong:--text-primary,--text-primary:--bg-main,--text-secondary:--bg-main"></div>
+        <h3>Trạng thái</h3>
+        <div class="swatches" data-swatches="--status-success-soft:--status-success,--status-error-soft:--status-error,--status-warning-soft:--status-warning"></div>
+    </section>
+
+    <section>
+        <h2>2. Typography</h2>
+        <p>Font: <strong>Be Vietnam Pro</strong> (thiết kế cho tiếng Việt, đủ dấu), dự phòng Segoe UI.</p>
+        <div class="type-row"><span>--fs-hero</span><div style="font-size:var(--fs-hero);font-weight:800;line-height:var(--lh-tight)">Học tiếng Anh</div></div>
+        <div class="type-row"><span>--fs-2xl · h1</span><div style="font-size:var(--fs-2xl);font-weight:800">Tiêu đề trang</div></div>
+        <div class="type-row"><span>--fs-xl · h2</span><div style="font-size:var(--fs-xl);font-weight:800">Tiêu đề mục</div></div>
+        <div class="type-row"><span>--fs-lg</span><div style="font-size:var(--fs-lg);font-weight:700">Tiêu đề thẻ bài học</div></div>
+        <div class="type-row"><span>--fs-md · body</span><div>Nội dung chính: ambiguous (adj) mơ hồ, không rõ ràng.</div></div>
+        <div class="type-row"><span>--fs-sm</span><div style="font-size:var(--fs-sm);color:var(--text-secondary)">Chữ phụ, mô tả, điều hướng</div></div>
+        <div class="type-row"><span>--fs-xs</span><div style="font-size:var(--fs-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase">Nhãn · badge · Cấp độ A2</div></div>
+    </section>
+
+    <section>
+        <h2>3. Bo góc</h2>
+        <div class="radius-row">
+            <div class="radius-box" style="border-radius:var(--radius-sm)">--radius-sm<br>8px · nút, input</div>
+            <div class="radius-box" style="border-radius:var(--radius-md)">--radius-md<br>14px · thẻ</div>
+            <div class="radius-box" style="border-radius:var(--radius-lg)">--radius-lg<br>24px · hero</div>
+            <div class="radius-box" style="border-radius:var(--radius-pill)">--radius-pill<br>chip, badge</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Thành phần</h2>
+        <h3>Nút (thử Tab để xem focus)</h3>
+        <div class="row">
+            <button class="btn btn--primary" type="button">Bắt đầu học</button>
+            <button class="btn btn--secondary" type="button">Xem lộ trình</button>
+            <button class="btn btn--link" type="button">Xem tất cả →</button>
+            <button class="btn btn--primary" type="button" disabled>Đã khóa</button>
+        </div>
+        <h3>Không làm: chữ sáng trên cam #d88920</h3>
+        <div class="row">
+            <button class="btn btn--bad" type="button">Đăng nhập</button>
+            <span class="badge badge--fail">2.69:1 - không đạt</span>
+        </div>
+        <h3>Ô nhập</h3>
+        <div class="row" style="align-items:start">
+            <div class="field"><label for="f1">Email</label><input class="input" id="f1" placeholder="ban@example.com"><small>Dùng email hoặc tên đăng nhập</small></div>
+            <div class="field"><label for="f2">Mật khẩu</label><input class="input input--error" id="f2" type="password" value="123" aria-invalid="true" aria-describedby="f2-err"><small class="error" id="f2-err">Mật khẩu tối thiểu 8 ký tự</small></div>
+        </div>
+        <h3>Thông báo</h3>
+        <div style="display:grid;gap:var(--space-2);max-width:520px">
+            <div class="alert alert--success" role="status">Chính xác! +10 XP</div>
+            <div class="alert alert--error" role="alert">Chưa đúng. Đáp án: ambiguous</div>
+            <div class="alert alert--warning" role="status">Bạn sắp mất chuỗi 5 ngày học</div>
+        </div>
+        <h3>Thẻ & hero</h3>
+        <div class="hero"><h3>Tiếp tục chuỗi 5 ngày</h3><p style="margin:var(--space-2) 0 0;color:#fff1d9">Gradient --color-brand-dark → --color-brand. Chữ đặt ở nửa tối của gradient.</p></div>
+        <div class="cards" style="margin-top:var(--space-4)">
+            <div class="card"><div class="card__icon">Aa</div><small>CẤP ĐỘ A1</small><strong>Từ vựng chủ đề Gia đình</strong><small>12 bài · 30 phút</small></div>
+            <div class="card"><div class="card__icon" style="background:var(--color-secondary)">♪</div><small>CẤP ĐỘ A2</small><strong>Nghe hội thoại cơ bản</strong><small>8 bài · 25 phút</small></div>
+        </div>
+    </section>
+
+    <section>
+        <h2>5. Khoảng cách & bóng</h2>
+        <div class="table-wrap"><table>
+            <tr><th>Token</th><th>Giá trị</th><th>Dùng cho</th></tr>
+            <tr><td><code>--space-2</code> / <code>--space-3</code></td><td>8 / 12px</td><td>Khoảng cách trong nút, giữa icon và chữ</td></tr>
+            <tr><td><code>--space-4</code> / <code>--space-5</code></td><td>16 / 24px</td><td>Padding thẻ, khoảng cách lưới thẻ</td></tr>
+            <tr><td><code>--space-7</code></td><td>48px</td><td>Khoảng cách giữa các section</td></tr>
+            <tr><td><code>--shadow-md</code></td><td>0 8px 24px nâu 8%</td><td>Thẻ</td></tr>
+            <tr><td><code>--shadow-lg</code></td><td>0 18px 42px nâu 20%</td><td>Hero, modal</td></tr>
+        </table></div>
+    </section>
+</main>
+<script>
+    const root = document.documentElement;
+    const css = name => getComputedStyle(root).getPropertyValue(name).trim();
+    const lum = hex => {
+        const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+            .map(v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    };
+    const ratio = (a, b) => {
+        const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+        return (hi + 0.05) / (lo + 0.05);
+    };
+    const badge = r => r >= 4.5 ? ['pass', 'AA'] : r >= 3 ? ['large', 'AA lớn'] : ['fail', 'Không đạt'];
+
+    function renderSwatches() {
+        document.querySelectorAll('[data-swatches]').forEach(box => {
+            box.innerHTML = box.dataset.swatches.split(',').map(pair => {
+                const [bg, fg] = pair.split(':');
+                const bgHex = css(bg), fgHex = css(fg);
+                const r = ratio(bgHex, fgHex);
+                const [cls, label] = badge(r);
+                return `<div class="swatch">
+                    <div class="swatch__color" style="background:${bgHex};color:${fgHex}">Aa</div>
+                    <div class="swatch__meta"><strong>${bg}</strong><span>${bgHex} · chữ ${fg}</span>
+                    <span><span class="badge badge--${cls}">${r.toFixed(2)}:1 ${label}</span></span></div></div>`;
+            }).join('');
+        });
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', e => {
+        const dark = root.dataset.theme !== 'dark';
+        root.dataset.theme = dark ? 'dark' : 'light';
+        e.currentTarget.textContent = dark ? 'Đổi sang Light' : 'Đổi sang Dark';
+        renderSwatches();
+    });
+    renderSwatches();
+</script>
+</body>
+</html>
