@@ -1,0 +1,99 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/LessonContent.schema.json",
+    "title": "Lesson Content",
+    "description": "Vocabulary and example sentences for a lesson.",
+    "type": "array",
+    "minItems": 1,
+    "items": {
+        "$ref": "#/$defs/contentItem"
+    },
+    "$defs": {
+        "nonEmptyString": {
+            "type": "string",
+            "minLength": 1
+        },
+        "contentItem": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "content",
+                "pronunciation-bre",
+                "pronunciation-name",
+                "definition-en",
+                "definition-vi",
+                "oxford-link",
+                "external-source",
+                "examples",
+                "synonyms",
+                "antonyms"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "pattern": "^[1-9][0-9]*$"
+                },
+                "content": {
+                    "$ref": "#/$defs/nonEmptyString"
+                },
+                "pronunciation-bre": {
+                    "type": "string"
+                },
+                "pronunciation-name": {
+                    "type": "string"
+                },
+                "definition-en": {
+                    "type": "string"
+                },
+                "definition-vi": {
+                    "type": "string"
+                },
+                "oxford-link": {
+                    "type": "string",
+                    "format": "uri",
+                    "pattern": "^https://www\\.oxfordlearnersdictionaries\\.com/"
+                },
+                "external-source": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "examples": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "term",
+                            "translation"
+                        ],
+                        "properties": {
+                            "term": {
+                                "$ref": "#/$defs/nonEmptyString"
+                            },
+                            "translation": {
+                                "$ref": "#/$defs/nonEmptyString"
+                            }
+                        }
+                    }
+                },
+                "synonyms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/nonEmptyString"
+                    }
+                },
+                "antonyms": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/nonEmptyString"
+                    }
+                }
+            }
+        }
+    }
+}

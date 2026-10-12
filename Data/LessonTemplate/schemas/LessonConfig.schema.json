@@ -1,0 +1,61 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "LessonTemplate",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "format": "uri-reference"
+        },
+        "name": {
+            "type": "string",
+            "description": "The name of the lesson template."
+        },
+        "category": {
+            "type": "string",
+            "description": "The category of the lesson template."
+        },
+        "description": {
+            "type": "string",
+            "description": "A brief description of the lesson template."
+        },
+        "level": {
+            "type": "string",
+            "description": "The difficulty level of the lesson template."
+        },
+        "quiz-settings": {
+            "type": "object",
+            "description": "Settings for the quiz.",
+            "additionalProperties": false,
+            "properties": {
+                "mix-with-lesson": {
+                    "type": "boolean"
+                },
+                "randomize-questions": {
+                    "type": "boolean"
+                },
+                "shuffle-questions": {
+                    "type": "boolean"
+                },
+                "shuffle-answers": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "content-settings": {
+            "type": "object",
+            "description": "Settings for lesson content.",
+            "additionalProperties": true
+        },
+        "content": {
+            "type": "string",
+            "description": "The path to the content file for the lesson template."
+        },
+        "quiz": {
+            "type": "string",
+            "description": "The path to the quiz file for the lesson template."
+        }
+    },
+    "required": ["name", "category", "description", "level", "content", "quiz"]
+}

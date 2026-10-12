@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DTOs.Lesson
 {
     /// <summary>
@@ -12,11 +14,28 @@ namespace DTOs.Lesson
     /// </summary>
     public class LessonConfigDto
     {
+        [JsonPropertyName("name")]
         public string Name { get; set; } = null!;
+
+        [JsonPropertyName("category")]
         public string Category { get; set; } = null!;
+
+        [JsonPropertyName("description")]
         public string Description { get; set; } = null!;
+
+        [JsonPropertyName("level")]
         public string Level { get; set; } = null!;
+
+        [JsonPropertyName("content")]
         public string Content { get; set; } = null!;
+
+        [JsonPropertyName("quiz")]
         public string? Quiz { get; set; } = null;
+
+        [JsonPropertyName("content-settings")]
+        public Dictionary<string, object?> ContentSettings { get; set; } = new();
+
+        [JsonPropertyName("quiz-settings")]
+        public LessonQuizSettingsDto QuizSettings { get; set; } = new();
     }
 }

@@ -19,5 +19,7 @@ namespace DTOs.Lesson
         public string Level { get; set; } = null!;
 
         public List<LessonContentItemDto> Contents { get; set; } = new();
+
+        public List<LessonQuizQuestionDto> Quiz { get; set; } = new();
     }
 }
