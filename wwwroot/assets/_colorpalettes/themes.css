@@ -1,46 +1,114 @@
-/* Color Palette & CSS Variables for Theme Management */
+/* Design tokens (SCRUM-46) - xem docs/ux/STYLE_GUIDE.md
+   Màu chính: cam ấm. Màu phụ: xanh. Tỉ lệ tương phản ghi theo nền --bg-main. */
 :root {
-    /* Default Light Mode */
-    --bg-main: #f8fafc;
-    --bg-surface: #ffffff;
+    /* Typography */
+    --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --fs-xs: .75rem;     /* 12px - nhãn, badge */
+    --fs-sm: .875rem;    /* 14px - chữ phụ, nav */
+    --fs-md: 1rem;       /* 16px - nội dung */
+    --fs-lg: 1.125rem;   /* 18px - tiêu đề thẻ */
+    --fs-xl: 1.5rem;     /* 24px - tiêu đề mục (h2) */
+    --fs-2xl: 2rem;      /* 32px - tiêu đề trang (h1) */
+    --fs-hero: clamp(2rem, 4vw, 3rem);
+    --fw-regular: 400;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+    --fw-heavy: 800;
+    --lh-tight: 1.15;
+    --lh-body: 1.6;
+
+    /* Radius */
+    --radius-sm: 8px;    /* nút, input, chip */
+    --radius-md: 14px;   /* thẻ, modal */
+    --radius-lg: 24px;   /* hero, khối lớn */
+    --radius-pill: 999px;
+
+    /* Spacing (bội số 4px) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* Nền & viền */
+    --bg-main: #fffaf2;
+    --bg-surface: #fffdf9;
     --bg-card: #ffffff;
-    --border-color: #e2e8f0;
+    --bg-soft: #fff1d9;          /* nền nhấn nhẹ: badge, ô được chọn */
+    --border-color: #eadfcf;
+    --border-strong: #d9c5a7;
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    /* Chữ */
+    --text-primary: #513b22;     /* 10.1:1 */
+    --text-secondary: #806b50;   /* 4.9:1 */
+    --text-on-primary: #fffaf2;
 
-    --color-primary: #2563eb;
-    --color-primary-hover: #1d4ed8;
-    --color-accent: #38bdf8;
+    /* Màu chính - cam */
+    --color-primary: #a65f12;        /* nút, link, tab active - 4.7:1 */
+    --color-primary-hover: #8f5410;  /* 5.9:1 */
+    --color-brand: #d88920;          /* chỉ dùng cho icon, hình minh họa, gradient - KHÔNG đặt chữ lên trên */
+    --color-brand-dark: #69451f;
+    --gradient-hero: linear-gradient(120deg, var(--color-brand-dark), var(--color-brand));
 
-    --status-success: #16a34a;
-    --status-error: #dc2626;
-    --status-warning: #ca8a04;
+    /* Màu phụ - xanh */
+    --color-secondary: #2563eb;      /* 5.0:1 */
+    --color-secondary-dark: #17345f; /* 11.9:1 */
+    --color-secondary-soft: #dbe5f5;
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    /* Trạng thái */
+    --status-success: #16805b;
+    --status-success-soft: #e7f7f0;
+    --status-error: #b42318;
+    --status-error-soft: #fdecea;
+    --status-warning: #b45309;
+    --status-warning-soft: #fff1d9;
+
+    /* Focus - dùng màu phụ để nổi trên nền cam */
+    --focus-ring: 0 0 0 3px rgb(37 99 235 / 45%);
+
+    /* Đổ bóng ánh nâu */
+    --shadow-sm: 0 1px 2px rgb(105 75 31 / 8%);
+    --shadow-md: 0 8px 24px rgb(105 75 31 / 8%);
+    --shadow-lg: 0 18px 42px rgb(105 75 31 / 20%);
+
+    --transition-fast: .2s ease;
 }
 
-/* Dark Mode Palette */
+/* Dark mode */
 [data-theme="dark"] {
-    --bg-main: #0b0f19;
-    --bg-surface: #111827;
-    --bg-card: #1f2937;
-    --border-color: #374151;
+    --bg-main: #1a140d;
+    --bg-surface: #241b12;
+    --bg-card: #2e2318;
+    --bg-soft: #3a2b1b;
+    --border-color: #4a3a28;
+    --border-strong: #6b5539;
 
-    --text-primary: #f9fafb;
-    --text-secondary: #cbd5e1;
-    --text-muted: #64748b;
+    --text-primary: #fbf3e6;     /* 16.6:1 */
+    --text-secondary: #d9c5a7;
+    --text-on-primary: #1a140d;
 
-    --color-primary: #3b82f6;
-    --color-primary-hover: #60a5fa;
-    --color-accent: #0ea5e9;
+    --color-primary: #f0a440;        /* 8.8:1 */
+    --color-primary-hover: #f5b660;
+    --color-brand: #d88920;
+    --color-brand-dark: #3a2610;
 
-    --status-success: #22c55e;
-    --status-error: #ef4444;
-    --status-warning: #eab308;
+    --color-secondary: #7aa7ff;
+    --color-secondary-dark: #bcd4ff;
+    --color-secondary-soft: #1e2b45;
 
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    --status-success: #4ade80;
+    --status-success-soft: #12301f;
+    --status-error: #f87171;
+    --status-error-soft: #3b1714;
+    --status-warning: #facc15;
+    --status-warning-soft: #3a2f0d;
+
+    --focus-ring: 0 0 0 3px rgb(122 167 255 / 55%);
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 50%);
+    --shadow-md: 0 8px 24px rgb(0 0 0 / 40%);
+    --shadow-lg: 0 18px 42px rgb(0 0 0 / 55%);
 }
