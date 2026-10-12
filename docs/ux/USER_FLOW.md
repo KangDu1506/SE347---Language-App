@@ -74,7 +74,7 @@ Các điểm dưới đây cần nhóm UI/Backend xử lý khi làm theo wirefra
 
 1. **Bảo mật:** form Đăng nhập, Đăng ký, Xác thực, Quên mật khẩu đều dùng `method="get"`. Mật khẩu vì thế hiện trên thanh địa chỉ và bị lưu vào lịch sử trình duyệt cùng log server. **Phải đổi sang `method="post"`.**
 2. Ô đăng nhập đang ghi "Tên đăng nhập", chưa nhận email như yêu cầu ("đăng nhập bằng username + password hoặc email").
-3. Trang Xác thực đang hiện sẵn mã mặc định `123456`. Chỉ nên giữ trong lúc dev, cần xóa trước khi demo.
+3. OTP đang hard-code `123456` ở cả client (`wwwroot/js/authentication.js`) và server (`Program.cs`), chưa có gửi mã qua email. Giữ dòng gợi ý mã trên trang Xác thực cho đến khi Backend tích hợp email OTP (Supabase Auth); sau đó xóa gợi ý và hai điểm hard-code.
 4. Chưa có nút "Gửi lại mã" và chưa giới hạn số lần gửi.
 5. Trang Đăng ký chưa có ô tên đăng nhập và ô xác nhận mật khẩu.
 6. Chưa có màn **Đặt mật khẩu mới** sau khi nhập mã khôi phục, cũng chưa có màn **kiểm tra đầu vào**. Scope đang ghi "kiểm tra đầu vào?" nên nhóm cần chốt có làm hay không.
