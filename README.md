@@ -10,8 +10,8 @@
 
 ## Công nghệ sử dụng
 
-- **Backend:** ASP.NET Core Razor Pages trên .NET 10 (LTS).
-- **Database và ORM:** Entity Framework Core, định hướng Code First.
+- **Backend:** ASP.NET Core Razor Pages trên .NET 10.
+- **Database và ORM:** Supabase (PostgreSQL) + Entity Framework Core (Npgsql). Schema do `supabase/migrations` quản lý, entity chỉ map vào bảng có sẵn: **không** chạy `dotnet ef migrations` cho các bảng này.
 - **Frontend:** HTML5, CSS3 và JavaScript ES6+.
   + *Framework:* Vue 3 CDN
 - **Quản lý mã nguồn:** Git.
@@ -20,8 +20,10 @@
 
 ```text
 SE347/
+├── Auth/                         # Xác thực JWT của Supabase (issuer, audience, JWKS)
 ├── Data/                         # DbContext và cấu hình dữ liệu
 ├── DTOs/                         # Data Transfer Objects
+├── Endpoints/                    # Minimal API JSON /api/* cho frontend Vue 3
 ├── Models/                       # Các entity của hệ thống
 ├── Pages/                        # Razor Pages và giao diện người dùng
 │   ├── Account/                  # Đăng nhập, đăng ký, hồ sơ và xác thực

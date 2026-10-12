@@ -1,0 +1,31 @@
+@*
+    Layout dùng chung cho các trang Razor. Cách dùng trong một trang:
+
+        @{
+            Layout = "_Layout";
+            ViewData["Title"] = "Trang chủ";
+        }
+
+        @section Styles {
+            <link rel="stylesheet" href="~/css/index.css" />
+        }
+
+        @section Scripts {
+            <script src="~/js/index.js" defer></script>
+        }
+*@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@(ViewData["Title"] ?? "SE347 Language App")</title>
+        <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css" />
+        @await RenderSectionAsync("Styles", required: false)
+    </head>
+    <body>
+        @RenderBody()
+
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+</html>
