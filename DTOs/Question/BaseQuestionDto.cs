@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace DTOs.QuestionDTOs
 {
-    public class BaseQuestionDTO
+    public class BaseQuestionDto
     {
         public static readonly IReadOnlyList<string> QuestionTypes = new List<string>
         {
