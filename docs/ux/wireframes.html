@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<!-- Wireframe low-fi Auth & Dashboard (SCRUM-44). Bản tham chiếu để vẽ lại trên Figma; luồng xem docs/ux/USER_FLOW.md -->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframes - SE347 Language App</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; color: #222; background: #f2f2f2; font-family: "Segoe UI", system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+        .page { width: min(1240px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 64px; }
+        h1 { margin: 0; font-size: 28px; }
+        .lead { margin: 4px 0 0; color: #666; }
+        .toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+        .toc a { display: block; padding: 4px 12px; border: 1px solid #bbb; border-radius: 999px; color: #333; background: #fff; text-decoration: none; }
+
+        .screen { margin-top: 48px; }
+        .screen > h2 { margin: 0 0 4px; font-size: 20px; }
+        .screen > p { margin: 0 0 16px; color: #666; }
+        .row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px; }
+        .notes { flex: 1 1 260px; margin: 0; padding: 16px 16px 16px 36px; border-radius: 8px; background: #fff; }
+        .notes li { margin-bottom: 6px; }
+
+        /* Khung thiết bị */
+        .frame { position: relative; overflow: hidden; border: 2px solid #555; border-radius: 10px; background: #fff; }
+        .frame--desktop { flex: 0 1 640px; min-height: 400px; }
+        .frame--mobile { flex: 0 0 300px; min-height: 560px; border-radius: 24px; }
+        .frame--mobile:has(.tabbar) { padding-bottom: 60px; }
+        .frame__label { display: block; padding: 3px 12px; border-bottom: 1px solid #ddd; color: #999; background: #fafafa; font-size: 11px; text-align: right; }
+
+        /* Phần tử wireframe */
+        .box { display: grid; place-items: center; border: 1.5px dashed #999; border-radius: 8px; color: #777; background: #f6f6f6; font-size: 12px; text-align: center; }
+        .mascot { border-style: solid; border-radius: 50%; background: #e6e6e6; }
+        .t-h { margin: 0; font-size: 20px; font-weight: 700; }
+        .t-s { margin: 0; color: #777; font-size: 12px; }
+        .field { display: grid; gap: 4px; font-size: 12px; font-weight: 600; }
+        .input { display: flex; align-items: center; justify-content: space-between; height: 36px; padding: 0 10px; border: 1.5px solid #888; border-radius: 6px; color: #aaa; font-weight: 400; }
+        .input--error { border-color: #222; border-width: 2.5px; }
+        .err { color: #222; font-size: 11px; font-weight: 600; }
+        .btn { display: grid; place-items: center; height: 38px; border-radius: 6px; color: #fff; background: #444; font-weight: 700; }
+        .btn--ghost { border: 1.5px solid #888; color: #333; background: #fff; }
+        .btn--disabled { color: #999; background: #ddd; }
+        .link { color: #222; font-size: 12px; text-decoration: underline; }
+        .divider { display: flex; align-items: center; gap: 8px; color: #999; font-size: 11px; }
+        .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid #ccc; }
+        .banner { padding: 8px 10px; border: 1.5px solid #222; border-radius: 6px; background: #eee; font-size: 12px; }
+        .bar { height: 8px; border-radius: 999px; background: #ddd; }
+        .bar > span { display: block; height: 100%; border-radius: inherit; background: #555; }
+        .otp { display: flex; gap: 6px; }
+        .otp span { display: grid; width: 36px; height: 44px; place-items: center; border: 1.5px solid #888; border-radius: 6px; font-weight: 700; }
+        .chk { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .chk::before { content: ""; width: 14px; height: 14px; border: 1.5px solid #888; border-radius: 3px; }
+        .stack { display: grid; gap: 12px; }
+        .card { padding: 12px; border: 1.5px solid #bbb; border-radius: 8px; }
+
+        /* Chấm chú thích */
+        .n { display: inline-grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; color: #fff; background: #e4572e; font-size: 11px; font-weight: 700; vertical-align: middle; }
+        [data-n]:not(.tabbar) { position: relative; }
+        [data-n]::after { content: attr(data-n); position: absolute; top: -7px; right: -7px; z-index: 1; display: grid; width: 18px; height: 18px; place-items: center; border-radius: 50%; color: #fff; background: #e4572e; font-size: 11px; font-weight: 700; }
+        .tabbar[data-n]::after { top: 2px; right: 2px; }
+
+        /* Bố cục auth */
+        .auth { display: grid; grid-template-columns: 1fr 1fr; min-height: 400px; }
+        .auth__side { display: grid; align-content: center; justify-items: center; gap: 12px; padding: 24px; background: #ececec; }
+        .auth__form { display: grid; align-content: center; gap: 12px; padding: 28px 32px; }
+        .m-auth { display: grid; gap: 12px; padding: 28px 20px; }
+
+        /* Dashboard */
+        .nav { display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 16px; border-bottom: 1.5px solid #ccc; font-size: 12px; }
+        .nav b { margin-right: auto; }
+        .pill { padding: 2px 8px; border: 1.5px solid #888; border-radius: 999px; font-size: 11px; font-weight: 700; }
+        .dash { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; padding: 16px; }
+        .hero { display: grid; grid-template-columns: 1fr 90px; align-items: center; gap: 12px; padding: 16px; border-radius: 10px; background: #e2e2e2; }
+        .week { display: flex; justify-content: space-between; gap: 4px; }
+        .week span { display: grid; width: 26px; height: 26px; place-items: center; border: 1.5px solid #999; border-radius: 50%; font-size: 10px; }
+        .week span.on { color: #fff; background: #555; border-color: #555; }
+        .path { display: grid; gap: 8px; }
+        .unit { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1.5px solid #bbb; border-radius: 8px; font-size: 12px; }
+        .unit i { display: grid; width: 26px; height: 26px; place-items: center; border-radius: 50%; background: #ddd; font-style: normal; font-size: 11px; }
+        .unit.done i { color: #fff; background: #555; }
+        .unit.lock { color: #aaa; border-style: dashed; }
+        .tabbar { position: absolute; right: 0; bottom: 0; left: 0; display: flex; justify-content: space-around; height: 54px; align-items: center; border-top: 1.5px solid #ccc; background: #fff; font-size: 10px; text-align: center; }
+        .tabbar span::before { content: ""; display: block; width: 18px; height: 18px; margin: 0 auto 2px; border-radius: 4px; background: #ccc; }
+        .tabbar .on { font-weight: 700; }
+        .tabbar .on::before { background: #555; }
+    </style>
+</head>
+<body>
+<main class="page">
+    <h1>Wireframe: Auth &amp; Dashboard</h1>
+    <p class="lead">SCRUM-44 · Low-fi, chỉ dùng thang xám để nhóm tập trung vào bố cục, chưa bàn màu. Màu sắc theo style guide (SCRUM-46). Chấm <span class="n">1</span> tương ứng với chú thích bên cạnh.</p>
+    <ul class="toc">
+        <li><a href="#login">1. Đăng nhập</a></li>
+        <li><a href="#signup">2. Đăng ký</a></li>
+        <li><a href="#otp">3. Nhập mã</a></li>
+        <li><a href="#forgot">4. Quên mật khẩu</a></li>
+        <li><a href="#placement">5. Kiểm tra đầu vào</a></li>
+        <li><a href="#dashboard">6. Dashboard</a></li>
+        <li><a href="#empty">7. Dashboard người mới</a></li>
+    </ul>
+
+    <!-- 1. Đăng nhập -->
+    <section class="screen" id="login">
+        <h2>1. Đăng nhập</h2>
+        <p>Desktop chia đôi: bên trái là mascot, bên phải là form. Mobile xếp dọc.</p>
+        <div class="row">
+            <div class="frame frame--desktop"><span class="frame__label">Desktop 1280</span>
+                <div class="auth">
+                    <div class="auth__side">
+                        <div class="box mascot" style="width:150px;height:150px">Mascot<br>(trạng thái chào)</div>
+                        <p class="t-h" style="font-size:16px;text-align:center">Mỗi ngày 10 phút,<br>vững 3000 từ Oxford</p>
+                    </div>
+                    <div class="auth__form">
+                        <p class="t-h">Đăng nhập</p>
+                        <div class="banner" data-n="1">Email/tên đăng nhập hoặc mật khẩu không đúng</div>
+                        <label data-n="2" class="field">Email hoặc tên đăng nhập<span class="input">huy2552006</span></label>
+                        <label data-n="3" class="field">Mật khẩu<span class="input">••••••••<span class="t-s">Hiện</span></span></label>
+                        <div style="display:flex;justify-content:space-between"><span class="chk">Ghi nhớ đăng nhập</span><span class="link">Quên mật khẩu?</span></div>
+                        <span class="btn" data-n="4">Đăng nhập</span>
+                        <span class="divider">hoặc</span>
+                        <div data-n="5" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><span class="btn btn--ghost">Google</span><span class="btn btn--ghost">Facebook</span></div>
+                        <p class="t-s" style="text-align:center">Chưa có tài khoản? <span class="link">Đăng ký</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="frame frame--mobile"><span class="frame__label">Mobile 375</span>
+                <div class="m-auth">
+                    <div class="box mascot" style="width:90px;height:90px;justify-self:center">Mascot</div>
+                    <p class="t-h" style="text-align:center">Đăng nhập</p>
+                    <label class="field">Email hoặc tên đăng nhập<span class="input">Nhập email hoặc username</span></label>
+                    <label class="field">Mật khẩu<span class="input">••••••••<span class="t-s">Hiện</span></span></label>
+                    <span class="link" style="justify-self:end">Quên mật khẩu?</span>
+                    <span class="btn">Đăng nhập</span>
+                    <span class="divider">hoặc</span>
+                    <span class="btn btn--ghost">Google</span>
+                    <span class="btn btn--ghost">Facebook</span>
+                    <p class="t-s" style="text-align:center">Chưa có tài khoản? <span class="link">Đăng ký</span></p>
+                </div>
+            </div>
+            <ol class="notes">
+                <li>Lỗi chung, đặt trên form. Không nói rõ sai ô nào để tránh dò tài khoản.</li>
+                <li>Một ô duy nhất nhận cả <b>email lẫn username</b>. Khi lỗi vẫn giữ lại nội dung ô này.</li>
+                <li>Nút Hiện/Ẩn mật khẩu.</li>
+                <li>Form gửi bằng <b>POST</b>. Code hiện tại đang dùng GET nên mật khẩu lộ trên URL.</li>
+                <li>Giữ nút Google/Facebook như bản hiện có. Nếu không kịp làm OAuth thì ẩn đi, không để nút "chết".</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 2. Đăng ký -->
+    <section class="screen" id="signup">
+        <h2>2. Đăng ký</h2>
+        <p>Dùng chung bố cục với màn Đăng nhập. Bản mobile tương tự, các ô xếp dọc.</p>
+        <div class="row">
+            <div class="frame frame--desktop"><span class="frame__label">Desktop 1280</span>
+                <div class="auth">
+                    <div class="auth__side">
+                        <div class="box mascot" style="width:150px;height:150px">Mascot<br>(trạng thái vui)</div>
+                        <p class="t-h" style="font-size:16px;text-align:center">Bắt đầu hành trình</p>
+                    </div>
+                    <div class="auth__form" style="gap:10px">
+                        <p class="t-h">Tạo tài khoản</p>
+                        <label class="field">Họ và tên<span class="input">Nguyễn Văn A</span></label>
+                        <label data-n="1" class="field">Tên đăng nhập<span class="input">vanhuy</span></label>
+                        <label data-n="2" class="field">Email<span class="input input--error">huy@gmail</span><span class="err">Email chưa đúng định dạng</span></label>
+                        <label class="field">Mật khẩu<span class="input">••••••••••<span class="t-s">Hiện</span></span></label>
+                        <div class="bar"><span style="width:66%"></span></div>
+                        <span data-n="3" class="t-s">Độ mạnh: Khá. Thêm ký tự đặc biệt để mạnh hơn</span>
+                        <span class="chk">Tôi đồng ý với điều khoản sử dụng</span>
+                        <span class="btn" data-n="4">Tạo tài khoản</span>
+                        <p class="t-s" style="text-align:center">Đã có tài khoản? <span class="link">Đăng nhập</span></p>
+                    </div>
+                </div>
+            </div>
+            <ol class="notes">
+                <li><b>Ô mới:</b> tên đăng nhập, cần có vì người dùng được phép đăng nhập bằng username. Kiểm tra trùng ngay khi rời ô.</li>
+                <li>Báo lỗi ngay dưới ô khi rời ô (on blur), không đợi đến lúc bấm gửi.</li>
+                <li>Thanh độ mạnh mật khẩu thay cho ô "Xác nhận mật khẩu", vì đã có nút Hiện mật khẩu. Nhóm chọn một trong hai cách.</li>
+                <li>Bấm "Tạo tài khoản" thì chuyển sang màn <b>Nhập mã</b>.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 3. Nhập mã -->
+    <section class="screen" id="otp">
+        <h2>3. Nhập mã xác thực (đăng ký / 2FA / quên mật khẩu)</h2>
+        <p>Một màn dùng chung cho cả ba trường hợp, chỉ thay đổi tiêu đề.</p>
+        <div class="row">
+            <div class="frame frame--mobile"><span class="frame__label">Mobile 375</span>
+                <div class="m-auth" style="padding-top:48px">
+                    <div class="box mascot" style="width:90px;height:90px;justify-self:center">Mascot</div>
+                    <p class="t-h" style="text-align:center">Kiểm tra email</p>
+                    <p data-n="1" class="t-s" style="text-align:center">Nhập mã 6 số đã gửi tới<br><b>h***@gmail.com</b> · <span class="link">Đổi email</span></p>
+                    <div data-n="2" class="otp" style="justify-content:center"><span>4</span><span>8</span><span>2</span><span></span><span></span><span></span></div>
+                    <span class="btn btn--disabled">Xác nhận</span>
+                    <p data-n="3" class="t-s" style="text-align:center">Chưa nhận được? <b>Gửi lại sau 00:42</b></p>
+                    <div data-n="4" class="banner" style="font-size:11px">Mã sai. Bạn còn 3 lần thử.</div>
+                </div>
+            </div>
+            <div class="frame frame--mobile"><span class="frame__label">Trạng thái: bị khóa</span>
+                <div class="m-auth" style="padding-top:48px">
+                    <div class="box mascot" style="width:90px;height:90px;justify-self:center">Mascot<br>(buồn)</div>
+                    <p class="t-h" style="text-align:center">Tạm khóa xác thực</p>
+                    <p class="t-s" style="text-align:center">Bạn đã nhập sai quá 5 lần.<br>Thử lại sau <b>14:32</b>.</p>
+                    <span class="btn btn--ghost">Quay lại đăng nhập</span>
+                </div>
+            </div>
+            <ol class="notes">
+                <li>Email được che bớt. Có link đổi email để sửa nếu gõ nhầm lúc đăng ký.</li>
+                <li>6 ô, tự nhảy sang ô kế tiếp, cho dán cả mã. Nhập đủ 6 số thì tự gửi.</li>
+                <li>Nút "Gửi lại" đếm ngược 60 giây, tối đa 5 lần mỗi giờ. Phần này đáp ứng yêu cầu "giới hạn gửi mã".</li>
+                <li>Báo số lần thử còn lại. Sai 5 lần thì khóa 15 phút (màn bên phải).</li>
+                <li>Bỏ dòng "Nhập mã mặc định 123456" đang có ở bản hiện tại.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 4. Quên mật khẩu -->
+    <section class="screen" id="forgot">
+        <h2>4. Quên mật khẩu → Đặt mật khẩu mới</h2>
+        <p>Luồng: nhập email → nhập mã (màn 3) → đặt mật khẩu mới → về Đăng nhập kèm thông báo thành công.</p>
+        <div class="row">
+            <div class="frame frame--mobile"><span class="frame__label">Bước 1</span>
+                <div class="m-auth" style="padding-top:48px">
+                    <span class="link">← Quay lại đăng nhập</span>
+                    <p class="t-h">Quên mật khẩu?</p>
+                    <p class="t-s">Nhập email đã đăng ký, chúng tôi sẽ gửi mã khôi phục.</p>
+                    <label class="field">Email<span class="input">you@example.com</span></label>
+                    <span class="btn">Gửi mã</span>
+                    <div class="banner" data-n="1" style="font-size:11px">Nếu email tồn tại, mã đã được gửi.</div>
+                </div>
+            </div>
+            <div class="frame frame--mobile"><span class="frame__label">Bước 3</span>
+                <div class="m-auth" style="padding-top:48px">
+                    <p class="t-h">Đặt mật khẩu mới</p>
+                    <label class="field">Mật khẩu mới<span class="input">••••••••<span class="t-s">Hiện</span></span></label>
+                    <div class="bar"><span style="width:90%"></span></div>
+                    <span class="t-s">Độ mạnh: Mạnh</span>
+                    <span data-n="2" class="btn">Lưu mật khẩu</span>
+                </div>
+            </div>
+            <ol class="notes">
+                <li>Luôn hiện cùng một thông báo dù email có tồn tại hay không, để không lộ email nào đã đăng ký.</li>
+                <li><b>Màn mới:</b> code hiện tại chưa có. Lưu xong thì đăng xuất mọi thiết bị và về Đăng nhập kèm banner "Đổi mật khẩu thành công".</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 5. Kiểm tra đầu vào -->
+    <section class="screen" id="placement">
+        <h2>5. Kiểm tra đầu vào (chờ nhóm chốt)</h2>
+        <p>Scope đang ghi "kiểm tra đầu vào?". Nếu làm, màn này hiện ngay sau khi xác thực email lần đầu.</p>
+        <div class="row">
+            <div class="frame frame--mobile"><span class="frame__label">Mobile 375</span>
+                <div class="m-auth" style="padding-top:48px">
+                    <div class="box mascot" style="width:110px;height:110px;justify-self:center">Mascot<br>(vui)</div>
+                    <p class="t-h" style="text-align:center">Chào mừng, Huy!</p>
+                    <p class="t-s" style="text-align:center">Làm bài kiểm tra 5 phút để chọn lộ trình vừa sức.</p>
+                    <span class="btn">Làm bài kiểm tra</span>
+                    <span class="divider">hoặc tự chọn cấp độ</span>
+                    <div data-n="1" class="stack" style="gap:8px">
+                        <span class="btn btn--ghost">Mới bắt đầu (A1)</span>
+                        <span class="btn btn--ghost">Biết cơ bản (A2)</span>
+                        <span class="btn btn--ghost">Khá (B1+)</span>
+                    </div>
+                </div>
+            </div>
+            <ol class="notes">
+                <li>Luôn cho phép bỏ qua bằng cách tự chọn cấp độ, để người dùng không bị chặn ở bước đầu.</li>
+                <li>Bài kiểm tra dùng lại các dạng câu hỏi của mini-game (chọn đáp án, điền từ), không cần thiết kế giao diện mới.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 6. Dashboard -->
+    <section class="screen" id="dashboard">
+        <h2>6. Dashboard</h2>
+        <p>Trả lời 3 câu hỏi ngay ở phần đầu màn hình: hôm nay học gì, còn bao nhiêu để đạt mục tiêu, chuỗi có đang bị đe dọa không.</p>
+        <div class="row">
+            <div class="frame frame--desktop" style="flex-basis:720px"><span class="frame__label">Desktop 1280</span>
+                <div class="nav"><b>Logo</b><span><u>Trang chủ</u></span><span>Học tập</span><span>Thi thử</span><span>Xếp hạng</span><span class="pill" data-n="1">🔥 12</span><span class="pill">2.840 XP</span><span class="box" style="width:28px;height:28px;border-radius:50%">A</span></div>
+                <div class="dash">
+                    <div class="stack">
+                        <div data-n="2" class="hero">
+                            <div class="stack" style="gap:8px">
+                                <p class="t-s">Chào buổi tối, Huy</p>
+                                <p class="t-h" style="font-size:17px">Tiếp tục: Bài 3 · Gia đình</p>
+                                <div class="bar" style="background:#fff"><span style="width:60%"></span></div>
+                                <p class="t-s">Mục tiêu hôm nay: 18 / 30 XP</p>
+                                <span class="btn" style="width:150px">Học tiếp</span>
+                            </div>
+                            <div class="box mascot" style="width:90px;height:90px">Mascot</div>
+                        </div>
+                        <div data-n="3" class="card stack" style="gap:8px">
+                            <div style="display:flex;justify-content:space-between"><b>Lộ trình A1 · Từ vựng hằng ngày</b><span class="link">Xem tất cả</span></div>
+                            <div class="path">
+                                <div class="unit done"><i>✓</i>Bài 1 · Chào hỏi<span class="t-s" style="margin-left:auto">3/3 ★</span></div>
+                                <div class="unit done"><i>✓</i>Bài 2 · Số đếm<span class="t-s" style="margin-left:auto">2/3 ★</span></div>
+                                <div class="unit"><i>3</i>Bài 3 · Gia đình<span class="t-s" style="margin-left:auto">Đang học 60%</span></div>
+                                <div class="unit lock"><i>🔒</i>Bài 4 · Đồ ăn</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stack">
+                        <div data-n="4" class="card stack" style="gap:8px">
+                            <b>Chuỗi 12 ngày</b>
+                            <div class="week"><span class="on">T2</span><span class="on">T3</span><span class="on">T4</span><span class="on">T5</span><span class="on">T6</span><span class="on">T7</span><span>CN</span></div>
+                            <p class="t-s">Học 1 bài hôm nay để giữ chuỗi</p>
+                        </div>
+                        <div data-n="5" class="card stack" style="gap:8px">
+                            <b>Ôn tập hôm nay</b>
+                            <p class="t-s">15 từ đến hạn ôn</p>
+                            <span class="btn btn--ghost">Ôn bằng flashcard</span>
+                        </div>
+                        <div class="card stack" style="gap:8px">
+                            <b>Huy hiệu gần đây</b>
+                            <div style="display:flex;gap:8px"><span class="box" style="width:40px;height:40px;border-radius:50%">🏅</span><span class="box" style="width:40px;height:40px;border-radius:50%">🏅</span><span class="box" style="width:40px;height:40px;border-radius:50%;border-style:dashed">?</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="frame frame--mobile"><span class="frame__label">Mobile 375</span>
+                <div class="nav"><b>Logo</b><span class="pill">🔥 12</span><span class="pill">2.840 XP</span></div>
+                <div class="stack" style="padding:14px">
+                    <div class="hero" style="grid-template-columns:1fr 64px">
+                        <div class="stack" style="gap:6px">
+                            <p class="t-h" style="font-size:15px">Bài 3 · Gia đình</p>
+                            <div class="bar" style="background:#fff"><span style="width:60%"></span></div>
+                            <p class="t-s">18 / 30 XP hôm nay</p>
+                            <span class="btn">Học tiếp</span>
+                        </div>
+                        <div class="box mascot" style="width:64px;height:64px">Mascot</div>
+                    </div>
+                    <div class="card"><div class="week"><span class="on">T2</span><span class="on">T3</span><span class="on">T4</span><span class="on">T5</span><span class="on">T6</span><span class="on">T7</span><span>CN</span></div></div>
+                    <div class="card" style="display:flex;justify-content:space-between;align-items:center"><span><b>Ôn tập</b><br><span class="t-s">15 từ đến hạn</span></span><span class="btn btn--ghost" style="padding:0 12px">Ôn</span></div>
+                    <div class="path">
+                        <div class="unit done"><i>✓</i>Bài 2 · Số đếm</div>
+                        <div class="unit"><i>3</i>Bài 3 · Gia đình</div>
+                        <div class="unit lock"><i>🔒</i>Bài 4 · Đồ ăn</div>
+                    </div>
+                </div>
+                <div data-n="6" class="tabbar"><span class="on">Trang chủ</span><span>Học</span><span>Thi thử</span><span>Xếp hạng</span><span>Hồ sơ</span></div>
+            </div>
+            <ol class="notes">
+                <li>Thanh điều hướng luôn hiện chuỗi và XP. Avatar mở menu gồm Hồ sơ và Đăng xuất.</li>
+                <li><b>Hero = 1 hành động chính:</b> tiếp tục đúng bài đang dở, kèm thanh mục tiêu XP trong ngày. Mascot đổi biểu cảm theo tiến độ.</li>
+                <li>Lộ trình dạng danh sách bài có trạng thái xong / đang học / khóa, kèm số sao đạt được.</li>
+                <li>Lịch chuỗi theo tuần. Chưa học hôm nay thì hiện nhắc nhở (dùng màu cảnh báo).</li>
+                <li>"Ôn tập hôm nay" dẫn thẳng vào flashcard với những từ đến hạn ôn.</li>
+                <li>Trên mobile, điều hướng chuyển xuống bottom tab bar, ô bấm cao ít nhất 44px.</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- 7. Dashboard trạng thái rỗng -->
+    <section class="screen" id="empty">
+        <h2>7. Dashboard: người dùng mới (trạng thái rỗng)</h2>
+        <p>Theo Definition of Done của Sprint 2: không hiện số liệu giả khi chưa có dữ liệu.</p>
+        <div class="row">
+            <div class="frame frame--mobile"><span class="frame__label">Mobile 375</span>
+                <div class="nav"><b>Logo</b><span class="pill">🔥 0</span><span class="pill">0 XP</span></div>
+                <div class="m-auth" style="justify-items:center;text-align:center;padding-top:40px">
+                    <div class="box mascot" style="width:120px;height:120px">Mascot<br>(chào)</div>
+                    <p class="t-h">Bắt đầu bài đầu tiên nhé!</p>
+                    <p class="t-s">Chỉ mất 5 phút. Hoàn thành để mở khóa chuỗi ngày học đầu tiên.</p>
+                    <span class="btn" style="width:100%">Bắt đầu: Bài 1 · Chào hỏi</span>
+                    <span class="link">Xem toàn bộ lộ trình</span>
+                </div>
+                <div class="tabbar"><span class="on">Trang chủ</span><span>Học</span><span>Thi thử</span><span>Xếp hạng</span><span>Hồ sơ</span></div>
+            </div>
+            <ol class="notes">
+                <li>Ẩn các thẻ chuỗi, ôn tập và huy hiệu khi chưa có dữ liệu. Chỉ giữ một CTA duy nhất.</li>
+                <li>Hiện tại <code>Index.cshtml</code> đang ghi cứng 68% và 12 ngày. Phải thay bằng dữ liệu thật hoặc trạng thái này.</li>
+            </ol>
+        </div>
+    </section>
+</main>
+</body>
+</html>
