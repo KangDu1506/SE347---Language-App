@@ -10,7 +10,7 @@
 
 ## Công nghệ sử dụng
 
-- **Backend:** ASP.NET Core Razor Pages trên .NET 9.
+- **Backend:** ASP.NET Core Razor Pages trên .NET 10.
 - **Database và ORM:** Supabase (PostgreSQL) + Entity Framework Core (Npgsql). Schema do `supabase/migrations` quản lý, entity chỉ map vào bảng có sẵn: **không** chạy `dotnet ef migrations` cho các bảng này.
 - **Frontend:** HTML5, CSS3 và JavaScript ES6+.
   + *Framework:* Vue 3 CDN
@@ -64,7 +64,7 @@ Các trang đăng nhập, đăng ký, quên mật khẩu và hồ sơ được t
 Ứng dụng có thành phần DevTools dành cho môi trường phát triển cục bộ:
 
 - Truy cập nhanh giữa các trang.
-- Theo dõi nhật ký thao tác và các request HTTP.
+- Theo dõi nhật ký thao tác và request HTTP.
 - Lưu trạng thái nhật ký bằng `localStorage` khi điều hướng giữa các trang.
 - Chỉ hiển thị khi thành phần tương ứng tồn tại và ứng dụng đang chạy trong môi trường phát triển.
 
@@ -72,7 +72,7 @@ Các trang đăng nhập, đăng ký, quên mật khẩu và hồ sơ được t
 
 ### Yêu cầu
 
-- .NET SDK 9.0.
+- .NET SDK 10.0.
 - Một hệ quản trị cơ sở dữ liệu được cấu hình trong ứng dụng.
 
 ### Khởi động

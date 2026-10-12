@@ -1,0 +1,93 @@
+[
+    {
+        "id": "1",
+        "content": "Ambiguous",
+        "pronunciation-bre": "/æmˈbɪɡ.ju.əs/",
+        "pronunciation-name": "/æmˈbɪɡ.ju.əs/",
+        "definition-en": "open to more than one interpretation; not having one obvious meaning.",
+        "definition-vi": "mơ hồ, nhiều nghĩa; có nhiều cách hiểu; không có một ý nghĩa rõ ràng.",
+        "oxford-link": "https://www.oxfordlearnersdictionaries.com/definition/english/ambiguous?q=ambiguous",
+        "external-source": [],
+        "examples":[
+            {
+                "term": "Her account was deliberately ambiguous.",
+                "translation": "Bản tường trình của cô ấy đã được cố tình mơ hồ."
+            },
+            {
+                "term": "an ambiguous word/term/statement",
+                "translation": "một từ/thuật ngữ/phát biểu mơ hồ."
+            }
+        ],
+        "synonyms": ["equivocal"],
+        "antonyms": ["clear", "unambiguous", "unequivocal"]
+    },
+
+    {
+        "id": "2",
+        "content": "Vague",
+        "pronunciation-bre": "/veɪɡ/",
+        "pronunciation-name": "/veɪɡ/",
+        "definition-en": "not clearly expressed; not having a precise meaning.",
+        "definition-vi": "mơ hồ, không rõ ràng; thiếu thông tin; không có ý nghĩa chính xác.",
+        "oxford-link": "https://www.oxfordlearnersdictionaries.com/definition/english/vague?q=vague",
+        "external-source": [],
+        "examples":[
+            {
+                "term": "to have a vague impression/memory/recollection of something",
+                "translation": "có ấn tượng/ký ức/nhớ lại mơ hồ về điều gì đó."
+            },
+            {
+                "term": "She's a little vague about her plans for next year.",
+                "translation": "Cô ấy có phần mơ hồ về các kế hoạch của mình cho năm tới."
+            }
+        ],
+        "synonyms": ["indistinct"],
+        "antonyms": ["clear", "precise"]
+    },
+
+    {
+        "id": "3",
+        "content": "Equivocal",
+        "pronunciation-bre": "/ɪˈkwɪv.ə.kəl/",
+        "pronunciation-name": "/ɪˈkwɪv.ə.kəl/",
+        "definition-en": "open to more than one interpretation; ambiguous.",
+        "definition-vi": "mơ hồ, nhiều nghĩa; có nhiều cách hiểu; không có một ý nghĩa rõ ràng.",
+        "oxford-link": "https://www.oxfordlearnersdictionaries.com/definition/english/equivocal?q=equivocal",
+        "external-source": [],
+        "examples":[
+            {
+                "term": "The experiments produced equivocal results.",
+                "translation": "Các thí nghiệm đã tạo ra những kết quả quá khó hiểu."
+            },
+            {
+                "term": "an equivocal answer/statement",
+                "translation": "một câu trả lời/phát biểu mơ hồ."
+            }
+        ],
+        "synonyms": ["ambiguous"],
+        "antonyms": ["clear", "unambiguous", "unequivocal"]
+    },
+
+    {
+        "id": "4",
+        "content": "Obscure",
+        "pronunciation-bre": "/əbˈskjʊər/",
+        "pronunciation-name": "/əbˈskjʊər/",
+        "definition-en": "not discovered or known about; uncertain.",
+        "definition-vi": "không được biết đến hoặc khám phá; không chắc chắn; khó hiểu.",
+        "oxford-link": "https://www.oxfordlearnersdictionaries.com/definition/english/obscure?q=obscure",
+        "external-source": [],
+        "examples":[
+            {
+                "term": "We went to see one of Shakespeare’s more obscure plays.",
+                "translation": "Chúng tôi đã đi xem một trong những vở kịch ít người biết đến của Shakespeare."
+            },
+            {
+                "term": "The origins of the tradition have become obscure.",
+                "translation": "Các nguồn gốc của truyền thống đã trở nên mơ hồ."
+            }
+        ],
+        "synonyms": ["unknown"],
+        "antonyms": ["clear", "well-known"]
+    }
+]

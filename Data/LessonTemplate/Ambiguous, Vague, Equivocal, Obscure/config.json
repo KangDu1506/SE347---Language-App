@@ -1,0 +1,17 @@
+{
+    "$schema": "../schemas/LessonConfig.schema.json",
+    "name": "Differ Ambiguous, Vague, Equivocal, Obscure",
+    "category": "Adjectives",
+    "description": "This lesson tells learners about the differences between ambiguous, vague, equivocal, and obscure.",
+    "level": "Intermediate",
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": true,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": false
+    },
+
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}
