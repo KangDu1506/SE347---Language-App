@@ -28,12 +28,13 @@ SE347/
 ├── Pages/                        # Razor Pages và giao diện người dùng
 │   ├── Account/                  # Đăng nhập, đăng ký, hồ sơ và xác thực
 │   └── Shared/                   # Thành phần giao diện dùng chung
+├── Properties/                   # launchSettings.json: profile chạy dev (cổng 5347)
 ├── Services/                     # Xử lý nghiệp vụ chính
 ├── Storage/                      # Tệp lưu trữ riêng tư
 ├── supabase/migrations/          # SQL schema Supabase (bảng, trigger, RLS)
 ├── wwwroot/                      # Tài nguyên tĩnh công khai
 │   ├── css/                      # Stylesheet theo từng màn hình
-│   ├── Images/                   # Hình ảnh giao diện
+│   ├── images/                   # Hình ảnh giao diện
 │   └── js/                       # JavaScript theo từng màn hình
 ├── Program.cs                    # Điểm khởi động và cấu hình ứng dụng
 └── SE347.csproj                  # Tệp cấu hình dự án
@@ -83,4 +84,17 @@ dotnet build
 dotnet run (hoặc dotnet watch)
 ```
 
-Sau khi ứng dụng khởi động, mở URL được hiển thị trong terminal bằng trình duyệt.
+`dotnet run` / `dotnet watch` dùng profile `http` trong `Properties/launchSettings.json`: môi trường **Development** (có nạp user-secrets) tại `http://localhost:5347`. Profile `https` (`dotnet run --launch-profile https`) chạy thêm `https://localhost:7347`.
+
+### CORS khi dev
+
+Production phục vụ trang (`wwwroot`, Razor Pages) và API cùng một origin nên không bật CORS. Chỉ trong môi trường Development, các origin trong `Cors:DevOrigins` (`appsettings.json`) được phép gọi `/api/*` và lấy file tĩnh:
+
+- `http://localhost:5500`, `http://127.0.0.1:5500`: Live Server (VS Code).
+- `http://localhost:5173`, `http://127.0.0.1:5173`: Vite.
+
+Frontend chạy ở các origin này gọi API theo địa chỉ `http://localhost:5347/api/...`, gửi token bằng header `Authorization: Bearer <access_token>` (không dùng cookie). Muốn thêm origin riêng trên máy mình thì ghi vào user-secrets hoặc `appsettings.Development.json`, lưu ý mảng được ghi đè theo vị trí:
+
+```bash
+dotnet user-secrets set "Cors:DevOrigins:4" "http://localhost:3000"
+```
