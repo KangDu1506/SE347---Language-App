@@ -50,19 +50,18 @@ app.Use(async (context, next) =>
 
     if (context.Request.Method is "POST" or "GET")
     {
-        var hasLoginData = context.Request.Query.ContainsKey("username") || context.Request.Query.ContainsKey("password");
-        var hasSignupData = context.Request.Query.ContainsKey("fullName") || context.Request.Query.ContainsKey("email") || context.Request.Query.ContainsKey("password");
         var hasForgotPasswordData = context.Request.Query.ContainsKey("email");
         var hasAuthenticationData = context.Request.Query.ContainsKey("code");
         var hasFormData = context.Request.Method == "POST" && context.Request.HasFormContentType;
 
-        if (isLoginPage && (hasLoginData || hasFormData))
+        // Đăng nhập/đăng ký chỉ nhận dữ liệu qua POST (body), không đọc mật khẩu từ query string để tránh lộ trên URL.
+        if (isLoginPage && hasFormData)
         {
             context.Response.Redirect("/Account/Authentication?mode=login", permanent: false, preserveMethod: false);
             return;
         }
 
-        if (isSignupPage && (hasSignupData || hasFormData))
+        if (isSignupPage && hasFormData)
         {
             context.Response.Redirect("/Account/Authentication?mode=signup", permanent: false, preserveMethod: false);
             return;
