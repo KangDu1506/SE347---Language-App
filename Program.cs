@@ -17,15 +17,25 @@ builder.Services.AddSupabaseJwtAuth(builder.Configuration);
 // Services nghiệp vụ (Services/)
 builder.Services.AddScoped<IUserService, UserService>();
 
+// CORS chỉ dùng khi dev: frontend chạy ở origin khác (Live Server, Vite) gọi /api/*.
+// Production phục vụ trang và API cùng origin nên không bật. Danh sách origin: Cors:DevOrigins.
+const string DevCorsPolicy = "DevFrontend";
+var devOrigins = builder.Configuration.GetSection("Cors:DevOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddPolicy(DevCorsPolicy, policy =>
+    policy.WithOrigins(devOrigins).AllowAnyHeader().AllowAnyMethod()));
+
 // 1. Kích hoạt tính năng đọc và render file .cshtml (SSR)
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// 2. Cho phép Server truy cập và chạy các file tĩnh như CSS, JS, hình ảnh
-app.UseStaticFiles();
-
 app.UseRouting();
+
+// Đặt sau UseRouting, trước UseAuthentication: preflight OPTIONS được trả lời trước khi xác thực JWT
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(DevCorsPolicy);
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -108,8 +118,12 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// 2. Phục vụ file tĩnh trong wwwroot (CSS, JS, hình ảnh), được nén gzip/brotli và gắn ETag lúc build
+app.MapStaticAssets();
+
 // 3. Tự động ánh xạ đường dẫn URL tới các file trong thư mục Pages
-app.MapRazorPages();
+app.MapRazorPages()
+    .WithStaticAssets();
 
 // 4. Endpoint JSON /api/* cho frontend Vue 3 (Endpoints/)
 app.MapUserEndpoints();
