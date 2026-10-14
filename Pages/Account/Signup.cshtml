@@ -10,9 +10,53 @@
         <script src="~/js/signup.js" defer></script>
     </head>
     <body>
-        <main class="account-page">
+        <main class="account-page account-page--auth">
             <a class="account-brand" href="/Index">SE347 Language App</a>
-            <section class="account-card" aria-labelledby="signup-title"><div class="account-card__heading"><p class="account-eyebrow">Bắt đầu hành trình</p><h1 id="signup-title">Tạo tài khoản</h1><p>Đăng ký để lưu tiến độ và học mọi lúc.</p></div><form class="account-form" action="/Account/Signup" method="post"><label for="fullName">Họ và tên<input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" required></label><label for="email">Email<input id="email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required></label><label for="password">Mật khẩu<input id="password" type="password" name="password" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password" minlength="8" required></label><label class="account-checkbox" for="terms"><input id="terms" type="checkbox" required><span>Tôi đồng ý với điều khoản sử dụng.</span></label><button type="submit">Tiếp tục xác thực</button></form><p class="account-switch">Đã có tài khoản? <a href="/Account/Login">Đăng nhập</a></p></section>
+            <section class="auth-layout auth-layout--signup" aria-labelledby="signup-title">
+                <div class="auth-layout__side">
+                    <div class="auth-mascot" aria-hidden="true">SE</div>
+                    <p class="auth-layout__title">Bắt đầu hành trình</p>
+                    <p class="auth-layout__text">Tạo tài khoản để lưu tiến độ và học mọi lúc.</p>
+                </div>
+                <div class="account-card">
+                    <div class="account-card__heading">
+                        <p class="account-eyebrow">Bắt đầu hành trình</p>
+                        <h1 id="signup-title">Tạo tài khoản</h1>
+                        <p>Đăng ký để lưu tiến độ và học mọi lúc.</p>
+                    </div>
+                    <form class="account-form" action="/Account/Signup" method="post" novalidate>
+                        <label for="fullName">
+                            Họ và tên
+                            <input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" required>
+                        </label>
+                        <label for="username">
+                            Tên đăng nhập
+                            <input id="username" type="text" name="username" placeholder="NguyenVanA" autocomplete="username" minlength="3" required>
+                        </label>
+                        <label for="email">
+                            Email
+                            <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" required>
+                        </label>
+                        <label for="password">
+                            Mật khẩu
+                            <div class="password-field">
+                                <input id="password" type="password" name="password" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password" minlength="8" required>
+                                <button class="password-toggle" id="signupPasswordToggle" type="button" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
+                            </div>
+                        </label>
+                        <div class="password-strength" id="passwordStrength" aria-live="polite">
+                            <div class="password-strength__bar" aria-hidden="true"><span></span></div>
+                            <p class="password-strength__text">Độ mạnh: Chưa có mật khẩu</p>
+                        </div>
+                        <label class="account-checkbox" for="terms">
+                            <input id="terms" type="checkbox" name="terms" required>
+                            <span>Tôi đồng ý với <a href="/Account/Terms" target="_blank" rel="noopener noreferrer">Điều khoản sử dụng</a>.</span>
+                        </label>
+                        <button type="submit">Tạo tài khoản</button>
+                    </form>
+                    <p class="account-switch">Đã có tài khoản? <a href="/Account/Login">Đăng nhập</a></p>
+                </div>
+            </section>
         </main>
     </body>
 </html>

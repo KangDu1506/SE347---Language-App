@@ -1,0 +1,45 @@
+@page
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Điều khoản sử dụng</title>
+        <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
+        <link rel="stylesheet" href="~/css/Account/Account.css"/>
+    </head>
+    <body>
+        <main class="account-page terms-page">
+            <a class="account-brand" href="/Index">SE347 Language App</a>
+            <article class="account-card" aria-labelledby="terms-title">
+                <div class="account-card__heading">
+                    <p class="account-eyebrow">Thông tin sử dụng</p>
+                    <h1 id="terms-title">Điều khoản sử dụng</h1>
+                    <p>Vui lòng đọc các điều khoản trước khi tạo tài khoản.</p>
+                </div>
+                <div class="terms-content">
+                    <h2>1. Sử dụng tài khoản</h2>
+                    <p>Bạn chịu trách nhiệm giữ bí mật thông tin đăng nhập và sử dụng tài khoản cho mục đích học tập.</p>
+                    <h2>2. Nội dung học tập</h2>
+                    <p>Nội dung trên ứng dụng được cung cấp để hỗ trợ việc học tiếng Anh. Không sao chép hoặc phân phối nội dung khi chưa được cho phép.</p>
+                    <h2>3. Tôn trọng cộng đồng</h2>
+                    <p>Không sử dụng ứng dụng để đăng tải nội dung vi phạm pháp luật hoặc gây ảnh hưởng đến người dùng khác.</p>
+                    <h2>4. Thay đổi điều khoản</h2>
+                    <p>Điều khoản có thể được cập nhật để phù hợp với tính năng và quy định mới. Phiên bản hiện tại được áp dụng từ ngày công bố.</p>
+                </div>
+                <p class="account-switch">
+                    <a href="/Account/Signup" id="closeTermsTab">Quay lại đăng ký</a>
+                </p>
+            </article>
+        </main>
+        <script>
+            document.getElementById('closeTermsTab').addEventListener('click', (event) => {
+                event.preventDefault();
+                window.close();
+                window.setTimeout(() => {
+                    window.location.assign('/Account/Signup');
+                }, 100);
+            });
+        </script>
+    </body>
+</html>

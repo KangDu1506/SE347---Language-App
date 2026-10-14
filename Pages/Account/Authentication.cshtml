@@ -10,39 +10,44 @@
         <script src="~/js/authentication.js" defer></script>
     </head>
     <body>
-        <main class="account-page">
-            <a class="account-brand" href="/Account/Login">SE347 Language App</a>
-
-            <section class="account-card" aria-labelledby="authentication-title">
-                <div class="account-card__heading">
-                    <p class="account-eyebrow">Bảo mật tài khoản</p>
-                    <h1 id="authentication-title">Xác thực tài khoản</h1>
-                    <p>Nhập mã mặc định <strong>123456</strong> để tiếp tục.</p>
+        <main class="account-page account-page--auth">
+            <section class="auth-layout auth-layout--verification" aria-labelledby="authentication-title">
+                <div class="auth-layout__side">
+                    <div class="auth-mascot" aria-hidden="true">6</div>
+                    <p class="auth-layout__title">Một bước nữa thôi</p>
+                    <p class="auth-layout__text">Xác thực để bảo vệ tài khoản và tiếp tục hành trình.</p>
                 </div>
+                <div class="account-card">
+                    <div class="account-card__heading">
+                        <p class="account-eyebrow">Bảo mật tài khoản</p>
+                        <h1 id="authentication-title">Kiểm tra email</h1>
+                        <p>Nhập mã 6 số đã gửi tới<br><strong>h***@@gmail.com</strong> · <a href="/Account/Signup">Đổi email</a></p>
+                    </div>
 
-                <form
-                    class="account-form"
-                    action="/Account/Authentication"
-                    method="get">
-                    <label for="verificationCode">Mã xác thực</label>
-                    <input
-                        id="verificationCode"
-                        class="verification-code"
-                        type="text"
-                        name="code"
-                        inputmode="numeric"
-                        autocomplete="one-time-code"
-                        pattern="[0-9]{6}"
-                        maxlength="6"
-                        placeholder="123456"
-                        required />
-                    <button id="verificationSubmit" type="submit">Xác nhận</button>
-                </form>
-
-                <p class="account-switch">
-                    Đã có tài khoản?
-                    <a href="/Account/Login">Quay lại đăng nhập</a>
-                </p>
+                    <form
+                        class="account-form"
+                        action="/Account/Authentication"
+                        method="get">
+                        <label class="verification-label" for="verificationDigit1">
+                            Mã xác thực
+                            <span class="verification-hint">(vui lòng tắt bộ gõ tiếng Việt để nhập)</span>
+                        </label>
+                        <div class="verification-inputs" aria-label="Mã xác thực gồm 6 số">
+                            <input id="verificationDigit1" type="text" inputmode="numeric" maxlength="1" aria-label="Số 1" autocomplete="one-time-code" autofocus required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 2" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 3" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 4" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 5" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 6" required>
+                        </div>
+                        <button id="verificationSubmit" type="submit" disabled>Xác nhận</button>
+                    </form>
+                    <p class="verification-resend account-switch">Chưa nhận được mã? <a href="/Account/Authentication">Gửi lại</a></p>
+                    <p class="account-switch">
+                        Đã có tài khoản?
+                        <a href="/Account/Login">Quay lại đăng nhập</a>
+                    </p>
+                </div>
             </section>
         </main>
     </body>

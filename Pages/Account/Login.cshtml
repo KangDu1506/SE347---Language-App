@@ -15,60 +15,69 @@
         <script src="~/js/login.js" defer></script>
     </head>
     <body>
-        <main class="account-page">
-        <section class="login-card" aria-labelledby="login-title">
-            <h2 id="login-title" data-i18n="global.login">Đăng nhập</h2>
-            <form method="post" action="/Account/Login">
-                <label for="username" data-i18n="global.username">Tên đăng nhập</label>
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    autocomplete="username"
-                    required />
-                <label for="password" data-i18n="global.password">Mật khẩu</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    autocomplete="current-password"
-                    required />
-                <button type="submit" data-i18n="global.login">Đăng nhập</button>
-            </form>
-            <hr>
-            <p data-i18n="login.or-login-with">Hoặc đăng nhập với</p>
-            <div class="other-login-button-container">
-                <button
-                    type="button"
-                    class="other-login-button google-login"
-                    data-i18n="login.google-login">
-                    Google
-                    <img
-                        src="~/images/GoogleIcon.webp"
-                        class="login-button-logo" />
-                </button>
-                <button
-                    type="button"
-                    class="other-login-button facebook-login"
-                    data-i18n="login.facebook-login">
-                    Facebook
-                </button>
-            </div>
+        <main class="account-page account-page--auth">
+            <section class="auth-layout" aria-labelledby="login-title">
+                <div class="auth-layout__side">
+                    <div class="auth-mascot" aria-hidden="true">SE</div>
+                    <p class="auth-layout__title">Mỗi ngày một chút,<br>tiến bộ thật nhiều</p>
+                    <p class="auth-layout__text">Tiếp tục hành trình học tiếng Anh của bạn.</p>
+                </div>
+                <div class="account-card login-card">
+                    <div class="account-card__heading">
+                        <p class="account-eyebrow">Chào mừng trở lại</p>
+                        <h1 id="login-title" data-i18n="global.login">Đăng nhập</h1>
+                        <p>Đăng nhập để tiếp tục hành trình học tập.</p>
+                    </div>
+                    <form class="account-form" method="post" action="/Account/Login">
+                        <label for="username" data-i18n="global.username">
+                            Email hoặc tên đăng nhập
+                            <input
+                                type="text"
+                                id="username"
+                                name="username"
+                                autocomplete="username"
+                                required />
+                        </label>
+                        <label for="password" data-i18n="global.password">
+                            Mật khẩu
+                            <div class="password-field">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    autocomplete="current-password"
+                                    required />
+                                <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Hiện mật khẩu">Hiện</button>
+                            </div>
+                        </label>
+                        <div class="login-options">
+                            <label class="account-checkbox" for="rememberLogin">
+                                <input id="rememberLogin" type="checkbox" />
+                                <span>Ghi nhớ đăng nhập</span>
+                            </label>
+                            <a class="login-forgot-link" href="/Account/ForgetPassword">Quên mật khẩu?</a>
+                        </div>
+                        <button type="submit" data-i18n="global.login">Đăng nhập</button>
+                    </form>
+                    <hr>
+                    <p data-i18n="login.or-login-with">Hoặc đăng nhập với</p>
+                    <div class="other-login-button-container">
+                        <button
+                            type="button"
+                            class="other-login-button google-login"
+                            data-i18n="login.google-login">
+                            Google
+                            <img
+                                src="~/images/GoogleIcon.webp"
+                                class="login-button-logo" />
+                        </button>
+                    </div>
 
-                <nav class="login-actions" aria-label="Tùy chọn tài khoản">
-                    <a
-                        class="login-action-button login-action-button--primary"
-                        href="/Account/Signup"
-                        role="button">
-                        Đăng ký
-                    </a>
-                    <a
-                        class="login-action-button login-action-button--secondary"
-                        href="/Account/ForgetPassword"
-                        role="button">
-                        Quên mật khẩu?
-                    </a>
-                </nav>
+                    <p class="account-switch login-signup-prompt">
+                        Chưa có tài khoản?
+                        <a href="/Account/Signup">Đăng ký</a>
+                    </p>
+                </div>
             </section>
         </main>
     </body>

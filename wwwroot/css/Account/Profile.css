@@ -399,6 +399,10 @@ button {
     background: #fff2dc;
 }
 
+.profile-tabbar {
+    display: none;
+}
+
 @media (max-width: 760px) {
     .profile-page {
         width: min(100% - 24px, 1120px);
@@ -430,6 +434,41 @@ button {
     .profile-stats,
     .profile-content {
         grid-template-columns: 1fr;
+    }
+
+    .profile-page {
+        padding-bottom: 84px;
+    }
+
+    .profile-tabbar {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 10;
+        display: flex;
+        justify-content: space-around;
+        min-height: 64px;
+        padding: 8px 12px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        background: var(--bg-card);
+        box-shadow: var(--shadow-lg);
+        font-size: var(--fs-xs);
+        font-weight: var(--fw-bold);
+    }
+
+    .profile-tabbar a {
+        display: grid;
+        min-width: 56px;
+        min-height: 44px;
+        place-items: center;
+        border-radius: var(--radius-sm);
+    }
+
+    .profile-tabbar__active {
+        color: var(--color-primary);
+        background: var(--bg-soft);
     }
 }
 

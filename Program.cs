@@ -78,7 +78,7 @@ app.Use(async (context, next) =>
             var mode = context.Request.Query["mode"].ToString();
             var code = context.Request.Query["code"].ToString();
 
-            if (code == "123456" && mode == "login")
+            if (System.Text.RegularExpressions.Regex.IsMatch(code, @"^\d{6}$") && mode == "login")
             {
                 context.Response.Cookies.Append("userToken", "authenticated", new CookieOptions
                 {

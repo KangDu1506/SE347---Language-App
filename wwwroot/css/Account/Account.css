@@ -42,6 +42,68 @@ button {
     padding: var(--space-7) 0;
 }
 
+.account-page--auth {
+    width: min(100% - var(--space-6), 1040px);
+}
+
+.auth-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, .9fr) minmax(420px, 1.1fr);
+    min-height: 520px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-layout__side {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: var(--space-3);
+    padding: var(--space-8) var(--space-7);
+    color: var(--text-primary);
+    background: var(--bg-soft);
+    text-align: center;
+}
+
+.auth-mascot {
+    display: grid;
+    width: 144px;
+    height: 144px;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    color: var(--text-on-primary);
+    background: var(--color-brand);
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-heavy);
+}
+
+.auth-layout__title {
+    margin: 0;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+    line-height: var(--lh-tight);
+}
+
+.auth-layout__text {
+    max-width: 260px;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+}
+
+.auth-layout > .account-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
 .account-brand {
     display: block;
     margin-bottom: var(--space-5);
@@ -53,7 +115,7 @@ button {
 
 .account-card,
 .login-card {
-    padding: var(--space-6);
+    padding: var(--space-7);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     background: var(--bg-card);
@@ -82,6 +144,14 @@ button {
     line-height: var(--lh-tight);
 }
 
+.auth-layout--signup {
+    min-height: 620px;
+}
+
+.auth-layout--signup > .account-card {
+    justify-content: flex-start;
+}
+
 .account-card__heading > p:last-child,
 .login-card > p {
     margin: var(--space-2) 0 var(--space-5);
@@ -92,6 +162,71 @@ button {
 .login-card form {
     display: grid;
     gap: var(--space-4);
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 64px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: var(--space-3);
+    min-width: 0;
+    min-height: 32px;
+    padding: 0 var(--space-2);
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 0;
+    color: var(--color-primary);
+    background: transparent;
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.password-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.password-toggle:hover {
+    color: var(--color-primary-hover);
+    background: transparent;
+}
+
+.login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: calc(var(--space-2) * -1);
+}
+
+.login-options .account-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0;
+}
+
+.login-options .account-checkbox input[type="checkbox"] {
+    width: auto;
+    min-height: auto;
+}
+
+.login-forgot-link,
+.login-signup-prompt a {
+    color: var(--color-primary);
+    font-weight: var(--fw-heavy);
+}
+
+.login-forgot-link {
+    font-size: var(--fs-xs);
+    white-space: nowrap;
 }
 
 .account-form label,
@@ -121,7 +256,7 @@ button {
     box-shadow: var(--focus-ring);
 }
 
-.account-form button,
+.account-form > button,
 .login-card form > button {
     min-height: 44px;
     border: 0;
@@ -131,13 +266,14 @@ button {
     font-weight: var(--fw-heavy);
 }
 
-.account-form button:hover,
+.account-form > button:hover,
 .login-card form > button:hover {
     background: var(--color-primary-hover);
 }
 
 .account-checkbox {
     display: flex;
+    flex-direction: row;
     align-items: flex-start;
     gap: var(--space-2);
     color: var(--text-secondary) !important;
@@ -145,9 +281,26 @@ button {
     font-weight: var(--fw-regular) !important;
 }
 
+.account-form label.account-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
 .account-checkbox input {
     flex: 0 0 auto;
     margin-top: 3px;
+}
+
+.account-checkbox a {
+    color: var(--color-primary);
+    font-weight: var(--fw-heavy);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.account-checkbox a:hover {
+    color: var(--color-primary-hover);
 }
 
 .account-switch {
@@ -169,9 +322,89 @@ button {
     font-size: var(--fs-lg) !important;
 }
 
+.verification-code--hidden {
+    position: absolute;
+    width: 1px !important;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.verification-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-2);
+}
+
+.verification-inputs input {
+    width: 100%;
+    min-height: 52px !important;
+    padding: var(--space-2) !important;
+    text-align: center;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+}
+
+.verification-inputs input.verification-input--filled-disabled {
+    border-color: var(--text-secondary);
+    color: var(--text-primary);
+    background: var(--border-color);
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.auth-layout--verification .account-card__heading > p:last-child {
+    margin-bottom: var(--space-4);
+}
+
+.auth-layout--verification .account-card__heading a {
+    color: var(--color-primary);
+    font-weight: var(--fw-heavy);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.verification-label {
+    display: flex !important;
+    align-items: baseline;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+}
+
+.verification-hint {
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-normal);
+}
+
+.verification-resend {
+    margin-top: var(--space-4);
+}
+
+.auth-layout--verification .account-form > button:disabled {
+    color: var(--text-secondary);
+    background: var(--border-color);
+    cursor: not-allowed;
+}
+
+.auth-banner {
+    margin: var(--space-4) 0 0;
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    background: var(--bg-soft);
+    font-size: var(--fs-xs);
+    text-align: center;
+}
+
 .login-card {
-    width: min(100% - var(--space-6), 420px);
-    margin: auto;
+    width: auto;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .login-card > h2 {
@@ -228,6 +461,13 @@ button {
     margin-top: var(--space-5);
 }
 
+.login-signup-prompt {
+    margin: var(--space-5) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+    text-align: center;
+}
+
 .login-action-button--primary {
     color: var(--text-on-primary);
     background: var(--color-primary);
@@ -239,11 +479,89 @@ button {
 }
 
 .login-message,
-.form-message {
+.form-message,
+.field-error {
     margin: var(--space-4) 0 0;
     color: var(--status-error);
     font-size: var(--fs-sm);
     text-align: center;
+}
+
+.field-error {
+    margin: calc(var(--space-2) * -1) 0 0;
+    text-align: left;
+}
+
+.account-form label.has-error input {
+    border-color: var(--status-error);
+}
+
+.account-form label.has-error input:focus {
+    box-shadow: 0 0 0 3px rgb(180 35 24 / 20%);
+}
+
+.password-strength {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: calc(var(--space-2) * -1);
+}
+
+.password-strength__bar {
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background: var(--border-color);
+}
+
+.password-strength__bar span {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--status-error);
+    transition: width var(--transition-fast), background var(--transition-fast);
+}
+
+.password-strength__text {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+}
+
+.password-strength[data-strength="medium"] .password-strength__bar span {
+    background: var(--status-warning);
+}
+
+.password-strength[data-strength="strong"] .password-strength__bar span {
+    background: var(--status-success);
+}
+
+.terms-page .account-card__heading > p:last-child {
+    margin-bottom: var(--space-4);
+}
+
+.terms-content {
+    display: grid;
+    gap: var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--fs-sm);
+}
+
+.terms-content h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: var(--fs-lg);
+}
+
+.terms-content p,
+.terms-content ul {
+    margin: 0;
+}
+
+.terms-content ul {
+    display: grid;
+    gap: var(--space-2);
+    padding-left: var(--space-5);
 }
 
 @media (max-width: 520px) {
@@ -254,6 +572,71 @@ button {
 
     .account-card,
     .login-card {
+        padding: var(--space-5);
+    }
+
+    .account-page--auth {
+        width: min(100% - var(--space-4), 480px);
+    }
+
+    .auth-layout {
+        display: block;
+        border-radius: var(--radius-md);
+        min-height: 0;
+    }
+
+    .auth-layout__side {
+        gap: var(--space-2);
+        padding: var(--space-5);
+    }
+
+    .auth-layout > .account-card {
+        border-radius: 0;
+    }
+
+    .auth-layout--signup {
+        min-height: 0;
+    }
+
+    .verification-inputs {
+        gap: var(--space-1);
+    }
+
+    .auth-layout--verification .account-card {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .auth-layout--verification .account-card__heading > p:last-child {
+        margin-bottom: var(--space-3);
+    }
+
+    .verification-inputs input {
+        min-height: 48px !important;
+        font-size: var(--fs-md);
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-layout--verification .account-card {
+        padding-right: var(--space-3);
+        padding-left: var(--space-3);
+    }
+
+    .verification-inputs {
+        gap: 3px;
+    }
+
+    .login-options {
+        align-items: flex-start;
+    }
+
+    .auth-mascot {
+        width: 88px;
+        height: 88px;
+        font-size: var(--fs-lg);
+    }
+
+    .terms-page .account-card {
         padding: var(--space-5);
     }
 }
