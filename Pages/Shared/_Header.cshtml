@@ -1,0 +1,36 @@
+@*
+    Header dùng chung (SCRUM-32), render trong _Layout.
+    Ẩn header: ViewData["ShowHeader"] = false (ví dụ trang làm bài).
+    Trên màn hình ≤ 760px, .site-nav chuyển thành thanh tab cố định ở đáy.
+*@
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+    var links = new (string Href, string Label, string Icon)[]
+    {
+        ("/Index", "Trang chủ", "M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"),
+        ("/Study", "Học tập", "M4 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4zm16 0h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"),
+        ("/TrialTest", "Thi thử", "M9 3h6v3H9zM5 5h2v3h10V5h2v16H5zm4 8 2 2 4-4"),
+        ("/Ranking", "Xếp hạng", "M4 21V11h4v10zm6 0V4h4v17zm6 0v-7h4v7z"),
+        ("/Account/Profile", "Hồ sơ", "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0z")
+    };
+}
+<header class="site-header">
+    <div class="site-header__inner">
+        <a class="site-brand" href="/Index" aria-label="SE347 Language App - Trang chủ">
+            SE347 <span>Language</span>
+        </a>
+
+        <nav class="site-nav" aria-label="Điều hướng chính">
+            @foreach (var link in links)
+            {
+                var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase);
+                <a class="site-nav__link@(isActive ? " is-active" : string.Empty)" href="@link.Href" aria-current="@(isActive ? "page" : null)">
+                    <svg class="site-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="@link.Icon" /></svg>
+                    <span>@link.Label</span>
+                </a>
+            }
+        </nav>
+
+        <a class="site-header__logout" href="/Account/Login?logout=1">Đăng xuất</a>
+    </div>
+</header>
