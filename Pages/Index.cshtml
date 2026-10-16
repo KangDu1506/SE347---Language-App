@@ -1,31 +1,24 @@
 @page
-<!-- Index -->
-<!-- Summary:
+@*
+    Index
+    Summary:
     This is the main index page of the application.
--->
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Trang chủ";
+}
 
-<!DOCTYPE html>
-<html lang="vi">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-i18n="global.index">Trang chủ</title>
-        <link rel="stylesheet" href="~/css/index.css"/>
-        <script src="~/js/auth-guard.js" defer></script>
-        <script src="~/js/index.js" defer></script>
-    </head>
-    <body>
+@section Styles {
+    <link rel="stylesheet" href="~/css/index.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/index.js" defer></script>
+}
+
         <main class="home-page">
-            <header class="home-header">
-                <nav class="home-nav" aria-label="Điều hướng chính">
-                    <a class="home-nav__active" href="/Index">Trang chủ</a>
-                    <a href="/Study">Học tập</a>
-                    <a href="/TrialTest">Làm bài thử</a>
-                    <a href="/Ranking">Xếp hạng</a>
-                </nav>
-                <a class="home-account" href="/Account/Profile">Hồ sơ</a>
-            </header>
-
             <section class="home-hero" aria-labelledby="home-title">
                 <div class="home-hero__content">
                     <p class="home-eyebrow">Chào mừng bạn trở lại</p>
@@ -63,5 +56,3 @@
                 </div>
             </section>
         </main>
-    </body>
-</html>

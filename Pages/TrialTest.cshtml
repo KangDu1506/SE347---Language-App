@@ -1,15 +1,20 @@
 @page
-<!DOCTYPE html>
-<html lang="vi">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Làm bài thử</title>
-		<link rel="stylesheet" href="~/css/TrialTest.css"/>
-		<script src="~/js/auth-guard.js" defer></script>
-		<script src="~/js/trialtest.js" defer></script>
-	</head>
-	<body>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Làm bài thử";
+    ViewData["ShowHeader"] = false;
+    ViewData["ShowFooter"] = false;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/TrialTest.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/trialtest.js" defer></script>
+}
+
 		<main class="trial-page">
 			<header class="trial-topbar"><span class="trial-counter">Câu hỏi <strong>04</strong> / 20</span><a href="/Study">Thoát bài kiểm tra</a></header>
 			<div class="trial-progress"><span></span></div>
@@ -29,5 +34,3 @@
 				<aside class="trial-sidebar"><div class="trial-timer"><span>Thời gian còn lại</span><strong>12:45</strong></div><div class="trial-question-map"><h2>Danh sách câu hỏi</h2><div class="trial-number-grid"><button class="is-done" type="button">1</button><button class="is-done" type="button">2</button><button class="is-done" type="button">3</button><button class="is-current" type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">7</button><button type="button">8</button><button type="button">9</button><button type="button">10</button><button type="button">11</button><button type="button">12</button></div></div></aside>
 			</section>
 		</main>
-	</body>
-</html>

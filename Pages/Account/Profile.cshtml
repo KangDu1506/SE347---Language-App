@@ -1,26 +1,19 @@
 @page
-<!DOCTYPE html>
-<html lang="vi">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Hồ sơ</title>
-		<link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
-		<link rel="stylesheet" href="~/css/Account/Profile.css"/>
-		<script src="~/js/auth-guard.js" defer></script>
-		<script src="~/js/profile.js" defer></script>
-	</head>
-	<body>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Hồ sơ";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Account/Profile.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/profile.js" defer></script>
+}
+
 		<main class="profile-page">
-			<header class="profile-topbar">
-				<a class="profile-brand" href="/Index">SE347 Language App</a>
-				<nav class="profile-nav" aria-label="Điều hướng hồ sơ">
-					<a href="/Index">Trang chủ</a>
-					<a href="/Study">Học tập</a>
-					<a class="profile-nav__active" href="/Account/Profile" aria-current="page">Hồ sơ</a>
-				</nav>
-				<a class="profile-logout" href="/Account/Login?logout=1">Đăng xuất</a>
-			</header>
 
 			<section class="profile-hero" aria-labelledby="profile-title">
 				<div class="profile-avatar" aria-hidden="true">NA</div>
@@ -102,5 +95,3 @@
 				<a class="profile-tabbar__active" href="/Account/Profile" aria-current="page">Hồ sơ</a>
 			</nav>
 		</main>
-	</body>
-</html>
