@@ -54,6 +54,24 @@ Khai báo biến môi trường theo tên trong `.env.example` (dùng `__` thay 
 
 Xóa khỏi code chưa đủ vì key vẫn nằm trong lịch sử git. Báo lead ngay để **rotate**: tạo Secret key mới và xóa key cũ ở API Keys; đổi Database password ở Project Settings → Database.
 
+## Quên mật khẩu qua email
+
+Luồng: `/Account/ForgetPassword` gọi `resetPasswordForEmail` → Supabase gửi **mã 6 số** → `/Account/Authentication?mode=forgot` gọi `verifyOtp({ type: 'recovery' })` → `/Account/ResetPassword` gọi `updateUser({ password })` rồi đăng xuất. Frontend dùng supabase-js qua partial `Pages/Shared/_SupabaseClient.cshtml` (chỉ cần `Supabase:Url` và `Supabase:PublishableKey`).
+
+Cấu hình một lần trên Dashboard:
+
+1. **Authentication → Emails → Templates → Reset Password**: email phải chứa mã `{{ .Token }}` (mặc định chỉ có link `{{ .ConfirmationURL }}`, không dùng được với trang nhập mã). Ví dụ:
+
+   ```html
+   <h2>Đặt lại mật khẩu</h2>
+   <p>Mã xác thực của bạn là: <strong>{{ .Token }}</strong></p>
+   <p>Mã có hiệu lực trong 1 giờ. Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+   ```
+
+2. **Authentication → Sign In / Providers → Email**: `Email OTP Length` = **6** (giao diện chỉ có 6 ô).
+3. **Authentication → Emails → SMTP Settings**: SMTP mặc định của Supabase chỉ gửi tới email của thành viên trong org và bị giới hạn vài email/giờ. Muốn gửi cho người dùng thật phải bật custom SMTP (Gmail App Password, Resend, Brevo...).
+4. **Authentication → Rate Limits**: chỉnh giới hạn gửi email nếu cần test nhiều.
+
 ## Migration hiện có
 
 | File | Nội dung |
