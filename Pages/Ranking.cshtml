@@ -1,19 +1,20 @@
 @page
-<!DOCTYPE html>
-<html lang="vi">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Bảng xếp hạng</title>
-		<link rel="stylesheet" href="~/css/Ranking.css"/>
-		<script src="~/js/auth-guard.js" defer></script>
-		<script src="~/js/ranking.js" defer></script>
-	</head>
-	<body>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Bảng xếp hạng";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Ranking.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/ranking.js" defer></script>
+}
+
 		<main class="ranking-page">
 			<header class="ranking-header"><div><a class="ranking-brand" href="/Index">SE347 Language App</a><p class="ranking-eyebrow">Cộng đồng học tập</p><h1>Bảng xếp hạng</h1><p>Thi đua cùng những người học tích cực nhất tuần này.</p></div><a class="ranking-profile" href="/Account/Profile">Hồ sơ <span>NA</span></a></header>
 			<nav class="ranking-tabs" aria-label="Phạm vi bảng xếp hạng"><button class="ranking-tab ranking-tab--active" type="button">Tuần này</button><button class="ranking-tab" type="button">Tháng này</button><button class="ranking-tab" type="button">Tất cả</button></nav>
 			<section class="ranking-table-wrap" aria-labelledby="ranking-title"><div class="ranking-table-heading"><h2 id="ranking-title">Top người học</h2><span>Điểm XP</span></div><div class="ranking-table"><div class="ranking-row ranking-row--header"><span>Hạng</span><span>Người học</span><span>Tiến độ</span><span>Điểm</span></div><div class="ranking-row ranking-row--highlight"><strong>01</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--gold">ML</i><b>Mai Linh</b></span><span class="ranking-bar"><i style="width: 92%"></i></span><strong>4,820</strong></div><div class="ranking-row"><strong>02</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--blue">TN</i><b>Trần Nam</b></span><span class="ranking-bar"><i style="width: 84%"></i></span><strong>4,360</strong></div><div class="ranking-row"><strong>03</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--green">HP</i><b>Hà Phương</b></span><span class="ranking-bar"><i style="width: 76%"></i></span><strong>3,940</strong></div><div class="ranking-row ranking-row--you"><strong>12</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--self">NA</i><b>Nguyễn An <small>Bạn</small></b></span><span class="ranking-bar"><i style="width: 54%"></i></span><strong>2,840</strong></div></div></section>
 		</main>
-	</body>
-</html>

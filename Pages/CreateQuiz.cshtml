@@ -1,15 +1,18 @@
 @page
-<!DOCTYPE html>
-<html lang="vi">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Tạo bài kiểm tra</title>
-		<link rel="stylesheet" href="~/css/CreateQuiz.css"/>
-		<script src="~/js/auth-guard.js" defer></script>
-		<script src="~/js/createquiz.js" defer></script>
-	</head>
-	<body>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Tạo bài kiểm tra";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/CreateQuiz.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/createquiz.js" defer></script>
+}
+
 		<main class="create-quiz-page">
 			<header class="create-quiz-header"><div><p class="create-quiz-eyebrow">Công cụ biên soạn</p><h1>Tạo bài kiểm tra</h1><p>Tạo nội dung luyện tập của riêng bạn.</p></div><a class="create-quiz-back" href="/Index">Quay lại trang chủ</a></header>
 			<form class="quiz-builder" action="#" method="post">
@@ -18,5 +21,3 @@
 				<footer class="quiz-builder__actions"><a href="/Index">Hủy</a><button class="quiz-save-button" type="submit">Lưu bài kiểm tra</button></footer>
 			</form>
 		</main>
-	</body>
-</html>
