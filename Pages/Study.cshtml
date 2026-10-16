@@ -1,15 +1,18 @@
 @page
-<!DOCTYPE html>
-<html lang="vi">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Học tập</title>
-		<link rel="stylesheet" href="~/css/Study.css"/>
-		<script src="~/js/auth-guard.js" defer></script>
-		<script src="~/js/study.js" defer></script>
-	</head>
-	<body>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Học tập";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Study.css" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/study.js" defer></script>
+}
+
 		<main class="study-page">
 			<header class="study-header">
 				<div><p class="study-eyebrow">Không gian học tập</p><h1>Học tập</h1><p>Chọn một chủ đề để tiếp tục tiến bộ mỗi ngày.</p></div>
@@ -23,5 +26,3 @@
 				<article class="study-card"><div class="study-card__top"><span class="study-card__icon study-card__icon--orange">L</span><span>10 bài</span></div><h2>Luyện nghe</h2><p>Cải thiện khả năng nghe qua các đoạn hội thoại ngắn.</p><a href="/TrialTest">Bắt đầu học &#8594;</a></article>
 			</section>
 		</main>
-	</body>
-</html>
