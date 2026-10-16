@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!-- Preview component dùng chung (SCRUM-29). Mở qua static server tại thư mục gốc repo. -->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Components Preview - SE347 Language App</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap">
+    <link rel="stylesheet" href="../../wwwroot/assets/_colorpalettes/themes.css">
+    <link rel="stylesheet" href="../../wwwroot/css/Shared/Components.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; color: var(--text-primary); background: var(--bg-main); font-family: var(--font-sans); line-height: var(--lh-body); }
+        main { width: min(1000px, calc(100% - 32px)); margin: 0 auto; padding: var(--space-7) 0 var(--space-8); }
+        header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); }
+        h1 { margin: 0; font-size: var(--fs-2xl); }
+        h2 { margin: var(--space-7) 0 var(--space-4); font-size: var(--fs-xl); }
+        .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+        code { padding: 1px 6px; border-radius: 6px; background: var(--bg-soft); font-size: .85em; }
+    </style>
+</head>
+<body>
+<main>
+    <header>
+        <div>
+            <h1>Components</h1>
+            <p style="margin:0;color:var(--text-secondary)">SCRUM-29 · <code>wwwroot/css/Shared/Components.css</code>, <code>wwwroot/js/Shared/toast.js</code></p>
+        </div>
+        <button class="btn btn--secondary" id="theme-toggle" type="button">Dark mode</button>
+    </header>
+
+    <h2>Button</h2>
+    <div class="row">
+        <button class="btn btn--primary" type="button">Primary</button>
+        <button class="btn btn--secondary" type="button">Secondary</button>
+        <button class="btn btn--ghost" type="button">Ghost</button>
+        <button class="btn btn--danger" type="button">Danger</button>
+        <button class="btn btn--primary" type="button" disabled>Disabled</button>
+        <button class="btn btn--primary" type="button" aria-busy="true" disabled>Đang lưu</button>
+    </div>
+    <div class="row" style="margin-top:var(--space-3)">
+        <button class="btn btn--primary btn--sm" type="button">Small</button>
+        <button class="btn btn--primary" type="button">Default</button>
+        <button class="btn btn--primary btn--lg" type="button">Large</button>
+        <a class="btn btn--secondary" href="#">Link dạng nút</a>
+    </div>
+
+    <h2>Input</h2>
+    <div class="grid">
+        <div class="field">
+            <label class="field__label" for="demo-email">Email</label>
+            <input class="input" id="demo-email" type="email" placeholder="you@example.com" aria-describedby="demo-email-hint">
+            <span class="field__hint" id="demo-email-hint">Dùng email đã đăng ký</span>
+        </div>
+        <div class="field">
+            <label class="field__label" for="demo-password">Mật khẩu</label>
+            <input class="input" id="demo-password" type="password" value="123" aria-invalid="true" aria-describedby="demo-password-error">
+            <span class="field__error" id="demo-password-error">Mật khẩu tối thiểu 8 ký tự</span>
+        </div>
+        <div class="field">
+            <label class="field__label" for="demo-level">Cấp độ</label>
+            <select class="input" id="demo-level"><option>A1</option><option>A2</option><option>B1</option></select>
+        </div>
+        <div class="field">
+            <label class="field__label" for="demo-disabled">Tên đăng nhập</label>
+            <input class="input" id="demo-disabled" value="vanhuy" disabled>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+            <label class="field__label" for="demo-note">Ghi chú</label>
+            <textarea class="input" id="demo-note" placeholder="Nhập ghi chú"></textarea>
+        </div>
+    </div>
+
+    <h2>Card</h2>
+    <div class="grid">
+        <article class="card">
+            <div class="card__header">
+                <div><p class="card__eyebrow">Cấp độ A1</p><h3 class="card__title">Từ vựng chủ đề Gia đình</h3></div>
+            </div>
+            <p class="card__body" style="margin:0">12 bài học · 30 phút</p>
+            <div class="card__footer"><button class="btn btn--ghost btn--sm" type="button">Chi tiết</button><button class="btn btn--primary btn--sm" type="button">Học tiếp</button></div>
+        </article>
+        <a class="card card--interactive" href="#">
+            <p class="card__eyebrow">Card bấm được</p>
+            <h3 class="card__title">Nghe hội thoại cơ bản</h3>
+            <p class="card__body" style="margin:0">8 bài học · 25 phút</p>
+        </a>
+        <article class="card card--soft">
+            <h3 class="card__title">Card soft</h3>
+            <p class="card__body" style="margin:0">Nền phụ, không đổ bóng. Dùng cho khối thông tin phụ.</p>
+        </article>
+    </div>
+
+    <h2>Toast</h2>
+    <div class="row">
+        <button class="btn btn--secondary" type="button" data-toast="success">Success</button>
+        <button class="btn btn--secondary" type="button" data-toast="error">Error</button>
+        <button class="btn btn--secondary" type="button" data-toast="warning">Warning</button>
+        <button class="btn btn--secondary" type="button" data-toast="info">Info</button>
+    </div>
+</main>
+<script src="../../wwwroot/js/Shared/toast.js"></script>
+<script>
+    const messages = {
+        success: 'Đã lưu tiến độ bài học.',
+        error: 'Không kết nối được máy chủ. Thử lại sau.',
+        warning: 'Bạn sắp mất chuỗi 5 ngày học.',
+        info: 'Có 15 từ đến hạn ôn tập.'
+    };
+    document.querySelectorAll('[data-toast]').forEach(button => {
+        button.addEventListener('click', () => AppToast[button.dataset.toast](messages[button.dataset.toast]));
+    });
+    document.getElementById('theme-toggle').addEventListener('click', e => {
+        const root = document.documentElement;
+        const dark = root.dataset.theme !== 'dark';
+        root.dataset.theme = dark ? 'dark' : 'light';
+        e.currentTarget.textContent = dark ? 'Light mode' : 'Dark mode';
+    });
+</script>
+</body>
+</html>
