@@ -95,13 +95,93 @@ document.addEventListener('DOMContentLoaded', () => {
     const mode = new URLSearchParams(window.location.search).get('mode') || 'signup';
     form.action = `/Account/Authentication?mode=${encodeURIComponent(mode)}`;
 
+    const showMessage = (text, isError = true) => {
+        message.className = isError ? 'form-message' : 'auth-banner';
+        message.setAttribute('role', isError ? 'alert' : 'status');
+        message.textContent = text;
+        form.after(message);
+    };
+
+    const resetDigits = () => {
+        digitInputs.forEach(input => { input.value = ''; });
+        updateSubmitState();
+        syncDisabledState(0);
+    };
+
+    // Quên mật khẩu: mã 6 số do Supabase gửi qua email (resetPasswordForEmail ở trang ForgetPassword).
+    const resetEmail = sessionStorage.getItem('pendingPasswordReset');
+
+    if (mode === 'forgot') {
+        const emailLabel = document.querySelector('#verificationEmail');
+        const changeEmailLink = document.querySelector('#changeEmailLink');
+        const resendLink = document.querySelector('.verification-resend a');
+
+        if (emailLabel && resetEmail) {
+            const [name, domain] = resetEmail.split('@');
+            emailLabel.textContent = `${name.slice(0, 1)}***@${domain}`;
+        }
+        changeEmailLink?.setAttribute('href', '/Account/ForgetPassword');
+
+        resendLink?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!resetEmail || !window.sb) {
+                window.location.assign('/Account/ForgetPassword');
+                return;
+            }
+
+            const { error } = await window.sb.auth.resetPasswordForEmail(resetEmail);
+            if (error) {
+                showMessage(error.status === 429
+                    ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                    : 'Không gửi lại được mã. Vui lòng thử lại sau.');
+                return;
+            }
+            resetDigits();
+            showMessage('Đã gửi lại mã xác thực, vui lòng kiểm tra email.', false);
+        });
+    }
+
+    const verifyPasswordReset = async () => {
+        const code = getCode();
+
+        if (!resetEmail) {
+            showMessage('Phiên khôi phục đã hết hạn. Vui lòng nhập lại email.');
+            return false;
+        }
+
+        if (!/^\d{6}$/.test(code) || !window.sb) {
+            showMessage('Mã xác thực không đúng hoặc đã hết hạn.');
+            return false;
+        }
+
+        submitButton.disabled = true;
+
+        // Mã đúng thì Supabase tạo phiên đăng nhập tạm để đổi mật khẩu ở trang ResetPassword.
+        const { error } = await window.sb.auth.verifyOtp({ email: resetEmail, token: code, type: 'recovery' });
+
+        if (error) {
+            showMessage(error.status === 429
+                ? 'Bạn thử quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                : 'Mã xác thực không đúng hoặc đã hết hạn.');
+            resetDigits();
+            return false;
+        }
+
+        sessionStorage.removeItem('pendingPasswordReset');
+        window.location.assign('/Account/ResetPassword');
+        return true;
+    };
+
     const verify = () => {
+        if (mode === 'forgot') {
+            return verifyPasswordReset();
+        }
+
         const code = getCode();
         const pendingSignup = sessionStorage.getItem('pendingSignup');
         const pendingLogin = sessionStorage.getItem('pendingLogin');
-        const pendingPasswordReset = sessionStorage.getItem('pendingPasswordReset');
 
-        if (!/^\d{6}$/.test(code) || (!pendingSignup && !pendingLogin && !pendingPasswordReset)) {
+        if (!/^\d{6}$/.test(code) || (!pendingSignup && !pendingLogin)) {
             message.textContent = 'Mã xác thực không đúng hoặc phiên đăng ký đã hết hạn.';
             form.after(message);
             return false;
@@ -110,12 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pendingSignup) {
             sessionStorage.setItem('registeredUser', pendingSignup);
             sessionStorage.removeItem('pendingSignup');
-            window.location.assign('/Account/Login');
-            return true;
-        }
-
-        if (pendingPasswordReset) {
-            sessionStorage.removeItem('pendingPasswordReset');
             window.location.assign('/Account/Login');
             return true;
         }

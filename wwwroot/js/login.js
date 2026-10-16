@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!form) return;
 
+    if (sessionStorage.getItem('passwordResetDone')) {
+        sessionStorage.removeItem('passwordResetDone');
+        const banner = document.createElement('p');
+        banner.className = 'auth-banner';
+        banner.setAttribute('role', 'status');
+        banner.textContent = 'Đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
+        form.before(banner);
+    }
+
     if (password && passwordToggle) {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';

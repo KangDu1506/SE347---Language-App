@@ -7,6 +7,7 @@
         <title>Xác thực tài khoản</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
+        <partial name="_SupabaseClient" />
         <script src="~/js/authentication.js" defer></script>
     </head>
     <body>
@@ -21,7 +22,7 @@
                     <div class="account-card__heading">
                         <p class="account-eyebrow">Bảo mật tài khoản</p>
                         <h1 id="authentication-title">Kiểm tra email</h1>
-                        <p>Nhập mã 6 số đã gửi tới<br><strong>h***@@gmail.com</strong> · <a href="/Account/Signup">Đổi email</a></p>
+                        <p>Nhập mã 6 số đã gửi tới<br><strong id="verificationEmail">h***@@gmail.com</strong> · <a id="changeEmailLink" href="/Account/Signup">Đổi email</a></p>
                     </div>
 
                     <form

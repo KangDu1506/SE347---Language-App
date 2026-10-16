@@ -1,0 +1,14 @@
+@*
+    Nạp supabase-js và tạo client dùng chung window.sb cho trang cần gọi Supabase Auth.
+    Đặt TRƯỚC script của trang (cùng defer) để window.sb có sẵn khi script trang chạy:
+
+        <partial name="_SupabaseClient" />
+        <script src="~/js/forget-password.js" defer></script>
+
+    Chỉ đưa Url và PublishableKey xuống trình duyệt, KHÔNG BAO GIỜ đưa SecretKey.
+*@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+<meta name="supabase-url" content="@Configuration["Supabase:Url"]" />
+<meta name="supabase-publishable-key" content="@Configuration["Supabase:PublishableKey"]" />
+<script src="https://cdn.jsdelivr.net/npm/@@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+<script src="~/js/supabase-client.js" defer></script>
