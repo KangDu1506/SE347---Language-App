@@ -1,0 +1,245 @@
+/* Component dùng chung (SCRUM-29): button, input, card, toast.
+   Phụ thuộc token trong assets/_colorpalettes/themes.css. Hướng dẫn: docs/frontend/COMPONENTS.md */
+
+/* ---------- Button ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 var(--space-5);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-weight: var(--fw-heavy);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.btn--primary { color: var(--text-on-primary); background: var(--color-primary); }
+.btn--primary:hover { background: var(--color-primary-hover); }
+
+.btn--secondary { border-color: var(--border-strong); color: var(--text-primary); background: var(--bg-card); }
+.btn--secondary:hover { border-color: var(--color-primary); }
+
+.btn--ghost { color: var(--color-primary); background: transparent; }
+.btn--ghost:hover { background: var(--bg-soft); }
+
+.btn--danger { color: #fff; background: var(--status-error); }
+.btn--danger:hover { filter: brightness(.92); }
+
+.btn--sm { min-height: 36px; padding: 0 var(--space-4); font-size: var(--fs-sm); }
+.btn--lg { min-height: 52px; padding: 0 var(--space-6); font-size: var(--fs-lg); }
+.btn--block { width: 100%; }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+    opacity: .5;
+    cursor: not-allowed;
+    transform: none;
+    pointer-events: none;
+}
+
+/* Trạng thái đang xử lý: thêm aria-busy="true" và disabled */
+.btn[aria-busy="true"]::before {
+    content: "";
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: btn-spin .7s linear infinite;
+}
+
+@keyframes btn-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Input ---------- */
+.field {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+}
+
+.field__label {
+    color: var(--text-primary);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
+}
+
+.field__hint {
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+}
+
+.field__error {
+    color: var(--status-error);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+}
+
+.input {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    font: inherit;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+textarea.input {
+    min-height: 96px;
+    padding: var(--space-3);
+    resize: vertical;
+}
+
+.input::placeholder { color: var(--text-secondary); opacity: .7; }
+.input:hover { border-color: var(--color-primary); }
+.input:focus-visible { outline: none; border-color: var(--color-secondary); box-shadow: var(--focus-ring); }
+.input:disabled { opacity: .6; cursor: not-allowed; }
+
+.input[aria-invalid="true"],
+.input--error { border-color: var(--status-error); }
+
+/* ---------- Card ---------- */
+.card {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-md);
+}
+
+.card__header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.card__eyebrow {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-heavy);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.card__title {
+    margin: 0;
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-bold);
+}
+
+.card__body { color: var(--text-secondary); }
+
+.card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-color);
+}
+
+.card--soft { background: var(--bg-surface); box-shadow: none; }
+
+/* Card bấm được: dùng trên thẻ <a> hoặc <button> */
+.card--interactive {
+    color: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.card--interactive:hover { border-color: var(--border-strong); box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+.card--interactive:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* ---------- Toast (tạo bởi js/Shared/toast.js) ---------- */
+.toast-region {
+    position: fixed;
+    right: var(--space-5);
+    bottom: var(--space-5);
+    z-index: 1000;
+    display: grid;
+    gap: var(--space-2);
+    width: min(380px, calc(100vw - 2 * var(--space-4)));
+    pointer-events: none;
+}
+
+.toast {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--text-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-lg);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-semibold);
+    pointer-events: auto;
+    animation: toast-in .2s ease-out;
+}
+
+.toast--success { border-left-color: var(--status-success); }
+.toast--error { border-left-color: var(--status-error); }
+.toast--warning { border-left-color: var(--status-warning); }
+.toast--info { border-left-color: var(--color-secondary); }
+
+.toast__close {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    margin: -4px -6px 0 0;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    background: transparent;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.toast__close:hover { background: var(--bg-soft); }
+.toast__close:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.toast.is-leaving { animation: toast-out .15s ease-in forwards; }
+
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
+
+@media (max-width: 760px) {
+    .toast-region {
+        top: var(--space-4);
+        right: 50%;
+        bottom: auto;
+        transform: translateX(50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .btn, .card--interactive, .input { transition: none; }
+    .btn:hover, .card--interactive:hover { transform: none; }
+    .toast, .toast.is-leaving { animation: none; }
+}
