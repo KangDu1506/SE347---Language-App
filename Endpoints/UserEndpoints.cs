@@ -28,18 +28,9 @@ namespace SE347.Endpoints
                 return Results.Ok(new UsernameAvailabilityDto(username, available));
             });
 
-            // GET /api/users/me: hồ sơ của user đang đăng nhập (cần Bearer token của Supabase)
-            group.MapGet("/me", async (ClaimsPrincipal user, IUserService users, CancellationToken ct) =>
-            {
-                if (user.GetUserId() is not Guid userId)
-                {
-                    return Results.Unauthorized();
-                }
-
-                var profile = await users.GetMyProfileAsync(userId, ct);
-                return profile is null ? Results.NotFound() : Results.Ok(profile);
-            })
-            .RequireAuthorization();
+            // GET /api/users/me và GET /api/me: hồ sơ của user đang đăng nhập (cần Bearer token của Supabase)
+            group.MapGet("/me", GetMyProfileAsync).RequireAuthorization();
+            app.MapGet("/api/me", GetMyProfileAsync).RequireAuthorization();
 
             // GET /api/users/{username}: hồ sơ công khai, 404 nếu không tồn tại hoặc đang để riêng tư
             group.MapGet("/{username}", async (string username, IUserService users, CancellationToken ct) =>
@@ -49,6 +40,17 @@ namespace SE347.Endpoints
             });
 
             return app;
+        }
+
+        private static async Task<IResult> GetMyProfileAsync(ClaimsPrincipal user, IUserService users, CancellationToken ct)
+        {
+            if (user.GetUserId() is not Guid userId)
+            {
+                return Results.Unauthorized();
+            }
+
+            var profile = await users.GetMyProfileAsync(userId, ct);
+            return profile is null ? Results.NotFound() : Results.Ok(profile);
         }
     }
 }
