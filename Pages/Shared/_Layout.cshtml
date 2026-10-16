@@ -13,22 +13,46 @@
         @section Scripts {
             <script src="~/js/index.js" defer></script>
         }
+
+    Ẩn header/footer (mặc định hiện):
+        ViewData["ShowHeader"] = false;
+        ViewData["ShowFooter"] = false;
 *@
+@{
+    var showHeader = ViewData["ShowHeader"] as bool? ?? true;
+    var showFooter = ViewData["ShowFooter"] as bool? ?? true;
+    var bodyClass = string.Join(" ", new[]
+    {
+        showHeader || showFooter ? "has-site-chrome" : null,
+        showHeader ? "has-site-header" : null
+    }.Where(c => c is not null));
+}
 <!DOCTYPE html>
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>@(ViewData["Title"] ?? "SE347 Language App")</title>
+        <title>@(ViewData["Title"] is string title ? $"{title} · SE347 Language App" : "SE347 Language App")</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@@400;600;700;800&display=swap" />
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css" />
         <link rel="stylesheet" href="~/css/Shared/Components.css" />
+        <link rel="stylesheet" href="~/css/Shared/Layout.css" />
         @await RenderSectionAsync("Styles", required: false)
     </head>
-    <body>
+    <body class="@(string.IsNullOrEmpty(bodyClass) ? null : bodyClass)">
+        @if (showHeader)
+        {
+            <partial name="_Header" />
+        }
+
         @RenderBody()
+
+        @if (showFooter)
+        {
+            <partial name="_Footer" />
+        }
 
         <script src="~/js/Shared/toast.js"></script>
         @await RenderSectionAsync("Scripts", required: false)
