@@ -4,9 +4,8 @@ function validateAdmin(token) {
 }
 
 function hasUserToken() {
-    return Boolean(sessionStorage.getItem('userToken') || document.cookie.split('; ').some(cookie => cookie === 'userToken=authenticated'));
+    return document.cookie.split('; ').some(cookie => cookie === 'userToken=authenticated');
 }
 
-if (!hasUserToken()) {
-    window.location.replace('/Account/Login');
-}
+const dashboard = document.querySelector('.home-page');
+if (dashboard) dashboard.hidden = !hasUserToken();

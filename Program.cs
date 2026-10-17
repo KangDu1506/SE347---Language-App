@@ -87,19 +87,10 @@ app.Use(async (context, next) =>
         || string.Equals(path, "/index", StringComparison.OrdinalIgnoreCase)
         || string.Equals(path, "/index.cshtml", StringComparison.OrdinalIgnoreCase);
 
-    if (isDashboardEntry)
+    if (isDashboardEntry && path == string.Empty)
     {
-        if (!context.Request.Cookies.ContainsKey("userToken"))
-        {
-            context.Response.Redirect("/Account/Login");
-            return;
-        }
-
-        if (path == string.Empty)
-        {
-            context.Response.Redirect("/Index");
-            return;
-        }
+        context.Response.Redirect("/Index");
+        return;
     }
 
     await next();

@@ -54,6 +54,12 @@
             <partial name="_Footer" />
         }
 
+        @if (showHeader)
+        {
+            <partial name="_SupabaseClient" />
+            <script src="~/js/Shared/site-auth.js" defer></script>
+        }
+
         <script src="~/js/Shared/toast.js"></script>
         @await RenderSectionAsync("Scripts", required: false)
     </body>
