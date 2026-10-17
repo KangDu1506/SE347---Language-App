@@ -2,39 +2,39 @@
 body {
     min-height: 100vh;
     margin: 0;
-    color: #513b22;
-    background: #fffaf2;
+    color: var(--text-primary);
+    background: var(--bg-main);
     font-family: "Segoe UI", sans-serif;
 }
 
 html body .profile-brand,
 html body .profile-identity h1,
 html body .profile-panel h2,
-html body .profile-stat strong { color: #513b22; }
+html body .profile-stat strong { color: var(--text-primary); }
 html body .profile-nav a:hover,
 html body .profile-nav__active,
 html body .profile-panel__link,
-html body .profile-progress-value { color: #b56a16; }
+html body .profile-progress-value { color: var(--color-primary); }
 html body .profile-nav,
 html body .profile-logout,
 html body .profile-email,
 html body .profile-stat__label,
 html body .profile-stat__note,
-html body .profile-panel__description { color: #806b50; }
+html body .profile-panel__description { color: var(--text-secondary); }
 html body .profile-hero,
 html body .profile-stat,
-html body .profile-panel { border-color: #eadfcf; background: #fff; }
-html body .profile-hero { box-shadow: 0 14px 36px rgb(105 75 31 / 8%); }
-html body .profile-avatar { background: #d88920; }
-html body .profile-edit-button { border-color: #d9c5a7; color: #b56a16; background: #fff; }
-html body .profile-edit-button:hover { border-color: #d88920; background: #fff8eb; }
-html body .profile-progress-track { background: #f0e6d2; }
-html body .profile-progress-track span { background: #d88920; }
+html body .profile-panel { border-color: var(--border-color); background: var(--bg-card); }
+html body .profile-hero { box-shadow: var(--shadow-md); }
+html body .profile-avatar { background: var(--color-primary); }
+html body .profile-edit-button { border-color: var(--border-strong); color: var(--color-primary); background: var(--bg-card); }
+html body .profile-edit-button:hover { border-color: var(--color-primary); background: var(--bg-soft); }
+html body .profile-progress-track { background: var(--border-color); }
+html body .profile-progress-track span { background: var(--color-primary); }
 html body .profile-activity-icon--blue,
-html body .profile-activity-icon--orange { color: #b56a16; background: #fff1d9; }
-html body .profile-activity-list strong { color: #513b22; }
-html body .profile-activity-list small { color: #806b50; }
-html body .profile-activity-list b { color: #b56a16; }
+html body .profile-activity-icon--orange { color: var(--color-primary); background: var(--bg-soft); }
+html body .profile-activity-list strong { color: var(--text-primary); }
+html body .profile-activity-list small { color: var(--text-secondary); }
+html body .profile-activity-list b { color: var(--color-primary); }
 
 body {
     color: var(--text-primary);
@@ -79,7 +79,7 @@ html body .profile-panel {
 }
 
 html body .profile-hero {
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
 }
 
 html body .profile-avatar {
@@ -145,7 +145,7 @@ button {
 }
 
 .profile-brand {
-    color: #17345f;
+    color: var(--text-primary);
     font-size: 1.05rem;
     font-weight: 800;
     letter-spacing: 0.01em;
@@ -157,7 +157,7 @@ button {
     align-items: center;
     flex: 1;
     gap: 28px;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 600;
 }
@@ -165,15 +165,15 @@ button {
 .profile-nav a:hover,
 .profile-logout:hover,
 .profile-panel__link:hover {
-    color: #2563eb;
+    color: var(--color-secondary);
 }
 
 .profile-nav__active {
-    color: #2563eb;
+    color: var(--color-secondary);
 }
 
 .profile-logout {
-    color: #526581;
+    color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 600;
 }
@@ -183,10 +183,10 @@ button {
     align-items: center;
     gap: 20px;
     padding: 30px 34px;
-    border: 1px solid #dbe5f5;
+    border: 1px solid var(--border-color);
     border-radius: 18px;
-    background: #ffffff;
-    box-shadow: 0 14px 36px rgb(28 57 99 / 8%);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-md);
 }
 
 .profile-avatar {
@@ -196,8 +196,8 @@ button {
     flex: 0 0 76px;
     place-items: center;
     border-radius: 50%;
-    color: #ffffff;
-    background: #2563eb;
+    color: var(--text-on-primary);
+    background: var(--color-secondary);
     font-size: 1.35rem;
     font-weight: 800;
 }
@@ -208,7 +208,7 @@ button {
 
 .profile-eyebrow {
     margin: 0 0 5px;
-    color: #6480a4;
+    color: var(--text-secondary);
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -218,7 +218,7 @@ button {
 .profile-identity h1,
 .profile-panel h2 {
     margin: 0;
-    color: #17345f;
+    color: var(--text-primary);
 }
 
 .profile-identity h1 {
@@ -227,22 +227,22 @@ button {
 
 .profile-email {
     margin: 4px 0 0;
-    color: #64748b;
+    color: var(--text-secondary);
 }
 
 .profile-edit-button {
     min-height: 42px;
     padding: 0.65rem 1rem;
-    border: 1px solid #b9c9e2;
+    border: 1px solid var(--border-strong);
     border-radius: 8px;
-    color: #2563eb;
-    background: #ffffff;
+    color: var(--color-secondary);
+    background: var(--bg-card);
     cursor: pointer;
     font-weight: 700;
 }
 
 .profile-edit-button:hover {
-    border-color: #2563eb;
+    border-color: var(--color-secondary);
     background: #f5f8ff;
 }
 
@@ -256,22 +256,22 @@ button {
 .profile-stat {
     min-height: 132px;
     padding: 22px 24px;
-    border: 1px solid #dbe5f5;
+    border: 1px solid var(--border-color);
     border-radius: 14px;
-    background: #ffffff;
+    background: var(--bg-card);
 }
 
 .profile-stat__label,
 .profile-stat__note {
     display: block;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.85rem;
 }
 
 .profile-stat strong {
     display: inline-block;
     margin-top: 12px;
-    color: #17345f;
+    color: var(--text-primary);
     font-size: 1.9rem;
 }
 
@@ -288,9 +288,9 @@ button {
 
 .profile-panel {
     padding: 26px;
-    border: 1px solid #dbe5f5;
+    border: 1px solid var(--border-color);
     border-radius: 14px;
-    background: #ffffff;
+    background: var(--bg-card);
 }
 
 .profile-panel__heading {
@@ -305,7 +305,7 @@ button {
 }
 
 .profile-progress-value {
-    color: #2563eb;
+    color: var(--color-secondary);
     font-size: 1.5rem;
     font-weight: 800;
 }
@@ -315,24 +315,24 @@ button {
     margin-top: 28px;
     overflow: hidden;
     border-radius: 99px;
-    background: #e7eef9;
+    background: var(--border-color);
 }
 
 .profile-progress-track span {
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: #2563eb;
+    background: var(--color-secondary);
 }
 
 .profile-panel__description {
     margin: 14px 0 22px;
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 0.9rem;
 }
 
 .profile-panel__link {
-    color: #2563eb;
+    color: var(--color-secondary);
     font-size: 0.9rem;
     font-weight: 800;
 }
@@ -358,17 +358,17 @@ button {
 }
 
 .profile-activity-list strong {
-    color: #304766;
+    color: var(--text-primary);
     font-size: 0.9rem;
 }
 
 .profile-activity-list small {
-    color: #8291a5;
+    color: var(--text-secondary);
     font-size: 0.78rem;
 }
 
 .profile-activity-list b {
-    color: #2563eb;
+    color: var(--color-secondary);
     font-size: 0.8rem;
     white-space: nowrap;
 }
@@ -385,18 +385,18 @@ button {
 }
 
 .profile-activity-icon--blue {
-    color: #2563eb;
-    background: #eaf1ff;
+    color: var(--color-secondary);
+    background: var(--color-secondary-soft);
 }
 
 .profile-activity-icon--green {
-    color: #16805b;
-    background: #e7f7f0;
+    color: var(--status-success);
+    background: var(--status-success-soft);
 }
 
 .profile-activity-icon--orange {
-    color: #b56a16;
-    background: #fff2dc;
+    color: var(--color-primary);
+    background: var(--bg-soft);
 }
 
 .profile-tabbar {
@@ -453,7 +453,7 @@ button {
         border-top: 1px solid var(--border-color);
         color: var(--text-secondary);
         background: var(--bg-card);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-md);
         font-size: var(--fs-xs);
         font-weight: var(--fw-bold);
     }
@@ -494,17 +494,17 @@ button {
     }
 }
 
-body { color: #513b22; background: #fffaf2; }
-.profile-brand, .profile-identity h1, .profile-panel h2, .profile-stat strong, .profile-activity-list strong { color: #513b22; }
-.profile-nav, .profile-logout, .profile-email, .profile-stat__label, .profile-stat__note, .profile-panel__description, .profile-activity-list small { color: #806b50; }
-.profile-nav a:hover, .profile-logout:hover, .profile-panel__link:hover, .profile-nav__active, .profile-panel__link, .profile-activity-list b { color: #b56a16; }
-.profile-eyebrow { color: #a66a25; }
-.profile-hero, .profile-stat, .profile-panel { border-color: #eadfcf; background: #fff; box-shadow: 0 10px 28px rgb(105 75 31 / 6%); }
-.profile-avatar { background: #d88920; }
-.profile-edit-button { border-color: #d9c5a7; color: #b56a16; background: #fff; }
-.profile-edit-button:hover { border-color: #d88920; background: #fff8eb; }
-.profile-progress-value { color: #b56a16; }
-.profile-progress-track { background: #f0e6d2; }
-.profile-progress-track span { background: #d88920; }
-.profile-activity-icon--blue, .profile-activity-icon--orange { color: #a66a25; background: #fff1d9; }
-.profile-activity-icon--green { color: #16805b; background: #e7f7f0; }
+body { color: var(--text-primary); background: var(--bg-main); }
+.profile-brand, .profile-identity h1, .profile-panel h2, .profile-stat strong, .profile-activity-list strong { color: var(--text-primary); }
+.profile-nav, .profile-logout, .profile-email, .profile-stat__label, .profile-stat__note, .profile-panel__description, .profile-activity-list small { color: var(--text-secondary); }
+.profile-nav a:hover, .profile-logout:hover, .profile-panel__link:hover, .profile-nav__active, .profile-panel__link, .profile-activity-list b { color: var(--color-primary); }
+.profile-eyebrow { color: var(--color-primary); }
+.profile-hero, .profile-stat, .profile-panel { border-color: var(--border-color); background: var(--bg-card); box-shadow: var(--shadow-md); }
+.profile-avatar { background: var(--color-primary); }
+.profile-edit-button { border-color: var(--border-strong); color: var(--color-primary); background: var(--bg-card); }
+.profile-edit-button:hover { border-color: var(--color-primary); background: var(--bg-soft); }
+.profile-progress-value { color: var(--color-primary); }
+.profile-progress-track { background: var(--border-color); }
+.profile-progress-track span { background: var(--color-primary); }
+.profile-activity-icon--blue, .profile-activity-icon--orange { color: var(--color-primary); background: var(--bg-soft); }
+.profile-activity-icon--green { color: var(--status-success); background: var(--status-success-soft); }

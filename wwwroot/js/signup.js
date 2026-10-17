@@ -14,8 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
-            passwordToggle.textContent = isPassword ? 'Ẩn' : 'Hiện';
-            passwordToggle.setAttribute('aria-label', isPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+            passwordToggle.setAttribute('aria-pressed', String(isPassword));
+            passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
+            passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
         });
     }
 
@@ -34,17 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         strength.dataset.strength = strengthState;
         strengthBar.style.width = `${width}%`;
-        strengthText.textContent = score === 0
-            ? 'Độ mạnh: Chưa có mật khẩu'
+        AppI18n.setText(strengthText, score === 0
+            ? 'ui.strength_no_password_yet'
             : score >= 3
-                ? 'Độ mạnh: Tốt'
-                : 'Độ mạnh: Yếu. Thêm chữ hoa, số hoặc ký tự đặc biệt';
+                ? 'ui.strength_good'
+                : 'ui.strength_weak_add_uppercase_letters_numbers_or_symbols');
     };
 
     password?.addEventListener('input', updateStrength);
     updateStrength();
 
-    form.querySelectorAll('input:not([type="checkbox"])').forEach((input) => {
+    form.querySelectorAll('input').forEach((input) => {
         input.addEventListener('blur', () => {
             setFieldError(input);
         });
@@ -66,19 +67,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const error = document.createElement('small');
             error.className = 'field-error';
             error.id = errorId;
-            error.textContent = input.validationMessage;
+            AppI18n.setText(error, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
             label.append(error);
         } else if (!isInvalid && existingError) {
             existingError.remove();
         } else if (isInvalid && existingError) {
-            existingError.textContent = input.validationMessage;
+            AppI18n.setText(existingError, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
         }
     }
 
     form.addEventListener('submit', (event) => {
         if (!form.checkValidity()) {
             event.preventDefault();
-            form.querySelectorAll('input:not([type="checkbox"])').forEach((input) => {
+            form.querySelectorAll('input').forEach((input) => {
                 setFieldError(input);
             });
             return;
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.target.closest('button')) {
             event.preventDefault();
             form.requestSubmit();
         }
