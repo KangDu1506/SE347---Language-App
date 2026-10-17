@@ -28,15 +28,15 @@
                     <form class="account-form" action="/Account/Signup" method="post" novalidate>
                         <label for="fullName">
                             Họ và tên
-                            <input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" required>
+                            <input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="100" required>
                         </label>
                         <label for="username">
                             Tên đăng nhập
-                            <input id="username" type="text" name="username" placeholder="NguyenVanA" autocomplete="username" minlength="3" required>
+                            <input id="username" type="text" name="username" placeholder="NguyenVanA" autocomplete="username" minlength="6" maxlength="32" required>
                         </label>
                         <label for="email">
                             Email
-                            <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" required>
+                            <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" maxlength="255" required>
                         </label>
                         <label for="password">
                             Mật khẩu
