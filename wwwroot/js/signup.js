@@ -69,9 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!words.every((word) => /^\p{Lu}\p{Ll}*$/u.test(word))) {
                 errors.push('Hãy viết hoa chữ cái đầu của mỗi từ trong họ và tên.');
             }
-            if (!/[ăâđêôơưáàảãạấầẩẫậắằẳẵặéèẻẽẹếềểễệíìỉĩịóòỏõọốồổỗộớờởỡợúùủũụứừửữựýỳỷỹỵ]/iu.test(normalizedName)) {
-                errors.push('Họ và tên tiếng Việt cần có dấu.');
-            }
         }
 
         if (input.id === 'username' && value) {
