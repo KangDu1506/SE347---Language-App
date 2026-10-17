@@ -18,26 +18,26 @@
 			<section class="profile-hero" aria-labelledby="profile-title">
 				<div class="profile-avatar" aria-hidden="true">NA</div>
 				<div class="profile-identity">
-					<p class="profile-eyebrow">Tài khoản cá nhân</p>
+					<p class="profile-eyebrow" data-i18n="ui.personal_account">Tài khoản cá nhân</p>
 					<h1 id="profile-title">Nguyễn Văn C</h1>
 					<p class="profile-email">nguyen.van.c@example.com</p>
 				</div>
-				<button class="profile-edit-button" type="button">Chỉnh sửa hồ sơ</button>
+				<button class="profile-edit-button" type="button" data-i18n="ui.edit_profile">Chỉnh sửa hồ sơ</button>
 			</section>
 
-			<section class="profile-stats" aria-label="Thống kê học tập">
+			<section class="profile-stats" aria-label="Thống kê học tập" data-i18n-aria-label="ui.learning_statistics">
 				<article class="profile-stat">
-					<span class="profile-stat__label">Ngày học liên tục</span>
+					<span class="profile-stat__label" data-i18n="ui.learning_streak">Ngày học liên tục</span>
 					<strong>12</strong>
-					<span class="profile-stat__note">ngày</span>
+					<span class="profile-stat__note" data-i18n="ui.days">ngày</span>
 				</article>
 				<article class="profile-stat">
-					<span class="profile-stat__label">Bài đã hoàn thành</span>
+					<span class="profile-stat__label" data-i18n="ui.completed_lessons">Bài đã hoàn thành</span>
 					<strong>48</strong>
-					<span class="profile-stat__note">bài học</span>
+					<span class="profile-stat__note" data-i18n="ui.lessons">bài học</span>
 				</article>
 				<article class="profile-stat">
-					<span class="profile-stat__label">Điểm tích lũy</span>
+					<span class="profile-stat__label" data-i18n="ui.total_points">Điểm tích lũy</span>
 					<strong>2,840</strong>
 					<span class="profile-stat__note">XP</span>
 				</article>
@@ -47,51 +47,51 @@
 				<section class="profile-panel profile-progress-panel" aria-labelledby="progress-title">
 					<div class="profile-panel__heading">
 						<div>
-							<p class="profile-eyebrow">Mục tiêu tuần này</p>
-							<h2 id="progress-title">Tiến độ học tập</h2>
+							<p class="profile-eyebrow" data-i18n="ui.this_week_s_goal">Mục tiêu tuần này</p>
+							<h2 id="progress-title" data-i18n="ui.learning_progress">Tiến độ học tập</h2>
 						</div>
 						<span class="profile-progress-value">72%</span>
 					</div>
-					<div class="profile-progress-track" role="progressbar" aria-label="Tiến độ học tập tuần này" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
+					<div class="profile-progress-track" role="progressbar" aria-label="Tiến độ học tập tuần này" data-i18n-aria-label="ui.this_week_s_learning_progress" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
 						<span style="width: 72%"></span>
 					</div>
-					<p class="profile-panel__description">Bạn đã hoàn thành 18 trên 25 hoạt động trong tuần này.</p>
-					<a class="profile-panel__link" href="/Study">Tiếp tục học <span aria-hidden="true">&#8594;</span></a>
+					<p class="profile-panel__description" data-i18n="ui.you_have_completed_18_of_25_activities_this_week">Bạn đã hoàn thành 18 trên 25 hoạt động trong tuần này.</p>
+					<a class="profile-panel__link" href="/Study"><span data-i18n="ui.continue_learning">Tiếp tục học</span> <span aria-hidden="true">&#8594;</span></a>
 				</section>
 
 				<section class="profile-panel" aria-labelledby="activity-title">
 					<div class="profile-panel__heading">
 						<div>
-							<p class="profile-eyebrow">Theo dõi gần đây</p>
-							<h2 id="activity-title">Hoạt động mới nhất</h2>
+							<p class="profile-eyebrow" data-i18n="ui.recent_progress">Theo dõi gần đây</p>
+							<h2 id="activity-title" data-i18n="ui.latest_activity">Hoạt động mới nhất</h2>
 						</div>
-						<a class="profile-panel__link" href="/Study">Xem tất cả</a>
+						<a class="profile-panel__link" href="/Study" data-i18n="ui.view_all">Xem tất cả</a>
 					</div>
 					<ul class="profile-activity-list">
 						<li>
 							<span class="profile-activity-icon profile-activity-icon--blue" aria-hidden="true">V</span>
-							<span><strong>Từ vựng cơ bản</strong><small>Hoàn thành hôm nay</small></span>
+							<span><strong data-i18n="ui.basic_vocabulary">Từ vựng cơ bản</strong><small data-i18n="ui.completed_today">Hoàn thành hôm nay</small></span>
 							<b>+120 XP</b>
 						</li>
 						<li>
 							<span class="profile-activity-icon profile-activity-icon--green" aria-hidden="true">N</span>
-							<span><strong>Ngữ pháp hiện tại đơn</strong><small>Hoàn thành hôm qua</small></span>
+							<span><strong data-i18n="ui.present_simple_grammar">Ngữ pháp hiện tại đơn</strong><small data-i18n="ui.completed_yesterday">Hoàn thành hôm qua</small></span>
 							<b>+90 XP</b>
 						</li>
 						<li>
 							<span class="profile-activity-icon profile-activity-icon--orange" aria-hidden="true">T</span>
-							<span><strong>Bài kiểm tra thử số 04</strong><small>Hoàn thành 2 ngày trước</small></span>
+							<span><strong data-i18n="ui.practice_test_04">Bài kiểm tra thử số 04</strong><small data-i18n="ui.completed_2_days_ago">Hoàn thành 2 ngày trước</small></span>
 							<b>+180 XP</b>
 						</li>
 					</ul>
 				</section>
 			</div>
 
-			<nav class="profile-tabbar" aria-label="Điều hướng chính">
-				<a href="/Index">Trang chủ</a>
-				<a href="/Study">Học</a>
-				<a href="/TrialTest">Thi thử</a>
-				<a href="/Ranking">Xếp hạng</a>
-				<a class="profile-tabbar__active" href="/Account/Profile" aria-current="page">Hồ sơ</a>
+			<nav class="profile-tabbar" aria-label="Điều hướng chính" data-i18n-aria-label="ui.main_navigation">
+				<a href="/Index" data-i18n="ui.home">Trang chủ</a>
+				<a href="/Study" data-i18n="ui.study">Học</a>
+				<a href="/TrialTest" data-i18n="ui.practice_test">Thi thử</a>
+				<a href="/Ranking" data-i18n="ui.rankings">Xếp hạng</a>
+				<a class="profile-tabbar__active" href="/Account/Profile" aria-current="page" data-i18n="ui.profile">Hồ sơ</a>
 			</nav>
 		</main>

@@ -16,21 +16,22 @@
 }
 <header class="site-header">
     <div class="site-header__inner">
-        <a class="site-brand" href="/Index" aria-label="SE347 Language App - Trang chủ">
+        <a class="site-brand" href="/Index" aria-label="SE347 Language App - Trang chủ" data-i18n-aria-label="ui.se347_language_app_home">
             SE347 <span>Language</span>
         </a>
 
-        <nav class="site-nav" aria-label="Điều hướng chính">
+        <nav class="site-nav" aria-label="Điều hướng chính" data-i18n-aria-label="ui.main_navigation">
             @foreach (var link in links)
             {
                 var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase);
                 <a class="site-nav__link@(isActive ? " is-active" : string.Empty)" href="@link.Href" aria-current="@(isActive ? "page" : null)">
                     <svg class="site-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="@link.Icon" /></svg>
-                    <span>@link.Label</span>
+                    <span data-i18n="@(link.Href switch { "/Index" => "ui.home", "/Study" => "ui.study", "/TrialTest" => "ui.practice_test", "/Ranking" => "ui.rankings", _ => "ui.profile" })">@link.Label</span>
                 </a>
             }
         </nav>
 
-        <a class="site-header__logout" href="/Account/Login?logout=1">Đăng xuất</a>
+        <a class="site-header__logout" href="/Account/Login?logout=1"><span data-i18n="ui.log_out">Đăng xuất</span></a>
+        <partial name="_PreferencesMenu" />
     </div>
 </header>

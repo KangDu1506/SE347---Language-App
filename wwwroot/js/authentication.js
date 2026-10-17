@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const digitInputs = Array.from(form.querySelectorAll('.verification-inputs input'));
     const submitButton = form.querySelector('#verificationSubmit');
-    
+
     const message = document.createElement('p');
     message.className = 'form-message';
     message.setAttribute('role', 'alert');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showMessage = (text, isError = true) => {
         message.className = isError ? 'form-message' : 'auth-banner';
         message.setAttribute('role', isError ? 'alert' : 'status');
-        message.textContent = text;
+        AppI18n.setText(message, text);
         form.after(message);
     };
 
@@ -132,12 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const { error } = await window.sb.auth.resetPasswordForEmail(resetEmail);
             if (error) {
                 showMessage(error.status === 429
-                    ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
-                    : 'Không gửi lại được mã. Vui lòng thử lại sau.');
+                    ? 'ui.too_many_requests_please_wait_a_few_minutes_and_try_again'
+                    : 'ui.unable_to_resend_the_code_please_try_again_later');
                 return;
             }
             resetDigits();
-            showMessage('Đã gửi lại mã xác thực, vui lòng kiểm tra email.', false);
+            showMessage('ui.verification_code_resent_please_check_your_email', false);
         });
     }
 
@@ -145,12 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const code = getCode();
 
         if (!resetEmail) {
-            showMessage('Phiên khôi phục đã hết hạn. Vui lòng nhập lại email.');
+            showMessage('ui.recovery_session_expired_please_enter_your_email_again');
             return false;
         }
 
         if (!/^\d{6}$/.test(code) || !window.sb) {
-            showMessage('Mã xác thực không đúng hoặc đã hết hạn.');
+            showMessage('ui.the_verification_code_is_incorrect_or_expired');
             return false;
         }
 
@@ -161,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (error) {
             showMessage(error.status === 429
-                ? 'Bạn thử quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
-                : 'Mã xác thực không đúng hoặc đã hết hạn.');
+                ? 'ui.too_many_attempts_please_wait_a_few_minutes_and_try_again'
+                : 'ui.the_verification_code_is_incorrect_or_expired');
             resetDigits();
             return false;
         }
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const pendingLogin = sessionStorage.getItem('pendingLogin');
 
         if (!/^\d{6}$/.test(code) || (!pendingSignup && !pendingLogin)) {
-            message.textContent = 'Mã xác thực không đúng hoặc phiên đăng ký đã hết hạn.';
+            AppI18n.setText(message, 'ui.invalid_verification_code_or_expired_registration_session');
             form.after(message);
             return false;
         }

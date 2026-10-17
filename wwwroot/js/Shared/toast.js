@@ -52,6 +52,7 @@
         close.type = 'button';
         close.className = 'toast__close';
         close.setAttribute('aria-label', 'Đóng thông báo');
+        close.setAttribute('data-i18n-aria-label', 'ui.dismiss_notification');
         close.textContent = '×';
         close.addEventListener('click', () => dismiss(toast));
 
