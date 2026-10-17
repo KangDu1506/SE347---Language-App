@@ -75,7 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    form.addEventListener('submit', (event) => {
+    const message = document.createElement('p');
+    message.className = 'form-message';
+    message.setAttribute('role', 'alert');
+
+    form.addEventListener('submit', async (event) => {
         if (!form.checkValidity()) {
             event.preventDefault();
             form.querySelectorAll('input:not([type="checkbox"])').forEach((input) => {
@@ -85,14 +89,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         event.preventDefault();
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton?.textContent;
+        if (!window.sb) {
+            message.textContent = 'Không kết nối được dịch vụ đăng ký. Vui lòng thử lại sau.';
+            form.before(message);
+            return;
+        }
+
         const formData = new FormData(form);
-        sessionStorage.setItem('pendingSignup', JSON.stringify({
-            fullName: formData.get('fullName'),
-            username: formData.get('username'),
-            email: formData.get('email'),
-            password: formData.get('password')
-        }));
-        window.location.assign('/Account/Authentication');
+        const email = String(formData.get('email')).trim().toLowerCase();
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Đang gửi mã...';
+        }
+
+        const { data, error } = await window.sb.auth.signUp({
+            email,
+            password: String(formData.get('password')),
+            options: {
+                data: {
+                    username: String(formData.get('username')).trim().toLowerCase(),
+                    display_name: String(formData.get('fullName')).trim()
+                }
+            }
+        });
+
+        if (error || !data.user) {
+            message.textContent = error?.status === 429
+                ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                : error?.message || 'Không tạo được tài khoản. Vui lòng kiểm tra lại thông tin.';
+            form.before(message);
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
+            return;
+        }
+
+        sessionStorage.setItem('pendingSignupEmail', email);
+        window.location.assign('/Account/Authentication?mode=signup');
     });
 
     form.addEventListener('keydown', (event) => {
