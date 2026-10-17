@@ -3,7 +3,7 @@
 ## Mục lục
 
 - [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-- [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+- [Bắt buộc xem: Phân tích tĩnh](#bắt-buộc-xem-phân-tích-tĩnh)
 - [Luồng xử lý và giải pháp kỹ thuật](#luồng-xử-lý-và-giải-pháp-kỹ-thuật)
 - [DevTools](#devtools)
 - [Chạy dự án](#chạy-dự-án)
@@ -16,29 +16,31 @@
   + *Framework:* Vue 3 CDN
 - **Quản lý mã nguồn:** Git.
 
-## Cấu trúc thư mục
+## Bắt buộc xem: Phân tích tĩnh
 
-```text
-SE347/
-├── Auth/                         # Xác thực JWT của Supabase (issuer, audience, JWKS)
-├── Data/                         # DbContext và cấu hình dữ liệu
-├── DTOs/                         # Data Transfer Objects
-├── Endpoints/                    # Minimal API JSON /api/* cho frontend Vue 3
-├── Models/                       # Các entity của hệ thống
-├── Pages/                        # Razor Pages và giao diện người dùng
-│   ├── Account/                  # Đăng nhập, đăng ký, hồ sơ và xác thực
-│   └── Shared/                   # Thành phần giao diện dùng chung
-├── Properties/                   # launchSettings.json: profile chạy dev (cổng 5347)
-├── Services/                     # Xử lý nghiệp vụ chính
-├── Storage/                      # Tệp lưu trữ riêng tư
-├── supabase/migrations/          # SQL schema Supabase (bảng, trigger, RLS)
-├── wwwroot/                      # Tài nguyên tĩnh công khai
-│   ├── css/                      # Stylesheet theo từng màn hình
-│   ├── images/                   # Hình ảnh giao diện
-│   └── js/                       # JavaScript theo từng màn hình
-├── Program.cs                    # Điểm khởi động và cấu hình ứng dụng
-└── SE347.csproj                  # Tệp cấu hình dự án
-```
+> **BẮT BUỘC XEM:** Các vấn đề dưới đây được ghi nhận qua rà soát tĩnh repo. Cần xử lý hoặc xác nhận trước khi dựa vào các luồng liên quan trong môi trường thật. Đây chưa phải kết quả kiểm thử runtime.
+
+| Mức độ | Phát hiện | Bằng chứng | Ảnh hưởng |
+|---|---|---|---|
+| Cao | Luồng đăng nhập và đăng ký đang mô phỏng ở trình duyệt, chưa xác thực mã đăng nhập/đăng ký với Supabase. Mật khẩu đăng ký được lưu trong `sessionStorage`; nhánh xác thực chỉ kiểm tra mã có 6 chữ số. Server cấp cookie khi nhận `mode=login` và mã 6 chữ số, còn middleware chỉ kiểm tra cookie có tồn tại. | [`wwwroot/js/signup.js`](wwwroot/js/signup.js), [`wwwroot/js/login.js`](wwwroot/js/login.js), [`wwwroot/js/authentication.js`](wwwroot/js/authentication.js), [`Program.cs`](Program.cs) | Tài khoản không được xác thực thực sự qua luồng này; cookie vào trang có thể bị giả mạo. Các API có `RequireAuthorization` vẫn yêu cầu JWT Supabase riêng. |
+| Trung bình | Frontend hiện chưa thấy gọi các API nghiệp vụ `/api/users/*`; trang hồ sơ cũng chưa tải dữ liệu hồ sơ. | [`Endpoints/UserEndpoints.cs`](Endpoints/UserEndpoints.cs), [`wwwroot/js/profile.js`](wwwroot/js/profile.js) | Dữ liệu hồ sơ và kiểm tra username chưa được nối vào giao diện; phiên giả lập không cung cấp JWT cho API được bảo vệ. |
+| Trung bình | Quy tắc tên cấm trong `is_valid_username` không nằm trong constraint bảng, trong khi quyền cập nhật trực tiếp cột `username` được cấp cho `authenticated`. | [`supabase/migrations/20261005090000_user_schema.sql`](supabase/migrations/20261005090000_user_schema.sql) | Cập nhật trực tiếp qua Supabase có thể đặt username dành riêng nếu không gọi hàm kiểm tra khả dụng. |
+| Thấp | Form đăng ký dùng `novalidate`; khi checkbox đồng ý điều khoản chưa chọn, submit bị chặn nhưng vòng hiển thị lỗi bỏ qua checkbox. | [`Pages/Account/Signup.cshtml`](Pages/Account/Signup.cshtml), [`wwwroot/js/signup.js`](wwwroot/js/signup.js) | Người dùng có thể không được thông báo vì sao không thể gửi form. |
+
+### Chẩn đoán runtime API (17/10/2026)
+
+Đã chạy ứng dụng bằng profile `http` trong môi trường Development và gửi request HTTP tới các route dưới đây.
+
+| Endpoint | Kết quả | Nhận xét |
+|---|---|---|
+| `GET /health` | `200 OK` | Ứng dụng khởi động và phục vụ request. |
+| `GET /api/health` | `503 Service Unavailable` | Chưa có connection string Supabase trong môi trường đang chạy. |
+| `GET /api/users/username-available` | `400 Bad Request` | Hành vi đúng khi thiếu tham số `username`. |
+| `GET /api/users/username-available?username=abc` | `500 Internal Server Error` | Truy vấn DB thất bại do connection string chưa được khởi tạo. |
+| `GET /api/users/me` và `GET /api/me` (không có token) | `401 Unauthorized` | Hai route được bảo vệ từ chối request chưa xác thực như dự kiến. |
+| `GET /api/users/nonexistent-runtime-check` | `500 Internal Server Error` | Truy vấn hồ sơ cần DB nhưng connection string chưa được khởi tạo. |
+
+**Giới hạn:** Chưa thể xác nhận phản hồi thành công của các API truy vấn DB hoặc thử xác thực với JWT hợp lệ cho tới khi cấu hình Supabase/database trong môi trường chạy. Các lỗi `500` ở trên phản ánh cấu hình runtime hiện tại, chưa đủ để kết luận truy vấn sẽ lỗi khi kết nối DB hợp lệ.
 
 ## Luồng xử lý và giải pháp kỹ thuật
 
