@@ -10,7 +10,8 @@ namespace DTOs.UserDTOs
         [Required, EmailAddress, StringLength(255)]
         public string Email { get; set; } = null!;
 
-        [Required, MinLength(8)]
+        [Required, MinLength(16)]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E])[A-Za-z0-9\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]+$")]
         public string Password { get; set; } = null!;
 
         [Required, Compare(nameof(Password))]

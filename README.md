@@ -67,6 +67,7 @@ Các trang đăng nhập, đăng ký, quên mật khẩu và hồ sơ được t
 - **Tài nguyên riêng tư:** Đặt trong `Storage`, nằm ngoài phạm vi tài nguyên tĩnh công khai.
 - Tệp riêng tư chỉ nên được phân phối qua endpoint trung gian sau khi hệ thống xác thực và kiểm tra quyền truy cập.
 - Tệp tải lên cần được kiểm tra định dạng, giới hạn dung lượng và đặt tên lưu trữ an toàn để tránh ghi đè hoặc khai thác đường dẫn.
+- Trên production, Azure App Service chuyển hướng HTTP sang HTTPS; ứng dụng gửi HSTS (1 năm), `X-Content-Type-Options`, `X-Frame-Options` và `Referrer-Policy`. Không bật HSTS trong Development để tránh ghim HTTPS cho localhost.
 
 ## DevTools
 
