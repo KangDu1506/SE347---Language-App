@@ -54,6 +54,23 @@ Khai báo biến môi trường theo tên trong `.env.example` (dùng `__` thay 
 
 Xóa khỏi code chưa đủ vì key vẫn nằm trong lịch sử git. Báo lead ngay để **rotate**: tạo Secret key mới và xóa key cũ ở API Keys; đổi Database password ở Project Settings → Database.
 
+## Xác thực email khi đăng ký
+
+Luồng: `/Account/Signup` gọi `auth.signUp` với email, mật khẩu và metadata hồ sơ → Supabase gửi mã OTP cho user chưa xác thực → `/Account/Authentication?mode=signup` gọi `verifyOtp({ type: 'signup' })` → sau khi xác thực, người dùng có thể đăng nhập bằng email và mật khẩu. Trigger `on_auth_user_created` quản lý tạo hồ sơ; mật khẩu không được lưu trong trình duyệt.
+
+Cấu hình trên Supabase Dashboard:
+
+1. **Authentication → Sign In / Providers → Email**: bật **Confirm email** và đặt **Email OTP Length** = **6**.
+2. **Authentication → Emails → Templates → Confirm signup**: email cần hiển thị `{{ .Token }}` để người dùng nhập mã trên trang xác thực, thay vì chỉ dùng `{{ .ConfirmationURL }}`. Ví dụ:
+
+   ```html
+   <h2>Xác thực tài khoản</h2>
+   <p>Mã xác thực của bạn là: <strong>{{ .Token }}</strong></p>
+   <p>Nếu bạn không yêu cầu tạo tài khoản, hãy bỏ qua email này.</p>
+   ```
+
+3. **Authentication → Emails → SMTP Settings**: SMTP mặc định của Supabase chỉ gửi tới email thành viên trong org và bị giới hạn. Muốn gửi cho người dùng thật, hãy bật custom SMTP (Gmail App Password, Resend, Brevo...).
+
 ## Quên mật khẩu qua email
 
 Luồng: `/Account/ForgetPassword` gọi `resetPasswordForEmail` → Supabase gửi **mã 6 số** → `/Account/Authentication?mode=forgot` gọi `verifyOtp({ type: 'recovery' })` → `/Account/ResetPassword` gọi `updateUser({ password })` rồi đăng xuất. Frontend dùng supabase-js qua partial `Pages/Shared/_SupabaseClient.cshtml` (chỉ cần `Supabase:Url` và `Supabase:PublishableKey`).

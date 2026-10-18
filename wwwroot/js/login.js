@@ -13,6 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!form) return;
 
+    const verified = new URLSearchParams(window.location.search).get('verified') === '1';
+    if (verified) {
+        const banner = document.createElement('p');
+        banner.className = 'auth-banner';
+        banner.setAttribute('role', 'status');
+        banner.textContent = 'Email đã được xác thực. Bạn có thể đăng nhập.';
+        form.before(banner);
+    }
+
     if (sessionStorage.getItem('passwordResetDone')) {
         sessionStorage.removeItem('passwordResetDone');
         const banner = document.createElement('p');
@@ -31,10 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         const username = document.querySelector('#username');
         const password = document.querySelector('#password');
-        const registeredUser = JSON.parse(sessionStorage.getItem('registeredUser') || 'null');
 
         if (!username.value.trim() || !password.value) {
             event.preventDefault();
@@ -43,19 +51,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const loginIdentifier = username.value.trim();
-        const matchesIdentifier = registeredUser
-            && (loginIdentifier === registeredUser.email || loginIdentifier === registeredUser.username);
-
-        if (!matchesIdentifier || password.value !== registeredUser.password) {
-            event.preventDefault();
-            message.textContent = 'Email/tên đăng nhập hoặc mật khẩu không đúng.';
+        event.preventDefault();
+        if (!window.sb) {
+            message.textContent = 'Không kết nối được dịch vụ đăng nhập. Vui lòng thử lại sau.';
             form.before(message);
             return;
         }
 
-        sessionStorage.setItem('pendingLogin', '1');
-        window.location.assign('/Account/Authentication?mode=login');
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+        const { data, error } = await window.sb.auth.signInWithPassword({
+            email: username.value.trim().toLowerCase(),
+            password: password.value
+        });
+
+        if (error || !data.session) {
+            message.textContent = error?.message?.toLowerCase().includes('not confirmed')
+                ? 'Email chưa được xác thực. Vui lòng nhập mã đã gửi tới email.'
+                : 'Email hoặc mật khẩu không đúng.';
+            form.before(message);
+            if (submitButton) submitButton.disabled = false;
+            return;
+        }
+
+        document.cookie = 'userToken=authenticated; path=/; SameSite=Lax';
+        window.location.assign('/Index');
     });
 
     form.addEventListener('keydown', (event) => {

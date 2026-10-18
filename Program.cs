@@ -78,18 +78,6 @@ app.Use(async (context, next) =>
             var mode = context.Request.Query["mode"].ToString();
             var code = context.Request.Query["code"].ToString();
 
-            if (System.Text.RegularExpressions.Regex.IsMatch(code, @"^\d{6}$") && mode == "login")
-            {
-                context.Response.Cookies.Append("userToken", "authenticated", new CookieOptions
-                {
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.Lax,
-                    Path = "/"
-                });
-                context.Response.Redirect("/Index", permanent: false, preserveMethod: false);
-                return;
-            }
-
             context.Response.Redirect("/Account/Login", permanent: false, preserveMethod: false);
             return;
         }
@@ -99,19 +87,10 @@ app.Use(async (context, next) =>
         || string.Equals(path, "/index", StringComparison.OrdinalIgnoreCase)
         || string.Equals(path, "/index.cshtml", StringComparison.OrdinalIgnoreCase);
 
-    if (isDashboardEntry)
+    if (isDashboardEntry && path == string.Empty)
     {
-        if (!context.Request.Cookies.ContainsKey("userToken"))
-        {
-            context.Response.Redirect("/Account/Login");
-            return;
-        }
-
-        if (path == string.Empty)
-        {
-            context.Response.Redirect("/Index");
-            return;
-        }
+        context.Response.Redirect("/Index");
+        return;
     }
 
     await next();
