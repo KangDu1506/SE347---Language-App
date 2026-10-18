@@ -6,6 +6,8 @@ using SE347.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+
 // Kết nối Supabase 
 var connectionString = builder.Configuration.GetConnectionString("Supabase");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -28,6 +30,21 @@ builder.Services.AddCors(options => options.AddPolicy(DevCorsPolicy, policy =>
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
+    if (!app.Environment.IsDevelopment())
+    {
+        headers["Strict-Transport-Security"] = "max-age=31536000";
+    }
+
+    await next();
+});
 
 app.UseRouting();
 

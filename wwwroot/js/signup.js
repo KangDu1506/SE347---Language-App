@@ -20,11 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const getPasswordRules = (value) => [
-        { valid: Array.from(value).length >= 8, message: 'Mật khẩu phải có ít nhất 8 ký tự.' },
+        { valid: Array.from(value).length >= 16, message: 'Mật khẩu phải có ít nhất 16 ký tự.' },
         { valid: /[A-Z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ hoa.' },
         { valid: /[a-z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ thường.' },
         { valid: /[0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ số.' },
-        { valid: /[^A-Za-z0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một ký tự đặc biệt.' }
+        { valid: /[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/.test(value), message: 'Mật khẩu phải có ít nhất một ký tự đặc biệt.' },
+        { valid: /^[A-Za-z0-9\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]+$/.test(value), message: 'Mật khẩu chỉ được chứa chữ hoa, chữ thường, chữ số và ký tự đặc biệt.' }
     ];
 
     const updateStrength = () => {
@@ -32,16 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const value = password.value;
         const score = getPasswordRules(value).filter((rule) => rule.valid).length;
-        const strengthState = score === 5 ? 'strong' : score >= 3 ? 'medium' : 'weak';
-        const width = score * 20;
+        const strengthState = score === 6 ? 'strong' : score >= 4 ? 'medium' : 'weak';
+        const width = score * 100 / 6;
 
         strength.dataset.strength = strengthState;
         strengthBar.style.width = `${width}%`;
         strengthText.textContent = score === 0
             ? 'Độ mạnh: Chưa có mật khẩu'
-            : score === 5
+            : score === 6
                 ? 'Độ mạnh: Mạnh'
-                : score >= 3
+                : score >= 4
                     ? 'Độ mạnh: Trung bình'
                     : 'Độ mạnh: Yếu';
     };
@@ -50,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStrength();
 
     function getFieldErrors(input) {
-        const value = input.value.trim();
+        const value = input.type === 'password' ? input.value : input.value.trim();
         const errors = [];
 
         if (input.type === 'checkbox') {
