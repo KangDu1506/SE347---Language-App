@@ -52,7 +52,8 @@
     --color-primary-hover: #8f5410;  /* 5.9:1 */
     --color-brand: #d88920;          /* chỉ dùng cho icon, hình minh họa, gradient - KHÔNG đặt chữ lên trên */
     --color-brand-dark: #69451f;
-    --gradient-hero: linear-gradient(120deg, var(--color-brand-dark), var(--color-brand));
+    /* Keep the brand hue, with enough darkness for --text-on-brand at both ends. */
+    --gradient-hero: linear-gradient(120deg, var(--color-brand-dark), color-mix(in srgb, var(--color-brand-dark) 65%, var(--color-brand)));
 
     /* Màu phụ - xanh */
     --color-secondary: #2563eb;      /* 5.0:1 */

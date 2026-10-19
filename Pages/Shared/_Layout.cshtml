@@ -31,8 +31,9 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>@(ViewData["Title"] is string title ? $"{title} · SE347 Language App" : "SE347 Language App")</title>
+        <title data-i18n="@(ViewContext.RouteData.Values["page"]?.ToString() switch { "/Index" => "ui.home", "/Study" => "ui.study", "/Ranking" => "ui.leaderboard", "/Account/Profile" => "ui.profile", "/CreateQuiz" => "ui.create_a_test", "/TrialTest" => "ui.try_a_test", _ => "" })" data-i18n-suffix=" · SE347 Language App">@(ViewData["Title"] is string title ? $"{title} · SE347 Language App" : "SE347 Language App")</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@@400;600;700;800&display=swap" />
@@ -40,6 +41,7 @@
         <link rel="stylesheet" href="~/css/Shared/Components.css" />
         <link rel="stylesheet" href="~/css/Shared/Layout.css" />
         @await RenderSectionAsync("Styles", required: false)
+        <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
     <body class="@(string.IsNullOrEmpty(bodyClass) ? null : bodyClass)">
         @if (showHeader)
