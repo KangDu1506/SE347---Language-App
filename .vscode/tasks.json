@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Check Supabase configuration presence",
+			"type": "shell",
+			"command": "dotnet user-secrets list --project SE347.csproj | ForEach-Object { ($_ -split ' = ')[0] }",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

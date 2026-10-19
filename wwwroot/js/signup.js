@@ -14,8 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
-            passwordToggle.textContent = isPassword ? 'Ẩn' : 'Hiện';
-            passwordToggle.setAttribute('aria-label', isPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+            const label = window.authUi.translate(isPassword ? 'password.hide' : 'password.show');
+            passwordToggle.textContent = label;
+            passwordToggle.setAttribute('aria-label', label);
         });
     }
 
@@ -39,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
         strength.dataset.strength = strengthState;
         strengthBar.style.width = `${width}%`;
         strengthText.textContent = score === 0
-            ? 'Độ mạnh: Chưa có mật khẩu'
+            ? window.authUi.translate('signup.strengthEmpty')
             : score === 6
-                ? 'Độ mạnh: Mạnh'
+                ? window.authUi.translate('signup.strengthStrong')
                 : score >= 4
-                    ? 'Độ mạnh: Trung bình'
-                    : 'Độ mạnh: Yếu';
+                    ? window.authUi.translate('signup.strengthMedium')
+                    : window.authUi.translate('signup.strengthWeak');
     };
 
     password?.addEventListener('input', updateStrength);
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const error = document.createElement('small');
                 error.className = 'field-error';
                 error.id = `${errorPrefix}-${index + 1}`;
-                error.textContent = errorMessage;
+                error.textContent = window.authUi.localize(errorMessage);
                 label.append(error);
                 return error.id;
             });
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitButton = form.querySelector('button[type="submit"]');
         const originalButtonText = submitButton?.textContent;
         if (!window.sb) {
-            message.textContent = 'Không kết nối được dịch vụ đăng ký. Vui lòng thử lại sau.';
+            message.textContent = window.authUi.localize('Không kết nối được dịch vụ đăng ký. Vui lòng thử lại sau.');
             form.before(message);
             return;
         }
@@ -150,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = String(formData.get('email')).trim().toLowerCase();
         if (submitButton) {
             submitButton.disabled = true;
-            submitButton.textContent = 'Đang gửi mã...';
+            submitButton.textContent = window.authUi.localize('Đang gửi mã...');
         }
 
         const { data, error } = await window.sb.auth.signUp({
@@ -165,9 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (error || !data.user) {
-            message.textContent = error?.status === 429
+            message.textContent = window.authUi.localize(error?.status === 429
                 ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
-                : error?.message || 'Không tạo được tài khoản. Vui lòng kiểm tra lại thông tin.';
+                : error?.message || 'Không tạo được tài khoản. Vui lòng kiểm tra lại thông tin.');
             form.before(message);
             if (submitButton) {
                 submitButton.disabled = false;

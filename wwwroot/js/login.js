@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const banner = document.createElement('p');
         banner.className = 'auth-banner';
         banner.setAttribute('role', 'status');
-        banner.textContent = 'Email đã được xác thực. Bạn có thể đăng nhập.';
+        banner.textContent = window.authUi.localize('Email đã được xác thực. Bạn có thể đăng nhập.');
         form.before(banner);
     }
 
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const banner = document.createElement('p');
         banner.className = 'auth-banner';
         banner.setAttribute('role', 'status');
-        banner.textContent = 'Đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.';
+        banner.textContent = window.authUi.localize('Đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.');
         form.before(banner);
     }
 
@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
-            passwordToggle.textContent = isPassword ? 'Ẩn' : 'Hiện';
-            passwordToggle.setAttribute('aria-label', isPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+            const label = window.authUi.translate(isPassword ? 'password.hide' : 'password.show');
+            passwordToggle.textContent = label;
+            passwordToggle.setAttribute('aria-label', label);
         });
     }
 
@@ -46,14 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!username.value.trim() || !password.value) {
             event.preventDefault();
-            message.textContent = 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.';
+            message.textContent = window.authUi.localize('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
             form.before(message);
             return;
         }
 
         event.preventDefault();
         if (!window.sb) {
-            message.textContent = 'Không kết nối được dịch vụ đăng nhập. Vui lòng thử lại sau.';
+            message.textContent = window.authUi.localize('Không kết nối được dịch vụ đăng nhập. Vui lòng thử lại sau.');
             form.before(message);
             return;
         }
@@ -66,9 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (error || !data.session) {
-            message.textContent = error?.message?.toLowerCase().includes('not confirmed')
+            message.textContent = window.authUi.localize(error?.message?.toLowerCase().includes('not confirmed')
                 ? 'Email chưa được xác thực. Vui lòng nhập mã đã gửi tới email.'
-                : 'Email hoặc mật khẩu không đúng.';
+                : 'Email hoặc mật khẩu không đúng.');
             form.before(message);
             if (submitButton) submitButton.disabled = false;
             return;

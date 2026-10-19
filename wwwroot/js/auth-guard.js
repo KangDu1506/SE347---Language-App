@@ -1,11 +1,26 @@
-function validateAdmin(token) {
-    // Add validating logic here.
-    return token === 'admin-123';
-}
+const protectedPage = document.querySelector('.home-page');
 
-function hasUserToken() {
-    return document.cookie.split('; ').some(cookie => cookie === 'userToken=authenticated');
-}
+if (protectedPage) {
+    protectedPage.hidden = true;
 
-const dashboard = document.querySelector('.home-page');
-if (dashboard) dashboard.hidden = !hasUserToken();
+    if (!window.sb) {
+        console.error('Không thể xác thực phiên: Supabase client chưa được khởi tạo.');
+        window.location.replace('/Account/Login');
+    } else {
+        window.sb.auth.getUser().then(({ data, error }) => {
+            if (error) {
+                console.error('Không thể xác thực phiên Supabase:', error);
+            }
+
+            if (error || !data.user) {
+                window.location.replace('/Account/Login');
+                return;
+            }
+
+            protectedPage.hidden = false;
+        }).catch((error) => {
+            console.error('Không thể xác thực phiên Supabase:', error);
+            window.location.replace('/Account/Login');
+        });
+    }
+}

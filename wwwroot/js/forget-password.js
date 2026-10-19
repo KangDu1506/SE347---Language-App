@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     message.setAttribute('role', 'alert');
 
     const showMessage = (text) => {
-        message.textContent = text;
+        message.textContent = window.authUi.localize(text);
         form.after(message);
     };
 

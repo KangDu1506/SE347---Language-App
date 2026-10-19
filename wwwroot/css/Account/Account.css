@@ -46,6 +46,39 @@ button {
     width: min(100% - var(--space-6), 1040px);
 }
 
+.account-preferences {
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 10;
+    display: flex;
+    gap: var(--space-2);
+}
+
+.account-preferences button {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-pill);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-bold);
+}
+
+.account-preferences button:hover {
+    background: var(--bg-soft);
+}
+
+.account-preferences button:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
 .auth-layout {
     display: grid;
     grid-template-columns: minmax(300px, .9fr) minmax(420px, 1.1fr);
@@ -577,6 +610,16 @@ button {
 
     .account-page--auth {
         width: min(100% - var(--space-4), 480px);
+    }
+
+    .account-preferences {
+        top: var(--space-2);
+        right: var(--space-2);
+    }
+
+    .account-preferences button {
+        min-height: 34px;
+        padding: 0 var(--space-2);
     }
 
     .auth-layout {

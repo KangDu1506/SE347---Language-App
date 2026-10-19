@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const showMessage = (text, isError = true) => {
         message.className = isError ? 'form-message' : 'auth-banner';
         message.setAttribute('role', isError ? 'alert' : 'status');
-        message.textContent = text;
+        message.textContent = window.authUi.localize(text);
         form.after(message);
     };
 
