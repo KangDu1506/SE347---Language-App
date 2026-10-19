@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
-            const label = window.authUi.translate(isPassword ? 'password.hide' : 'password.show');
-            passwordToggle.textContent = label;
-            passwordToggle.setAttribute('aria-label', label);
+            passwordToggle.setAttribute('aria-pressed', String(isPassword));
+            passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
+            passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
         });
     }
 
@@ -39,82 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         strength.dataset.strength = strengthState;
         strengthBar.style.width = `${width}%`;
-        strengthText.textContent = score === 0
-            ? window.authUi.translate('signup.strengthEmpty')
-            : score === 6
-                ? window.authUi.translate('signup.strengthStrong')
-                : score >= 4
-                    ? window.authUi.translate('signup.strengthMedium')
-                    : window.authUi.translate('signup.strengthWeak');
+        AppI18n.setText(strengthText, score === 0
+            ? 'ui.strength_no_password_yet'
+            : score >= 3
+                ? 'ui.strength_good'
+                : 'ui.strength_weak_add_uppercase_letters_numbers_or_symbols');
     };
 
     password?.addEventListener('input', updateStrength);
     updateStrength();
-
-    function getFieldErrors(input) {
-        const value = input.type === 'password' ? input.value : input.value.trim();
-        const errors = [];
-
-        if (input.type === 'checkbox') {
-            if (input.required && !input.checked) errors.push('Bạn cần đồng ý với Điều khoản sử dụng.');
-            return errors;
-        }
-
-        if (!value && input.required) errors.push('Vui lòng nhập thông tin này.');
-
-        if (input.id === 'fullName' && value) {
-            const normalizedName = value.normalize('NFC');
-            const words = normalizedName.split(/[ '-]+/);
-            if (!/^[\p{L}]+(?:[ '-][\p{L}]+)*$/u.test(normalizedName)) {
-                errors.push('Họ và tên chỉ được chứa chữ cái, dấu cách, dấu nháy hoặc gạch nối.');
-            }
-            if (!words.every((word) => /^\p{Lu}\p{Ll}*$/u.test(word))) {
-                errors.push('Hãy viết hoa chữ cái đầu của mỗi từ trong họ và tên.');
-            }
-        }
-
-        if (input.id === 'username' && value) {
-            const length = Array.from(value).length;
-            if (length < 6) errors.push('Tên đăng nhập phải có ít nhất 6 ký tự.');
-            if (length > 32) errors.push('Tên đăng nhập không được vượt quá 32 ký tự.');
-        }
-
-        if (input.type === 'email' && value && input.validity.typeMismatch) {
-            errors.push('Email không đúng định dạng, ví dụ: ten@example.com.');
-        }
-
-        if (input.id === 'password' && value) {
-            errors.push(...getPasswordRules(value).filter((rule) => !rule.valid).map((rule) => rule.message));
-        }
-
-        return errors;
-    }
-
-    function setFieldErrors(input, errors = getFieldErrors(input)) {
-        const label = input.closest('label');
-        if (!label) return errors.length === 0;
-
-        const errorPrefix = `${input.id}-error`;
-        label.querySelectorAll(`[id^="${errorPrefix}"]`).forEach((error) => error.remove());
-        label.classList.toggle('has-error', errors.length > 0);
-        input.setAttribute('aria-invalid', errors.length > 0 ? 'true' : 'false');
-
-        if (errors.length > 0) {
-            const errorIds = errors.map((errorMessage, index) => {
-                const error = document.createElement('small');
-                error.className = 'field-error';
-                error.id = `${errorPrefix}-${index + 1}`;
-                error.textContent = window.authUi.localize(errorMessage);
-                label.append(error);
-                return error.id;
-            });
-            input.setAttribute('aria-describedby', errorIds.join(' '));
-        } else {
-            input.removeAttribute('aria-describedby');
-        }
-
-        return errors.length === 0;
-    }
 
     form.querySelectorAll('input').forEach((input) => {
         input.addEventListener('blur', () => {
@@ -125,25 +58,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const message = document.createElement('p');
-    message.className = 'form-message';
-    message.setAttribute('role', 'alert');
+    function setFieldError(input) {
+        const label = input.closest('label');
+        if (!label) return;
+
+        const errorId = `${input.id}-error`;
+        const existingError = document.getElementById(errorId);
+        const isInvalid = !input.checkValidity();
+
+        label.classList.toggle('has-error', isInvalid);
+        input.setAttribute('aria-invalid', isInvalid ? 'true' : 'false');
+        input.setAttribute('aria-describedby', isInvalid ? errorId : '');
+
+        if (isInvalid && !existingError) {
+            const error = document.createElement('small');
+            error.className = 'field-error';
+            error.id = errorId;
+            AppI18n.setText(error, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
+            label.append(error);
+        } else if (!isInvalid && existingError) {
+            existingError.remove();
+        } else if (isInvalid && existingError) {
+            AppI18n.setText(existingError, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
+        }
+    }
 
     form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const allFieldsValid = [...form.querySelectorAll('input')]
-            .map((input) => setFieldErrors(input))
-            .every(Boolean);
-        if (!allFieldsValid) {
-            return;
-        }
-
-        message.remove();
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton?.textContent;
-        if (!window.sb) {
-            message.textContent = window.authUi.localize('Không kết nối được dịch vụ đăng ký. Vui lòng thử lại sau.');
-            form.before(message);
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            form.querySelectorAll('input').forEach((input) => {
+                setFieldError(input);
+            });
             return;
         }
 
@@ -182,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.target.closest('button')) {
             event.preventDefault();
             form.requestSubmit();
         }

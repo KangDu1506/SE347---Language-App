@@ -18,93 +18,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     message.setAttribute('role', 'alert');
 
     const showMessage = (text) => {
-        message.textContent = text;
+        AppI18n.setText(message, text);
         form.after(message);
     };
 
-    const bindPasswordToggle = (input, toggle, visibleLabel) => {
-        toggle?.addEventListener('click', () => {
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            toggle.textContent = isPassword ? 'Ẩn' : 'Hiện';
-            toggle.setAttribute('aria-label', `${isPassword ? 'Ẩn' : 'Hiện'} ${visibleLabel}`);
-        });
-    };
-
-    bindPasswordToggle(password, passwordToggle, 'mật khẩu mới');
-    bindPasswordToggle(confirmPassword, confirmPasswordToggle, 'mật khẩu nhập lại');
-
-    const getPasswordRules = (value) => [
-        { valid: Array.from(value).length >= 8, message: 'Mật khẩu phải có ít nhất 8 ký tự.' },
-        { valid: /[A-Z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ hoa.' },
-        { valid: /[a-z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ thường.' },
-        { valid: /[0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ số.' },
-        { valid: /[^A-Za-z0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một ký tự đặc biệt.' }
-    ];
-
-    const updateStrength = () => {
-        if (!strength || !strengthText || !strengthBar) return;
-
-        const value = password.value;
-        const score = getPasswordRules(value).filter((rule) => rule.valid).length;
-        strength.dataset.strength = score === 5 ? 'strong' : score >= 3 ? 'medium' : 'weak';
-        strengthBar.style.width = `${score * 20}%`;
-        strengthText.textContent = score === 0
-            ? 'Độ mạnh: Chưa có mật khẩu'
-            : score === 5
-                ? 'Độ mạnh: Mạnh'
-                : score >= 3
-                    ? 'Độ mạnh: Trung bình'
-                    : 'Độ mạnh: Yếu';
-    };
-
-    const getFieldErrors = (input) => {
-        const errors = [];
-        if (!input.value) errors.push('Vui lòng nhập thông tin này.');
-
-        if (input === password && input.value) {
-            errors.push(...getPasswordRules(input.value).filter((rule) => !rule.valid).map((rule) => rule.message));
-        }
-
-        if (input === confirmPassword && input.value && input.value !== password.value) {
-            errors.push('Mật khẩu nhập lại không khớp.');
-        }
-
-        return errors;
-    };
-
-    const setFieldErrors = (input) => {
-        const label = input.closest('label');
-        const errors = getFieldErrors(input);
-        const errorPrefix = `${input.id}-error`;
-        label.querySelectorAll(`[id^="${errorPrefix}"]`).forEach((error) => error.remove());
-        label.classList.toggle('has-error', errors.length > 0);
-        input.setAttribute('aria-invalid', errors.length > 0 ? 'true' : 'false');
-
-        if (errors.length) {
-            const errorIds = errors.map((errorMessage, index) => {
-                const error = document.createElement('small');
-                error.className = 'field-error';
-                error.id = `${errorPrefix}-${index + 1}`;
-                error.textContent = errorMessage;
-                label.append(error);
-                return error.id;
-            });
-            input.setAttribute('aria-describedby', errorIds.join(' '));
-        } else {
-            input.removeAttribute('aria-describedby');
-        }
-
-        return errors.length === 0;
-    };
-
-    password.addEventListener('input', () => {
-        updateStrength();
-        if (password.getAttribute('aria-invalid') === 'true') setFieldErrors(password);
-        if (confirmPassword.value && confirmPassword.getAttribute('aria-invalid') === 'true') setFieldErrors(confirmPassword);
-    });
-    confirmPassword.addEventListener('input', () => {
-        if (confirmPassword.getAttribute('aria-invalid') === 'true') setFieldErrors(confirmPassword);
+    passwordToggle?.addEventListener('click', () => {
+        const isPassword = password.type === 'password';
+        password.type = isPassword ? 'text' : 'password';
+        confirmPassword.type = password.type;
+        passwordToggle.setAttribute('aria-pressed', String(isPassword));
+        passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
+        passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
     });
     password.addEventListener('blur', () => setFieldErrors(password));
     confirmPassword.addEventListener('blur', () => setFieldErrors(confirmPassword));
@@ -114,7 +38,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data } = window.sb ? await window.sb.auth.getSession() : { data: {} };
     if (!data?.session) {
         submitButton.disabled = true;
-        message.innerHTML = 'Phiên khôi phục đã hết hạn. <a href="/Account/ForgetPassword">Gửi lại mã xác thực</a>.';
+        const expired = document.createElement('span');
+        AppI18n.setText(expired, 'auth.recovery_expired');
+        const recoveryLink = document.createElement('a');
+        recoveryLink.href = '/Account/ForgetPassword';
+        AppI18n.setText(recoveryLink, 'auth.resend_code');
+        message.replaceChildren(expired, document.createTextNode(' '), recoveryLink);
         form.after(message);
         return;
     }
@@ -123,8 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         event.preventDefault();
         message.remove();
 
-        const fieldsValid = [password, confirmPassword].map(setFieldErrors).every(Boolean);
-        if (!fieldsValid) {
+        if (password.value.length < 8) {
+            showMessage('ui.your_new_password_must_contain_at_least_8_characters');
+            return;
+        }
+
+        if (password.value !== confirmPassword.value) {
+            showMessage('ui.passwords_do_not_match');
             return;
         }
 
@@ -134,10 +68,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (error) {
             submitButton.disabled = false;
             showMessage(error.code === 'same_password'
-                ? 'Mật khẩu mới phải khác mật khẩu cũ.'
+                ? 'ui.your_new_password_must_differ_from_the_old_one'
                 : error.code === 'weak_password'
-                    ? 'Mật khẩu quá yếu, vui lòng chọn mật khẩu khác.'
-                    : 'Không đổi được mật khẩu. Vui lòng thử lại.');
+                    ? 'ui.password_is_too_weak_please_choose_a_different_one'
+                    : 'ui.unable_to_change_password_please_try_again');
             return;
         }
 
@@ -148,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     form.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.target.closest('button')) {
             event.preventDefault();
             form.requestSubmit();
         }

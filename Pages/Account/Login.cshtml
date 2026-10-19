@@ -8,38 +8,34 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-page-title="page.login">Đăng nhập</title>
+        <title data-i18n="ui.sign_in">Đăng nhập</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
         <script src="~/js/login.js" defer></script>
+        <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
     <body>
-        <div class="account-preferences" aria-label="Tùy chọn hiển thị">
-            <button type="button" data-theme-toggle>
-                <span data-theme-icon aria-hidden="true">☾</span>
-                <span data-theme-label>Giao diện</span>
-            </button>
-            <button type="button" data-language-toggle aria-label="English">English</button>
-        </div>
+        <partial name="_AccountHeader" />
         <main class="account-page account-page--auth">
-            <section class="auth-layout" aria-labelledby="login-title">
+            <section class="auth-layout auth-layout--login" aria-labelledby="login-title">
                 <div class="auth-layout__side">
                     <div class="auth-mascot" aria-hidden="true">SE</div>
-                    <p class="auth-layout__title" data-i18n="login.sideTitle">Mỗi ngày một chút,<br>tiến bộ thật nhiều</p>
-                    <p class="auth-layout__text" data-i18n="login.sideText">Tiếp tục hành trình học tiếng Anh của bạn.</p>
+                    <p class="auth-layout__title"><span data-i18n="ui.a_little_every_day">Mỗi ngày một chút,</span><br><span data-i18n="ui.a_lot_of_progress">tiến bộ thật nhiều</span></p>
+                    <p class="auth-layout__text" data-i18n="ui.continue_your_english_learning_journey">Tiếp tục hành trình học tiếng Anh của bạn.</p>
                 </div>
                 <div class="account-card login-card">
                     <div class="account-card__heading">
-                        <p class="account-eyebrow" data-i18n="login.eyebrow">Chào mừng trở lại</p>
-                        <h1 id="login-title" data-i18n="login.submit">Đăng nhập</h1>
-                        <p data-i18n="login.subtitle">Đăng nhập để tiếp tục hành trình học tập.</p>
+                        <p class="account-eyebrow" data-i18n="ui.welcome_back">Chào mừng trở lại</p>
+                        <h1 id="login-title" data-i18n="ui.sign_in">Đăng nhập</h1>
+                        <p data-i18n="ui.sign_in_to_continue_your_learning_journey">Đăng nhập để tiếp tục hành trình học tập.</p>
                     </div>
                     <form class="account-form" method="post" action="/Account/Login">
                         <label for="username">
-                            <span data-i18n="login.email">Email</span>
+                            <span data-i18n="ui.email_or_username">Email hoặc tên đăng nhập</span>
                             <input
                                 type="text"
                                 id="username"
@@ -48,7 +44,7 @@
                                 required />
                         </label>
                         <label for="password">
-                            <span data-i18n="login.password">Mật khẩu</span>
+                            <span data-i18n="ui.password">Mật khẩu</span>
                             <div class="password-field">
                                 <input
                                     type="password"
@@ -56,25 +52,26 @@
                                     name="password"
                                     autocomplete="current-password"
                                     required />
-                                <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-label="Hiện mật khẩu" data-i18n-aria-label="password.show" data-i18n="password.show">Hiện</button>
+                                <button class="password-toggle" id="passwordToggle" type="button" aria-controls="password" aria-pressed="false" aria-label="Hiện mật khẩu" data-i18n-aria-label="ui.show_password" title="Hiện mật khẩu" data-i18n-title="ui.show_password"><partial name="_PasswordVisibilityIcon" /></button>
                             </div>
                         </label>
                         <div class="login-options">
                             <label class="account-checkbox" for="rememberLogin">
                                 <input id="rememberLogin" type="checkbox" />
-                                <span data-i18n="login.remember">Ghi nhớ đăng nhập</span>
+                                <span data-i18n="ui.remember_me">Ghi nhớ đăng nhập</span>
                             </label>
-                            <a class="login-forgot-link" href="/Account/ForgetPassword" data-i18n="login.forgot">Quên mật khẩu?</a>
+                            <a class="login-forgot-link" href="/Account/ForgetPassword" data-i18n="ui.forgot_password">Quên mật khẩu?</a>
                         </div>
-                        <button type="submit" data-i18n="login.submit">Đăng nhập</button>
+                        <button type="submit" data-i18n="ui.sign_in">Đăng nhập</button>
                     </form>
                     <hr>
-                    <p data-i18n="login.or">Hoặc đăng nhập với</p>
+                    <p data-i18n="ui.or_sign_in_with">Hoặc đăng nhập với</p>
                     <div class="other-login-button-container">
                         <button
                             type="button"
-                            class="other-login-button google-login">
-                            <span data-i18n="login.google">Google</span>
+                            class="other-login-button google-login"
+                           >
+                            Google
                             <img
                                 src="~/images/GoogleIcon.webp"
                                 class="login-button-logo" />
@@ -82,8 +79,8 @@
                     </div>
 
                     <p class="account-switch login-signup-prompt">
-                        <span data-i18n="login.noAccount">Chưa có tài khoản?</span>
-                        <a href="/Account/Signup" data-i18n="login.signup">Đăng ký</a>
+                        <span data-i18n="ui.don_t_have_an_account">Chưa có tài khoản?</span>
+                        <a href="/Account/Signup" data-i18n="ui.sign_up">Đăng ký</a>
                     </p>
                 </div>
             </section>

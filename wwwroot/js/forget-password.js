@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     message.setAttribute('role', 'alert');
 
     const showMessage = (text) => {
-        message.textContent = window.authUi.localize(text);
+        AppI18n.setText(message, text);
         form.after(message);
     };
 
@@ -19,12 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
         message.remove();
 
         if (!form.checkValidity()) {
-            showMessage('Vui lòng nhập email hợp lệ.');
+            showMessage('validation.email');
             return;
         }
 
         if (!window.sb) {
-            showMessage('Không kết nối được máy chủ xác thực. Vui lòng thử lại sau.');
+            showMessage('ui.cannot_connect_to_the_authentication_server_please_try_again_later');
             return;
         }
 
@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (error) {
             showMessage(error.status === 429
-                ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
-                : 'Không gửi được mã xác thực. Vui lòng thử lại sau.');
+                ? 'ui.too_many_requests_please_wait_a_few_minutes_and_try_again'
+                : 'ui.unable_to_send_a_verification_code_please_try_again_later');
             return;
         }
 

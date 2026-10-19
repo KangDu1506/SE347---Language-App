@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const banner = document.createElement('p');
         banner.className = 'auth-banner';
         banner.setAttribute('role', 'status');
-        banner.textContent = window.authUi.localize('Đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.');
+        AppI18n.setText(banner, 'ui.password_changed_please_sign_in_with_your_new_password');
         form.before(banner);
     }
 
@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         passwordToggle.addEventListener('click', () => {
             const isPassword = password.type === 'password';
             password.type = isPassword ? 'text' : 'password';
-            const label = window.authUi.translate(isPassword ? 'password.hide' : 'password.show');
-            passwordToggle.textContent = label;
-            passwordToggle.setAttribute('aria-label', label);
+            passwordToggle.setAttribute('aria-pressed', String(isPassword));
+            passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
+            passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
         });
     }
 
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!username.value.trim() || !password.value) {
             event.preventDefault();
-            message.textContent = window.authUi.localize('Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.');
+            AppI18n.setText(message, 'ui.please_enter_your_username_and_password');
             form.before(message);
             return;
         }
@@ -59,17 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const submitButton = form.querySelector('button[type="submit"]');
-        if (submitButton) submitButton.disabled = true;
-        const { data, error } = await window.sb.auth.signInWithPassword({
-            email: username.value.trim().toLowerCase(),
-            password: password.value
-        });
-
-        if (error || !data.session) {
-            message.textContent = window.authUi.localize(error?.message?.toLowerCase().includes('not confirmed')
-                ? 'Email chưa được xác thực. Vui lòng nhập mã đã gửi tới email.'
-                : 'Email hoặc mật khẩu không đúng.');
+        if (!matchesIdentifier || password.value !== registeredUser.password) {
+            event.preventDefault();
+            AppI18n.setText(message, 'ui.incorrect_email_username_or_password');
             form.before(message);
             if (submitButton) submitButton.disabled = false;
             return;
@@ -80,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     form.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && !event.target.closest('button')) {
             event.preventDefault();
             form.requestSubmit();
         }

@@ -3,66 +3,62 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-page-title="signup.page">Đăng ký</title>
+        <title data-i18n="ui.sign_up">Đăng ký</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
         <script src="~/js/signup.js" defer></script>
+        <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
     <body>
-        <div class="account-preferences" aria-label="Tùy chọn hiển thị">
-            <button type="button" data-theme-toggle>
-                <span data-theme-icon aria-hidden="true">☾</span>
-                <span data-theme-label>Giao diện</span>
-            </button>
-            <button type="button" data-language-toggle aria-label="English">English</button>
-        </div>
+        <partial name="_AccountHeader" />
         <main class="account-page account-page--auth">
             <section class="auth-layout auth-layout--signup" aria-labelledby="signup-title">
                 <div class="auth-layout__side">
                     <div class="auth-mascot" aria-hidden="true">SE</div>
-                    <p class="auth-layout__title" data-i18n="signup.sideTitle">Bắt đầu hành trình</p>
-                    <p class="auth-layout__text" data-i18n="signup.sideText">Tạo tài khoản để lưu tiến độ và học mọi lúc.</p>
+                    <p class="auth-layout__title" data-i18n="ui.start_your_journey">Bắt đầu hành trình</p>
+                    <p class="auth-layout__text" data-i18n="ui.create_an_account_to_save_progress_and_learn_anywhere">Tạo tài khoản để lưu tiến độ và học mọi lúc.</p>
                 </div>
                 <div class="account-card">
                     <div class="account-card__heading">
-                        <p class="account-eyebrow" data-i18n="signup.eyebrow">Bắt đầu hành trình</p>
-                        <h1 id="signup-title" data-i18n="signup.title">Tạo tài khoản</h1>
-                        <p data-i18n="signup.subtitle">Đăng ký để lưu tiến độ và học mọi lúc.</p>
+                        <p class="account-eyebrow" data-i18n="ui.start_your_journey">Bắt đầu hành trình</p>
+                        <h1 id="signup-title" data-i18n="ui.create_account">Tạo tài khoản</h1>
+                        <p data-i18n="ui.sign_up_to_save_progress_and_learn_anywhere">Đăng ký để lưu tiến độ và học mọi lúc.</p>
                     </div>
                     <form class="account-form" action="/Account/Signup" method="post" novalidate>
                         <label for="fullName">
-                            <span data-i18n="signup.fullName">Họ và tên</span>
-                            <input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" maxlength="100" required>
+                            <span data-i18n="ui.full_name">Họ và tên</span>
+                            <input id="fullName" type="text" name="fullName" placeholder="Nguyễn Văn A" autocomplete="name" required>
                         </label>
                         <label for="username">
-                            <span data-i18n="signup.username">Tên đăng nhập</span>
-                            <input id="username" type="text" name="username" placeholder="NguyenVanA" autocomplete="username" minlength="6" maxlength="32" required>
+                            <span data-i18n="ui.username">Tên đăng nhập</span>
+                            <input id="username" type="text" name="username" placeholder="NguyenVanA" autocomplete="username" minlength="3" required>
                         </label>
                         <label for="email">
                             <span data-i18n="signup.email">Email</span>
                             <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" maxlength="255" required>
                         </label>
                         <label for="password">
-                            <span data-i18n="signup.password">Mật khẩu</span>
+                            <span data-i18n="ui.password">Mật khẩu</span>
                             <div class="password-field">
-                                <input id="password" type="password" name="password" placeholder="Tối thiểu 16 ký tự" data-i18n-placeholder="signup.passwordPlaceholder" autocomplete="new-password" minlength="16" required>
-                                <button class="password-toggle" id="signupPasswordToggle" type="button" aria-controls="password" aria-label="Hiện mật khẩu" data-i18n-aria-label="password.show" data-i18n="password.show">Hiện</button>
+                                <input id="password" type="password" name="password" placeholder="Tối thiểu 8 ký tự" data-i18n-placeholder="ui.at_least_8_characters" autocomplete="new-password" minlength="8" required>
+                                <button class="password-toggle" id="signupPasswordToggle" type="button" aria-controls="password" aria-pressed="false" aria-label="Hiện mật khẩu" data-i18n-aria-label="ui.show_password" title="Hiện mật khẩu" data-i18n-title="ui.show_password"><partial name="_PasswordVisibilityIcon" /></button>
                             </div>
                         </label>
                         <div class="password-strength" id="passwordStrength" aria-live="polite">
                             <div class="password-strength__bar" aria-hidden="true"><span></span></div>
-                            <p class="password-strength__text" data-i18n="signup.strengthEmpty">Độ mạnh: Chưa có mật khẩu</p>
+                            <p class="password-strength__text" data-i18n="ui.strength_no_password_yet">Độ mạnh: Chưa có mật khẩu</p>
                         </div>
                         <label class="account-checkbox" for="terms">
                             <input id="terms" type="checkbox" name="terms" required>
-                            <span><span data-i18n="signup.terms">Tôi đồng ý với</span> <a href="/Account/Terms" target="_blank" rel="noopener noreferrer" data-i18n="signup.termsLink">Điều khoản sử dụng</a>.</span>
+                            <span><span data-i18n="ui.i_agree_to_the">Tôi đồng ý với</span> <a href="/Account/Terms" target="_blank" rel="noopener noreferrer" data-i18n="ui.terms_of_use">Điều khoản sử dụng</a>.</span>
                         </label>
-                        <button type="submit" data-i18n="signup.submit">Tạo tài khoản</button>
+                        <button type="submit" data-i18n="ui.create_account">Tạo tài khoản</button>
                     </form>
-                    <p class="account-switch"><span data-i18n="signup.haveAccount">Đã có tài khoản?</span> <a href="/Account/Login" data-i18n="signup.login">Đăng nhập</a></p>
+                    <p class="account-switch"><span data-i18n="ui.already_have_an_account">Đã có tài khoản?</span> <a href="/Account/Login" data-i18n="ui.sign_in">Đăng nhập</a></p>
                 </div>
             </section>
         </main>

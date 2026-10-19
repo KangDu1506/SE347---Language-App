@@ -3,34 +3,30 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-page-title="auth.page">Xác thực tài khoản</title>
+        <title data-i18n="ui.verify_account">Xác thực tài khoản</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
         <script src="~/js/authentication.js" defer></script>
+        <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
     <body>
-        <div class="account-preferences" aria-label="Tùy chọn hiển thị">
-            <button type="button" data-theme-toggle>
-                <span data-theme-icon aria-hidden="true">☾</span>
-                <span data-theme-label>Giao diện</span>
-            </button>
-            <button type="button" data-language-toggle aria-label="English">English</button>
-        </div>
+        <partial name="_AccountHeader" />
         <main class="account-page account-page--auth">
             <section class="auth-layout auth-layout--verification" aria-labelledby="authentication-title">
                 <div class="auth-layout__side">
                     <div class="auth-mascot" aria-hidden="true">6</div>
-                    <p class="auth-layout__title" data-i18n="auth.sideTitle">Một bước nữa thôi</p>
-                    <p class="auth-layout__text" data-i18n="auth.sideText">Xác thực để bảo vệ tài khoản và tiếp tục hành trình.</p>
+                    <p class="auth-layout__title" data-i18n="ui.just_one_more_step">Một bước nữa thôi</p>
+                    <p class="auth-layout__text" data-i18n="ui.verify_to_protect_your_account_and_continue_learning">Xác thực để bảo vệ tài khoản và tiếp tục hành trình.</p>
                 </div>
                 <div class="account-card">
                     <div class="account-card__heading">
-                        <p class="account-eyebrow" data-i18n="auth.eyebrow">Bảo mật tài khoản</p>
-                        <h1 id="authentication-title" data-i18n="auth.title">Kiểm tra email</h1>
-                        <p><span data-i18n="auth.instructions">Nhập mã 6 số đã gửi tới</span><br><strong id="verificationEmail">h***@@gmail.com</strong> · <a id="changeEmailLink" href="/Account/Signup" data-i18n="auth.changeEmail">Đổi email</a></p>
+                        <p class="account-eyebrow" data-i18n="ui.account_security">Bảo mật tài khoản</p>
+                        <h1 id="authentication-title" data-i18n="ui.check_your_email">Kiểm tra email</h1>
+                        <p><span data-i18n="ui.enter_the_6_digit_code_sent_to">Nhập mã 6 số đã gửi tới</span><br><strong id="verificationEmail">h***@@gmail.com</strong> · <a id="changeEmailLink" href="/Account/Signup" data-i18n="ui.change_email">Đổi email</a></p>
                     </div>
 
                     <form
@@ -38,23 +34,23 @@
                         action="/Account/Authentication"
                         method="get">
                         <label class="verification-label" for="verificationDigit1">
-                            <span data-i18n="auth.code">Mã xác thực</span>
-                            <span class="verification-hint" data-i18n="auth.keyboardHint">(vui lòng tắt bộ gõ tiếng Việt để nhập)</span>
+                            <span data-i18n="ui.verification_code">Mã xác thực</span>
+                            <span class="verification-hint" data-i18n="ui.please_use_a_numeric_keyboard">(vui lòng tắt bộ gõ tiếng Việt để nhập)</span>
                         </label>
-                        <div class="verification-inputs" aria-label="Mã xác thực gồm 6 số" data-i18n-aria-label="auth.codeGroup">
-                            <input id="verificationDigit1" type="text" inputmode="numeric" maxlength="1" aria-label="Số 1" data-i18n-aria-label="auth.digit1" autocomplete="one-time-code" autofocus required>
-                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 2" data-i18n-aria-label="auth.digit2" required>
-                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 3" data-i18n-aria-label="auth.digit3" required>
-                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 4" data-i18n-aria-label="auth.digit4" required>
-                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 5" data-i18n-aria-label="auth.digit5" required>
-                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 6" data-i18n-aria-label="auth.digit6" required>
+                        <div class="verification-inputs" aria-label="Mã xác thực gồm 6 số" data-i18n-aria-label="ui.6_digit_verification_code">
+                            <input id="verificationDigit1" type="text" inputmode="numeric" maxlength="1" aria-label="Số 1" data-i18n-aria-label="auth.digit_1" autocomplete="one-time-code" autofocus required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 2" data-i18n-aria-label="auth.digit_2" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 3" data-i18n-aria-label="auth.digit_3" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 4" data-i18n-aria-label="auth.digit_4" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 5" data-i18n-aria-label="auth.digit_5" required>
+                            <input type="text" inputmode="numeric" maxlength="1" aria-label="Số 6" data-i18n-aria-label="auth.digit_6" required>
                         </div>
-                        <button id="verificationSubmit" type="submit" disabled data-i18n="auth.submit">Xác nhận</button>
+                        <button id="verificationSubmit" type="submit" disabled data-i18n="ui.confirm">Xác nhận</button>
                     </form>
-                    <p class="verification-resend account-switch"><span data-i18n="auth.noCode">Chưa nhận được mã?</span> <a href="/Account/Authentication" data-i18n="auth.resend">Gửi lại</a></p>
+                    <p class="verification-resend account-switch"><span data-i18n="ui.didn_t_receive_a_code">Chưa nhận được mã?</span> <a href="/Account/Authentication" data-i18n="ui.resend">Gửi lại</a></p>
                     <p class="account-switch">
-                        <span data-i18n="auth.haveAccount">Đã có tài khoản?</span>
-                        <a href="/Account/Login" data-i18n="auth.login">Quay lại đăng nhập</a>
+                        <span data-i18n="ui.already_have_an_account">Đã có tài khoản?</span>
+                        <a href="/Account/Login" data-i18n="ui.back_to_sign_in">Quay lại đăng nhập</a>
                     </p>
                 </div>
             </section>

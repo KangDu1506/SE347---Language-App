@@ -3,32 +3,34 @@
 <html lang="vi">
     <head>
         <meta charset="UTF-8">
+        <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Điều khoản sử dụng</title>
+        <title data-i18n="ui.terms_of_use">Điều khoản sử dụng</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
+        <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
     <body>
+        <partial name="_AccountHeader" />
         <main class="account-page terms-page">
-            <a class="account-brand" href="/Index">SE347 Language App</a>
             <article class="account-card" aria-labelledby="terms-title">
                 <div class="account-card__heading">
-                    <p class="account-eyebrow">Thông tin sử dụng</p>
-                    <h1 id="terms-title">Điều khoản sử dụng</h1>
-                    <p>Vui lòng đọc các điều khoản trước khi tạo tài khoản.</p>
+                    <p class="account-eyebrow" data-i18n="ui.usage_information">Thông tin sử dụng</p>
+                    <h1 id="terms-title" data-i18n="ui.terms_of_use">Điều khoản sử dụng</h1>
+                    <p data-i18n="ui.please_read_the_terms_before_creating_an_account">Vui lòng đọc các điều khoản trước khi tạo tài khoản.</p>
                 </div>
                 <div class="terms-content">
-                    <h2>1. Sử dụng tài khoản</h2>
-                    <p>Bạn chịu trách nhiệm giữ bí mật thông tin đăng nhập và sử dụng tài khoản cho mục đích học tập.</p>
-                    <h2>2. Nội dung học tập</h2>
-                    <p>Nội dung trên ứng dụng được cung cấp để hỗ trợ việc học tiếng Anh. Không sao chép hoặc phân phối nội dung khi chưa được cho phép.</p>
-                    <h2>3. Tôn trọng cộng đồng</h2>
-                    <p>Không sử dụng ứng dụng để đăng tải nội dung vi phạm pháp luật hoặc gây ảnh hưởng đến người dùng khác.</p>
-                    <h2>4. Thay đổi điều khoản</h2>
-                    <p>Điều khoản có thể được cập nhật để phù hợp với tính năng và quy định mới. Phiên bản hiện tại được áp dụng từ ngày công bố.</p>
+                    <h2 data-i18n="ui.1_account_use">1. Sử dụng tài khoản</h2>
+                    <p data-i18n="ui.you_are_responsible_for_keeping_your_credentials_confidential_and_using_your_account_for_learning">Bạn chịu trách nhiệm giữ bí mật thông tin đăng nhập và sử dụng tài khoản cho mục đích học tập.</p>
+                    <h2 data-i18n="ui.2_learning_content">2. Nội dung học tập</h2>
+                    <p data-i18n="ui.content_is_provided_to_support_english_learning_do_not_copy_or_distribute_it_without_permission">Nội dung trên ứng dụng được cung cấp để hỗ trợ việc học tiếng Anh. Không sao chép hoặc phân phối nội dung khi chưa được cho phép.</p>
+                    <h2 data-i18n="ui.3_respect_the_community">3. Tôn trọng cộng đồng</h2>
+                    <p data-i18n="ui.do_not_use_the_app_to_post_unlawful_content_or_harm_other_users">Không sử dụng ứng dụng để đăng tải nội dung vi phạm pháp luật hoặc gây ảnh hưởng đến người dùng khác.</p>
+                    <h2 data-i18n="ui.4_changes_to_the_terms">4. Thay đổi điều khoản</h2>
+                    <p data-i18n="ui.these_terms_may_be_updated_for_new_features_and_rules_the_current_version_takes_effect_on_publication">Điều khoản có thể được cập nhật để phù hợp với tính năng và quy định mới. Phiên bản hiện tại được áp dụng từ ngày công bố.</p>
                 </div>
                 <p class="account-switch">
-                    <a href="/Account/Signup" id="closeTermsTab">Quay lại đăng ký</a>
+                    <a href="/Account/Signup" id="closeTermsTab" data-i18n="ui.back_to_sign_up">Quay lại đăng ký</a>
                 </p>
             </article>
         </main>
