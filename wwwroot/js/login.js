@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     message.setAttribute('role', 'alert');
 
     if (!form) return;
+    const completion = window.FormCompletion.attach(form);
 
     const verified = new URLSearchParams(window.location.search).get('verified') === '1';
     if (verified) {
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             AppI18n.setText(message, 'ui.incorrect_email_username_or_password');
             form.before(message);
-            if (submitButton) submitButton.disabled = false;
+            completion.refresh();
             return;
         }
 

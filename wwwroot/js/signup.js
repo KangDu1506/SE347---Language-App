@@ -7,8 +7,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const password = document.querySelector('#password');
     const passwordToggle = document.querySelector('#signupPasswordToggle');
     const strength = document.querySelector('#passwordStrength');
-    const strengthText = strength?.querySelector('.password-strength__text');
-    const strengthBar = strength?.querySelector('span');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    const completion = window.FormCompletion.attach(form);
+    const message = document.createElement('p');
+    message.className = 'form-message';
+    message.setAttribute('role', 'alert');
+
+    if (new URLSearchParams(window.location.search).get('changeEmail') === '1') {
+        const draft = sessionStorage.getItem('pendingSignupFormDraft');
+        if (draft) {
+            try {
+                const values = JSON.parse(draft);
+                form.querySelector('#fullName').value = values.fullName || '';
+                form.querySelector('#username').value = values.username || '';
+                form.querySelector('#email').value = values.email || sessionStorage.getItem('pendingSignupEmail') || '';
+                password.value = values.password || '';
+                form.querySelector('#terms').checked = Boolean(values.terms);
+                completion.refresh();
+            } catch (error) {
+                console.error('Could not restore the saved sign-up form.', error);
+                sessionStorage.removeItem('pendingSignupFormDraft');
+            }
+        }
+    } else {
+        sessionStorage.removeItem('pendingSignupFormDraft');
+    }
 
     if (password && passwordToggle) {
         passwordToggle.addEventListener('click', () => {
@@ -20,34 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const getPasswordRules = (value) => [
-        { valid: Array.from(value).length >= 16, message: 'Mật khẩu phải có ít nhất 16 ký tự.' },
-        { valid: /[A-Z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ hoa.' },
-        { valid: /[a-z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ thường.' },
-        { valid: /[0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ số.' },
-        { valid: /[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/.test(value), message: 'Mật khẩu phải có ít nhất một ký tự đặc biệt.' },
-        { valid: /^[A-Za-z0-9\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]+$/.test(value), message: 'Mật khẩu chỉ được chứa chữ hoa, chữ thường, chữ số và ký tự đặc biệt.' }
-    ];
-
-    const updateStrength = () => {
-        if (!password || !strength || !strengthText || !strengthBar) return;
-
-        const value = password.value;
-        const score = getPasswordRules(value).filter((rule) => rule.valid).length;
-        const strengthState = score === 6 ? 'strong' : score >= 4 ? 'medium' : 'weak';
-        const width = score * 100 / 6;
-
-        strength.dataset.strength = strengthState;
-        strengthBar.style.width = `${width}%`;
-        AppI18n.setText(strengthText, score === 0
-            ? 'ui.strength_no_password_yet'
-            : score >= 3
-                ? 'ui.strength_good'
-                : 'ui.strength_weak_add_uppercase_letters_numbers_or_symbols');
-    };
-
-    password?.addEventListener('input', updateStrength);
-    updateStrength();
+    window.PasswordStrength.attach(password, strength);
 
     form.querySelectorAll('input').forEach((input) => {
         input.addEventListener('blur', () => {
@@ -83,6 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const saveFormDraft = () => {
+        sessionStorage.setItem('pendingSignupFormDraft', JSON.stringify({
+            fullName: form.querySelector('#fullName').value,
+            username: form.querySelector('#username').value,
+            email: form.querySelector('#email').value,
+            password: password.value,
+            terms: form.querySelector('#terms').checked
+        }));
+    };
+
     form.addEventListener('submit', async (event) => {
         if (!form.checkValidity()) {
             event.preventDefault();
@@ -94,10 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
         const email = String(formData.get('email')).trim().toLowerCase();
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent = window.authUi.localize('Đang gửi mã...');
-        }
+        saveFormDraft();
+        sessionStorage.setItem('pendingSignupEmail', email);
+        completion.setBusy(true);
+        submitButton.textContent = window.authUi.localize('Đang gửi mã...');
 
         const { data, error } = await window.sb.auth.signUp({
             email,
@@ -111,18 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (error || !data.user) {
+            sessionStorage.removeItem('pendingSignupEmail');
             message.textContent = window.authUi.localize(error?.status === 429
                 ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
                 : error?.message || 'Không tạo được tài khoản. Vui lòng kiểm tra lại thông tin.');
             form.before(message);
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent = originalButtonText;
-            }
+            completion.setBusy(false);
+            submitButton.textContent = originalButtonText;
             return;
         }
 
-        sessionStorage.setItem('pendingSignupEmail', email);
+        sessionStorage.setItem('pendingSignupEmail', data.user.email || email);
         window.location.assign('/Account/Authentication?mode=signup');
     });
 

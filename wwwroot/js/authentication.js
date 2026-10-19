@@ -5,16 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form) return;
 
     const digitInputs = Array.from(form.querySelectorAll('.verification-inputs input'));
-    const submitButton = form.querySelector('#verificationSubmit');
+    const completion = window.FormCompletion.attach(form);
 
     const message = document.createElement('p');
     message.className = 'form-message';
     message.setAttribute('role', 'alert');
 
     const updateSubmitState = () => {
-        if (submitButton) {
-            submitButton.disabled = digitInputs.some(input => !input.value);
-        }
+        completion.refresh();
     };
 
     const getCode = () => digitInputs.map(input => input.value).join('');
@@ -94,7 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mode = new URLSearchParams(window.location.search).get('mode') || 'signup';
     form.action = `/Account/Authentication?mode=${encodeURIComponent(mode)}`;
-    const signupEmail = sessionStorage.getItem('pendingSignupEmail');
+    let signupEmail = sessionStorage.getItem('pendingSignupEmail') || '';
+    try {
+        const draft = JSON.parse(sessionStorage.getItem('pendingSignupFormDraft') || '{}');
+        if (typeof draft.email === 'string' && draft.email.trim()) {
+            signupEmail = draft.email.trim().toLowerCase();
+            sessionStorage.setItem('pendingSignupEmail', signupEmail);
+        }
+    } catch (error) {
+        console.error('Could not read the saved sign-up email.', error);
+    }
+    const maskEmail = (email) => {
+        const separatorIndex = email.lastIndexOf('@');
+        if (separatorIndex <= 0 || separatorIndex === email.length - 1) return email;
+        return `${email.slice(0, 1)}***${email.slice(separatorIndex)}`;
+    };
 
     const showMessage = (text, isError = true) => {
         message.className = isError ? 'form-message' : 'auth-banner';
@@ -109,66 +121,132 @@ document.addEventListener('DOMContentLoaded', () => {
         syncDisabledState(0);
     };
 
+    const setupResendCooldown = (link, storageKey) => {
+        if (!link) return null;
+
+        let timer;
+        let cooldownEnd = Number(sessionStorage.getItem(storageKey)) || 0;
+        const render = () => {
+            const seconds = Math.ceil((cooldownEnd - Date.now()) / 1000);
+            if (seconds > 0) {
+                const template = window.AppI18n.t('ui.resend_in_seconds', 'Gửi lại sau {seconds} giây');
+                link.removeAttribute('data-i18n');
+                link.textContent = template.replace('{seconds}', String(seconds));
+                link.classList.add('verification-resend--disabled');
+                link.setAttribute('aria-disabled', 'true');
+                link.setAttribute('tabindex', '-1');
+                return true;
+            }
+
+            clearInterval(timer);
+            sessionStorage.removeItem(storageKey);
+            link.classList.remove('verification-resend--disabled');
+            link.removeAttribute('aria-disabled');
+            link.removeAttribute('tabindex');
+            link.setAttribute('data-i18n', 'ui.resend');
+            window.AppI18n.translate(link);
+            return false;
+        };
+        const start = () => {
+            cooldownEnd = Date.now() + 60000;
+            sessionStorage.setItem(storageKey, String(cooldownEnd));
+            render();
+            timer = setInterval(render, 250);
+        };
+        const setBusy = (busy) => {
+            link.classList.toggle('verification-resend--disabled', busy);
+            link.setAttribute('aria-disabled', String(busy));
+            if (busy) link.setAttribute('tabindex', '-1');
+            else if (cooldownEnd <= Date.now()) link.removeAttribute('tabindex');
+        };
+
+        if (cooldownEnd > Date.now()) {
+            render();
+            timer = setInterval(render, 250);
+        } else {
+            sessionStorage.removeItem(storageKey);
+        }
+        window.addEventListener('app:languagechange', render);
+        window.AppI18n.ready.then(render);
+        return { start, setBusy, isCoolingDown: () => cooldownEnd > Date.now() };
+    };
+
+    const resendCooldownKey = `verificationResendUntil:${mode}`;
+    const resendLink = document.querySelector('.verification-resend a');
+    const resendCooldown = setupResendCooldown(resendLink, resendCooldownKey);
+    let resendInFlight = false;
+    const resendCode = async (request, failureMessage) => {
+        if (resendInFlight || resendCooldown?.isCoolingDown()) return;
+        resendInFlight = true;
+        resendCooldown?.setBusy(true);
+        try {
+            const { error } = await request();
+            if (error) {
+                showMessage(error.status === 429
+                    ? 'ui.too_many_requests_please_wait_a_few_minutes_and_try_again'
+                    : failureMessage);
+                resendCooldown?.setBusy(false);
+                return;
+            }
+            resetDigits();
+            showMessage('ui.verification_code_resent_please_check_your_email', false);
+            resendCooldown?.start();
+        } catch (error) {
+            console.error('Could not resend the verification code.', error);
+            showMessage(failureMessage);
+            resendCooldown?.setBusy(false);
+        } finally {
+            resendInFlight = false;
+        }
+    };
+
     // Quên mật khẩu: mã 6 số do Supabase gửi qua email (resetPasswordForEmail ở trang ForgetPassword).
     const resetEmail = sessionStorage.getItem('pendingPasswordReset');
 
     if (mode === 'forgot') {
         const emailLabel = document.querySelector('#verificationEmail');
-        const changeEmailLink = document.querySelector('#changeEmailLink');
-        const resendLink = document.querySelector('.verification-resend a');
 
         if (emailLabel && resetEmail) {
-            const [name, domain] = resetEmail.split('@');
-            emailLabel.textContent = `${name.slice(0, 1)}***@${domain}`;
+            emailLabel.textContent = maskEmail(resetEmail);
         }
-        changeEmailLink?.setAttribute('href', '/Account/ForgetPassword');
 
         resendLink?.addEventListener('click', async (e) => {
             e.preventDefault();
+            if (resendCooldown?.isCoolingDown() || resendInFlight) return;
             if (!resetEmail || !window.sb) {
                 window.location.assign('/Account/ForgetPassword');
                 return;
             }
-
-            const { error } = await window.sb.auth.resetPasswordForEmail(resetEmail);
-            if (error) {
-                showMessage(error.status === 429
-                    ? 'ui.too_many_requests_please_wait_a_few_minutes_and_try_again'
-                    : 'ui.unable_to_resend_the_code_please_try_again_later');
-                return;
-            }
-            resetDigits();
-            showMessage('ui.verification_code_resent_please_check_your_email', false);
+            await resendCode(
+                () => window.sb.auth.resetPasswordForEmail(resetEmail),
+                'ui.unable_to_resend_the_code_please_try_again_later'
+            );
         });
     }
 
     if (mode === 'signup') {
         const emailLabel = document.querySelector('#verificationEmail');
-        const changeEmailLink = document.querySelector('#changeEmailLink');
-        const resendLink = document.querySelector('.verification-resend a');
 
         if (emailLabel && signupEmail) {
-            const [name, domain] = signupEmail.split('@');
-            emailLabel.textContent = `${name.slice(0, 1)}***@${domain}`;
+            emailLabel.textContent = maskEmail(signupEmail);
         }
-        changeEmailLink?.setAttribute('href', '/Account/Signup');
 
         resendLink?.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!signupEmail || !window.sb) {
-                window.location.assign('/Account/Signup');
+            if (resendCooldown?.isCoolingDown() || resendInFlight) return;
+            if (!signupEmail) {
+                showMessage('ui.signup_email_missing_for_resend');
+                return;
+            }
+            if (!window.sb) {
+                showMessage('ui.cannot_connect_to_the_authentication_server_please_try_again_later');
                 return;
             }
 
-            const { error } = await window.sb.auth.resend({ type: 'signup', email: signupEmail });
-            if (error) {
-                showMessage(error.status === 429
-                    ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
-                    : 'Không gửi lại được mã. Vui lòng kiểm tra email và thử lại.');
-                return;
-            }
-            resetDigits();
-            showMessage('Đã gửi lại mã xác thực, vui lòng kiểm tra email.', false);
+            await resendCode(
+                () => window.sb.auth.resend({ type: 'signup', email: signupEmail }),
+                'ui.unable_to_resend_the_code_please_try_again_later'
+            );
         });
     }
 
@@ -185,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        submitButton.disabled = true;
+        completion.setBusy(true);
 
         // Mã đúng thì Supabase tạo phiên đăng nhập tạm để đổi mật khẩu ở trang ResetPassword.
         const { error } = await window.sb.auth.verifyOtp({ email: resetEmail, token: code, type: 'recovery' });
@@ -195,6 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ? 'ui.too_many_attempts_please_wait_a_few_minutes_and_try_again'
                 : 'ui.the_verification_code_is_incorrect_or_expired');
             resetDigits();
+            completion.setBusy(false);
             return false;
         }
 
@@ -214,17 +293,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        submitButton.disabled = true;
+        completion.setBusy(true);
         const { error } = await window.sb.auth.verifyOtp({ email: signupEmail, token: code, type: 'signup' });
         if (error) {
             showMessage(error.status === 429
                 ? 'Bạn thử quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
                 : 'Mã xác thực không đúng hoặc đã hết hạn.');
             resetDigits();
+            completion.setBusy(false);
             return false;
         }
 
         sessionStorage.removeItem('pendingSignupEmail');
+        sessionStorage.removeItem('pendingSignupFormDraft');
         window.location.assign('/Account/Login?verified=1');
         return true;
     };

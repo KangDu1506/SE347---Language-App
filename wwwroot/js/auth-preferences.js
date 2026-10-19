@@ -32,9 +32,13 @@
             'signup.username': 'Tên đăng nhập',
             'signup.email': 'Email',
             'signup.password': 'Mật khẩu',
-            'signup.passwordPlaceholder': 'Tối thiểu 16 ký tự',
-            'password.show': 'Hiện',
-            'password.hide': 'Ẩn',
+            'signup.passwordPlaceholder': 'Tối thiểu 10 ký tự',
+            'ui.at_least_10_characters': 'Tối thiểu 10 ký tự',
+            'ui.password_suggestions': 'Gợi ý mật khẩu',
+            'ui.password_suggestion_uppercase': 'Thêm chữ hoa',
+            'ui.password_suggestion_lowercase': 'Thêm chữ thường',
+            'ui.password_suggestion_number': 'Thêm chữ số',
+            'ui.password_suggestion_symbol': 'Thêm ký tự đặc biệt',
             'signup.strengthEmpty': 'Độ mạnh: Chưa có mật khẩu',
             'signup.strengthStrong': 'Độ mạnh: Mạnh',
             'signup.strengthMedium': 'Độ mạnh: Trung bình',
@@ -50,7 +54,6 @@
             'auth.eyebrow': 'Bảo mật tài khoản',
             'auth.title': 'Kiểm tra email',
             'auth.instructions': 'Nhập mã 6 số đã gửi tới',
-            'auth.changeEmail': 'Đổi email',
             'auth.code': 'Mã xác thực',
             'auth.keyboardHint': '(vui lòng tắt bộ gõ tiếng Việt để nhập)',
             'auth.codeGroup': 'Mã xác thực gồm 6 số',
@@ -107,9 +110,13 @@
             'signup.username': 'Username',
             'signup.email': 'Email',
             'signup.password': 'Password',
-            'signup.passwordPlaceholder': 'At least 16 characters',
-            'password.show': 'Show',
-            'password.hide': 'Hide',
+            'signup.passwordPlaceholder': 'At least 10 characters',
+            'ui.at_least_10_characters': 'At least 10 characters',
+            'ui.password_suggestions': 'Password suggestions',
+            'ui.password_suggestion_uppercase': 'Add an uppercase letter',
+            'ui.password_suggestion_lowercase': 'Add a lowercase letter',
+            'ui.password_suggestion_number': 'Add a number',
+            'ui.password_suggestion_symbol': 'Add a special character',
             'signup.strengthEmpty': 'Strength: No password',
             'signup.strengthStrong': 'Strength: Strong',
             'signup.strengthMedium': 'Strength: Medium',
@@ -125,7 +132,6 @@
             'auth.eyebrow': 'Account security',
             'auth.title': 'Check your email',
             'auth.instructions': 'Enter the 6-digit code sent to',
-            'auth.changeEmail': 'Change email',
             'auth.code': 'Verification code',
             'auth.keyboardHint': '(please disable Vietnamese input to enter the code)',
             'auth.codeGroup': '6-digit verification code',
@@ -169,12 +175,6 @@
         ['Phiên khôi phục đã hết hạn. Vui lòng nhập lại email.', 'Your recovery session expired. Please enter your email again.'],
         ['Mã xác thực không đúng hoặc đã hết hạn.', 'The verification code is incorrect or has expired.'],
         ['Phiên đăng ký đã hết hạn. Vui lòng đăng ký lại để nhận mã mới.', 'Your sign-up session expired. Please sign up again to get a new code.'],
-        ['Mật khẩu phải có ít nhất 16 ký tự.', 'Password must be at least 16 characters.'],
-        ['Mật khẩu phải có ít nhất một chữ hoa.', 'Password must contain at least one uppercase letter.'],
-        ['Mật khẩu phải có ít nhất một chữ thường.', 'Password must contain at least one lowercase letter.'],
-        ['Mật khẩu phải có ít nhất một chữ số.', 'Password must contain at least one number.'],
-        ['Mật khẩu phải có ít nhất một ký tự đặc biệt.', 'Password must contain at least one special character.'],
-        ['Mật khẩu chỉ được chứa chữ hoa, chữ thường, chữ số và ký tự đặc biệt.', 'Password may only contain letters, numbers, and special characters.'],
         ['Bạn cần đồng ý với Điều khoản sử dụng.', 'You must agree to the Terms of Use.'],
         ['Vui lòng nhập thông tin này.', 'This field is required.'],
         ['Họ và tên chỉ được chứa chữ cái, dấu cách, dấu nháy hoặc gạch nối.', 'Full name may only contain letters, spaces, apostrophes, or hyphens.'],
@@ -212,11 +212,6 @@
         document.querySelectorAll('[data-page-title]').forEach((element) => {
             const value = translations[nextLanguage][element.dataset.pageTitle];
             if (value !== undefined) element.textContent = value;
-        });
-        document.querySelectorAll('.password-toggle').forEach((button) => {
-            const label = translations[nextLanguage][button.previousElementSibling.type === 'password' ? 'password.show' : 'password.hide'];
-            button.textContent = label;
-            button.setAttribute('aria-label', label);
         });
         const strength = document.querySelector('.password-strength');
         const strengthText = strength?.querySelector('.password-strength__text');

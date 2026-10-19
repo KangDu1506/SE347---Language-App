@@ -9,9 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const passwordToggle = form.querySelector('#newPasswordToggle');
     const confirmPasswordToggle = form.querySelector('#confirmPasswordToggle');
     const strength = form.querySelector('#passwordStrength');
-    const strengthText = strength?.querySelector('.password-strength__text');
-    const strengthBar = strength?.querySelector('span');
-    const submitButton = form.querySelector('button[type="submit"]');
+    const completion = window.FormCompletion.attach(form);
 
     const message = document.createElement('p');
     message.className = 'form-message';
@@ -32,12 +30,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     password.addEventListener('blur', () => setFieldErrors(password));
     confirmPassword.addEventListener('blur', () => setFieldErrors(confirmPassword));
-    updateStrength();
+    window.PasswordStrength.attach(password, strength);
 
     // Chỉ vào được trang này sau khi nhập đúng mã khôi phục (verifyOtp tạo phiên tạm).
+    completion.setBusy(true);
     const { data } = window.sb ? await window.sb.auth.getSession() : { data: {} };
     if (!data?.session) {
-        submitButton.disabled = true;
         const expired = document.createElement('span');
         AppI18n.setText(expired, 'auth.recovery_expired');
         const recoveryLink = document.createElement('a');
@@ -47,13 +45,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         form.after(message);
         return;
     }
+    completion.setBusy(false);
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         message.remove();
 
-        if (password.value.length < 8) {
-            showMessage('ui.your_new_password_must_contain_at_least_8_characters');
+        if (password.value.length < 10) {
+            showMessage('ui.your_new_password_must_contain_at_least_10_characters');
             return;
         }
 
@@ -62,11 +61,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        submitButton.disabled = true;
+        completion.setBusy(true);
         const { error } = await window.sb.auth.updateUser({ password: password.value });
 
         if (error) {
-            submitButton.disabled = false;
+            completion.setBusy(false);
             showMessage(error.code === 'same_password'
                 ? 'ui.your_new_password_must_differ_from_the_old_one'
                 : error.code === 'weak_password'

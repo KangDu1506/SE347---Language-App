@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
+        <script src="~/js/Shared/form-completion.js" defer></script>
         <script src="~/js/login.js" defer></script>
         <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
@@ -62,7 +63,7 @@
                             </label>
                             <a class="login-forgot-link" href="/Account/ForgetPassword" data-i18n="ui.forgot_password">Quên mật khẩu?</a>
                         </div>
-                        <button type="submit" data-i18n="ui.sign_in">Đăng nhập</button>
+                        <button type="submit" disabled data-i18n="ui.sign_in">Đăng nhập</button>
                     </form>
                     <hr>
                     <p data-i18n="ui.or_sign_in_with">Hoặc đăng nhập với</p>

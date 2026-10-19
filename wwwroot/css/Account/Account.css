@@ -326,6 +326,22 @@ button {
     background: var(--color-primary-hover);
 }
 
+.account-form > button[type="submit"]:disabled,
+.login-card form > button[type="submit"]:disabled {
+    cursor: not-allowed;
+    opacity: .68;
+}
+
+.account-form > button[type="submit"],
+.login-card form > button[type="submit"] {
+    transition: opacity var(--transition-fast), background var(--transition-fast);
+}
+
+.account-form > button[type="submit"]:disabled:hover,
+.login-card form > button[type="submit"]:disabled:hover {
+    background: var(--color-primary);
+}
+
 .account-checkbox {
     display: flex;
     flex-direction: row;
@@ -435,6 +451,12 @@ button {
 
 .verification-resend {
     margin-top: var(--space-4);
+}
+
+.verification-resend--disabled {
+    pointer-events: none;
+    opacity: .5;
+    cursor: not-allowed;
 }
 
 .auth-layout--verification .account-form > button:disabled {
@@ -581,6 +603,30 @@ button {
     margin: 0;
     color: var(--text-secondary);
     font-size: var(--fs-xs);
+}
+
+.password-strength__suggestions {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    color: var(--text-secondary);
+    font-size: var(--fs-xs);
+    list-style: none;
+}
+
+.password-strength__suggestions li {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.password-strength__suggestions li[hidden] {
+    display: none;
+}
+
+.password-strength__suggestions li > span:first-child {
+    color: var(--status-warning);
+    font-weight: var(--fw-heavy);
 }
 
 .password-strength[data-strength="medium"] .password-strength__bar span {

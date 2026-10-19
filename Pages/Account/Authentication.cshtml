@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
+        <script src="~/js/Shared/form-completion.js" defer></script>
         <script src="~/js/authentication.js" defer></script>
         <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
@@ -26,7 +27,7 @@
                     <div class="account-card__heading">
                         <p class="account-eyebrow" data-i18n="ui.account_security">Bảo mật tài khoản</p>
                         <h1 id="authentication-title" data-i18n="ui.check_your_email">Kiểm tra email</h1>
-                        <p><span data-i18n="ui.enter_the_6_digit_code_sent_to">Nhập mã 6 số đã gửi tới</span><br><strong id="verificationEmail">h***@@gmail.com</strong> · <a id="changeEmailLink" href="/Account/Signup" data-i18n="ui.change_email">Đổi email</a></p>
+                        <p><span data-i18n="ui.enter_the_6_digit_code_sent_to">Nhập mã 6 số đã gửi tới</span><br><strong id="verificationEmail"></strong></p>
                     </div>
 
                     <form

@@ -10,6 +10,8 @@
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
         <script src="~/js/auth-preferences.js" defer></script>
+        <script src="~/js/Shared/password-strength.js" defer></script>
+        <script src="~/js/Shared/form-completion.js" defer></script>
         <script src="~/js/signup.js" defer></script>
         <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
@@ -44,19 +46,25 @@
                         <label for="password">
                             <span data-i18n="ui.password">Mật khẩu</span>
                             <div class="password-field">
-                                <input id="password" type="password" name="password" placeholder="Tối thiểu 8 ký tự" data-i18n-placeholder="ui.at_least_8_characters" autocomplete="new-password" minlength="8" required>
+                                <input id="password" type="password" name="password" placeholder="Tối thiểu 10 ký tự" data-i18n-placeholder="ui.at_least_10_characters" autocomplete="new-password" minlength="10" required>
                                 <button class="password-toggle" id="signupPasswordToggle" type="button" aria-controls="password" aria-pressed="false" aria-label="Hiện mật khẩu" data-i18n-aria-label="ui.show_password" title="Hiện mật khẩu" data-i18n-title="ui.show_password"><partial name="_PasswordVisibilityIcon" /></button>
                             </div>
                         </label>
                         <div class="password-strength" id="passwordStrength" aria-live="polite">
                             <div class="password-strength__bar" aria-hidden="true"><span></span></div>
+                            <ul class="password-strength__suggestions" aria-label="Gợi ý mật khẩu" data-i18n-aria-label="ui.password_suggestions">
+                                <li data-password-suggestion="uppercase"><span aria-hidden="true">!</span><span data-i18n="ui.password_suggestion_uppercase">Thêm chữ hoa</span></li>
+                                <li data-password-suggestion="lowercase"><span aria-hidden="true">!</span><span data-i18n="ui.password_suggestion_lowercase">Thêm chữ thường</span></li>
+                                <li data-password-suggestion="number"><span aria-hidden="true">!</span><span data-i18n="ui.password_suggestion_number">Thêm chữ số</span></li>
+                                <li data-password-suggestion="symbol"><span aria-hidden="true">!</span><span data-i18n="ui.password_suggestion_symbol">Thêm ký tự đặc biệt</span></li>
+                            </ul>
                             <p class="password-strength__text" data-i18n="ui.strength_no_password_yet">Độ mạnh: Chưa có mật khẩu</p>
                         </div>
                         <label class="account-checkbox" for="terms">
                             <input id="terms" type="checkbox" name="terms" required>
                             <span><span data-i18n="ui.i_agree_to_the">Tôi đồng ý với</span> <a href="/Account/Terms" target="_blank" rel="noopener noreferrer" data-i18n="ui.terms_of_use">Điều khoản sử dụng</a>.</span>
                         </label>
-                        <button type="submit" data-i18n="ui.create_account">Tạo tài khoản</button>
+                        <button type="submit" disabled data-i18n="ui.create_account">Tạo tài khoản</button>
                     </form>
                     <p class="account-switch"><span data-i18n="ui.already_have_an_account">Đã có tài khoản?</span> <a href="/Account/Login" data-i18n="ui.sign_in">Đăng nhập</a></p>
                 </div>
