@@ -8,6 +8,7 @@
         <title data-i18n="ui.sign_up">Đăng ký</title>
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
+        <partial name="_SupabaseClient" />
         <script src="~/js/signup.js" defer></script>
         <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
@@ -37,7 +38,7 @@
                         </label>
                         <label for="email">
                             Email
-                            <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" required>
+                            <input id="email" type="email" name="email" placeholder="NguyenVanA@example.com" autocomplete="email" maxlength="255" required>
                         </label>
                         <label for="password">
                             <span data-i18n="ui.password">Mật khẩu</span>

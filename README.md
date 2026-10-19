@@ -22,8 +22,8 @@
 
 | Mức độ | Phát hiện | Bằng chứng | Ảnh hưởng |
 |---|---|---|---|
-| Cao | Luồng đăng nhập và đăng ký đang mô phỏng ở trình duyệt, chưa xác thực mã đăng nhập/đăng ký với Supabase. Mật khẩu đăng ký được lưu trong `sessionStorage`; nhánh xác thực chỉ kiểm tra mã có 6 chữ số. Server cấp cookie khi nhận `mode=login` và mã 6 chữ số, còn middleware chỉ kiểm tra cookie có tồn tại. | [`wwwroot/js/signup.js`](wwwroot/js/signup.js), [`wwwroot/js/login.js`](wwwroot/js/login.js), [`wwwroot/js/authentication.js`](wwwroot/js/authentication.js), [`Program.cs`](Program.cs) | Tài khoản không được xác thực thực sự qua luồng này; cookie vào trang có thể bị giả mạo. Các API có `RequireAuthorization` vẫn yêu cầu JWT Supabase riêng. |
-| Trung bình | Frontend hiện chưa thấy gọi các API nghiệp vụ `/api/users/*`; trang hồ sơ cũng chưa tải dữ liệu hồ sơ. | [`Endpoints/UserEndpoints.cs`](Endpoints/UserEndpoints.cs), [`wwwroot/js/profile.js`](wwwroot/js/profile.js) | Dữ liệu hồ sơ và kiểm tra username chưa được nối vào giao diện; phiên giả lập không cung cấp JWT cho API được bảo vệ. |
+| Thấp | Một số trang chỉ ẩn giao diện bằng JavaScript kiểm tra cookie `userToken=authenticated`. Cookie này do trình duyệt tự đặt sau khi đăng nhập, không phải thông tin xác thực được ký và có thể bị giả mạo; các trang Razor tương ứng không được bảo vệ phía server. | [`wwwroot/js/login.js`](wwwroot/js/login.js), [`wwwroot/js/auth-guard.js`](wwwroot/js/auth-guard.js), [`Program.cs`](Program.cs) | Người chưa đăng nhập có thể bỏ qua lớp ẩn giao diện và xem nội dung tĩnh của các trang. Đây không phải quyền truy cập vào API được bảo vệ: các endpoint có `RequireAuthorization` vẫn yêu cầu JWT Supabase. Không dùng cookie này để bảo vệ dữ liệu hoặc thao tác nhạy cảm. |
+| Trung bình | Frontend hiện chưa thấy gọi các API nghiệp vụ `/api/users/*`; trang hồ sơ cũng chưa tải dữ liệu hồ sơ. | [`Endpoints/UserEndpoints.cs`](Endpoints/UserEndpoints.cs), [`wwwroot/js/profile.js`](wwwroot/js/profile.js) | Dữ liệu hồ sơ và kiểm tra username chưa được nối vào giao diện; chức năng hồ sơ chưa nhận hoặc hiển thị dữ liệu từ API. |
 | Trung bình | Quy tắc tên cấm trong `is_valid_username` không nằm trong constraint bảng, trong khi quyền cập nhật trực tiếp cột `username` được cấp cho `authenticated`. | [`supabase/migrations/20261005090000_user_schema.sql`](supabase/migrations/20261005090000_user_schema.sql) | Cập nhật trực tiếp qua Supabase có thể đặt username dành riêng nếu không gọi hàm kiểm tra khả dụng. |
 | Thấp | Form đăng ký dùng `novalidate`; khi checkbox đồng ý điều khoản chưa chọn, submit bị chặn nhưng vòng hiển thị lỗi bỏ qua checkbox. | [`Pages/Account/Signup.cshtml`](Pages/Account/Signup.cshtml), [`wwwroot/js/signup.js`](wwwroot/js/signup.js) | Người dùng có thể không được thông báo vì sao không thể gửi form. |
 
@@ -41,6 +41,12 @@
 | `GET /api/users/nonexistent-runtime-check` | `500 Internal Server Error` | Truy vấn hồ sơ cần DB nhưng connection string chưa được khởi tạo. |
 
 **Giới hạn:** Chưa thể xác nhận phản hồi thành công của các API truy vấn DB hoặc thử xác thực với JWT hợp lệ cho tới khi cấu hình Supabase/database trong môi trường chạy. Các lỗi `500` ở trên phản ánh cấu hình runtime hiện tại, chưa đủ để kết luận truy vấn sẽ lỗi khi kết nối DB hợp lệ.
+
+### Rà soát bảo mật luồng xác thực (18/10/2026)
+
+Rà soát mã tĩnh luồng đăng ký, đăng nhập, xác minh email và khôi phục mật khẩu. Đăng ký/đăng nhập hiện gọi Supabase Auth (`signUp`, `signInWithPassword`); mã OTP được xác minh qua `verifyOtp`, và đổi mật khẩu yêu cầu phiên khôi phục do Supabase tạo. Không còn bằng chứng cho nhận định cũ rằng mật khẩu đăng ký được lưu trong `sessionStorage` hoặc mã OTP chỉ được kiểm tra ở trình duyệt.
+
+Không ghi nhận lỗ hổng khai thác được trong các thao tác xác thực với Supabase trong phạm vi rà soát này. Cookie `userToken` chỉ điều khiển việc ẩn/hiện giao diện phía trình duyệt, có thể giả mạo nhưng không được các API bảo vệ dùng làm thông tin xác thực. Đây là giới hạn kiểm soát giao diện được ghi nhận ở mức thấp trong bảng trên, không phải bằng chứng vượt qua xác thực JWT của API. Chưa thực hiện kiểm thử động với tài khoản hoặc cấu hình Supabase thực.
 
 ## Luồng xử lý và giải pháp kỹ thuật
 
@@ -61,6 +67,7 @@ Các trang đăng nhập, đăng ký, quên mật khẩu và hồ sơ được t
 - **Tài nguyên riêng tư:** Đặt trong `Storage`, nằm ngoài phạm vi tài nguyên tĩnh công khai.
 - Tệp riêng tư chỉ nên được phân phối qua endpoint trung gian sau khi hệ thống xác thực và kiểm tra quyền truy cập.
 - Tệp tải lên cần được kiểm tra định dạng, giới hạn dung lượng và đặt tên lưu trữ an toàn để tránh ghi đè hoặc khai thác đường dẫn.
+- Trên production, Azure App Service chuyển hướng HTTP sang HTTPS; ứng dụng gửi HSTS (1 năm), `X-Content-Type-Options`, `X-Frame-Options` và `Referrer-Policy`. Không bật HSTS trong Development để tránh ghim HTTPS cho localhost.
 
 ## DevTools
 

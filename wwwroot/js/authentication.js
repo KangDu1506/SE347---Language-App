@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mode = new URLSearchParams(window.location.search).get('mode') || 'signup';
     form.action = `/Account/Authentication?mode=${encodeURIComponent(mode)}`;
+    const signupEmail = sessionStorage.getItem('pendingSignupEmail');
 
     const showMessage = (text, isError = true) => {
         message.className = isError ? 'form-message' : 'auth-banner';
@@ -141,6 +142,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (mode === 'signup') {
+        const emailLabel = document.querySelector('#verificationEmail');
+        const changeEmailLink = document.querySelector('#changeEmailLink');
+        const resendLink = document.querySelector('.verification-resend a');
+
+        if (emailLabel && signupEmail) {
+            const [name, domain] = signupEmail.split('@');
+            emailLabel.textContent = `${name.slice(0, 1)}***@${domain}`;
+        }
+        changeEmailLink?.setAttribute('href', '/Account/Signup');
+
+        resendLink?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!signupEmail || !window.sb) {
+                window.location.assign('/Account/Signup');
+                return;
+            }
+
+            const { error } = await window.sb.auth.resend({ type: 'signup', email: signupEmail });
+            if (error) {
+                showMessage(error.status === 429
+                    ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                    : 'Không gửi lại được mã. Vui lòng kiểm tra email và thử lại.');
+                return;
+            }
+            resetDigits();
+            showMessage('Đã gửi lại mã xác thực, vui lòng kiểm tra email.', false);
+        });
+    }
+
     const verifyPasswordReset = async () => {
         const code = getCode();
 
@@ -172,11 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     };
 
-    const verify = () => {
-        if (mode === 'forgot') {
-            return verifyPasswordReset();
-        }
-
+    const verifySignup = async () => {
         const code = getCode();
         const pendingSignup = sessionStorage.getItem('pendingSignup');
         const pendingLogin = sessionStorage.getItem('pendingLogin');
@@ -187,23 +214,37 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         }
 
-        if (pendingSignup) {
-            sessionStorage.setItem('registeredUser', pendingSignup);
-            sessionStorage.removeItem('pendingSignup');
-            window.location.assign('/Account/Login');
-            return true;
+        submitButton.disabled = true;
+        const { error } = await window.sb.auth.verifyOtp({ email: signupEmail, token: code, type: 'signup' });
+        if (error) {
+            showMessage(error.status === 429
+                ? 'Bạn thử quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                : 'Mã xác thực không đúng hoặc đã hết hạn.');
+            resetDigits();
+            return false;
         }
 
-        sessionStorage.setItem('userToken', 'authenticated');
-        sessionStorage.removeItem('pendingLogin');
-        document.cookie = 'userToken=authenticated; path=/; SameSite=Lax';
-        window.location.assign('/Index');
+        sessionStorage.removeItem('pendingSignupEmail');
+        window.location.assign('/Account/Login?verified=1');
         return true;
     };
 
-    form.addEventListener('submit', (e) => {
+    const verify = () => {
+        if (mode === 'forgot') {
+            return verifyPasswordReset();
+        }
+
+        if (mode === 'signup') {
+            return verifySignup();
+        }
+
+        window.location.assign('/Account/Login');
+        return false;
+    };
+
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        verify();
+        await verify();
     });
 
     updateSubmitState();

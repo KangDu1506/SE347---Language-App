@@ -20,18 +20,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const getPasswordRules = (value) => [
+        { valid: Array.from(value).length >= 16, message: 'Mật khẩu phải có ít nhất 16 ký tự.' },
+        { valid: /[A-Z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ hoa.' },
+        { valid: /[a-z]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ thường.' },
+        { valid: /[0-9]/.test(value), message: 'Mật khẩu phải có ít nhất một chữ số.' },
+        { valid: /[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/.test(value), message: 'Mật khẩu phải có ít nhất một ký tự đặc biệt.' },
+        { valid: /^[A-Za-z0-9\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]+$/.test(value), message: 'Mật khẩu chỉ được chứa chữ hoa, chữ thường, chữ số và ký tự đặc biệt.' }
+    ];
+
     const updateStrength = () => {
         if (!password || !strength || !strengthText || !strengthBar) return;
 
         const value = password.value;
-        const score = [
-            value.length >= 8,
-            /[A-Z]/.test(value),
-            /[0-9]/.test(value),
-            /[^A-Za-z0-9]/.test(value)
-        ].filter(Boolean).length;
-        const strengthState = score >= 3 ? 'strong' : score >= 2 ? 'medium' : '';
-        const width = score === 0 ? 0 : score === 1 ? 25 : score === 2 ? 50 : score === 3 ? 75 : 100;
+        const score = getPasswordRules(value).filter((rule) => rule.valid).length;
+        const strengthState = score === 6 ? 'strong' : score >= 4 ? 'medium' : 'weak';
+        const width = score * 100 / 6;
 
         strength.dataset.strength = strengthState;
         strengthBar.style.width = `${width}%`;
@@ -47,7 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.querySelectorAll('input').forEach((input) => {
         input.addEventListener('blur', () => {
-            setFieldError(input);
+            setFieldErrors(input);
+        });
+        input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
+            if (input.getAttribute('aria-invalid') === 'true') setFieldErrors(input);
         });
     });
 
@@ -74,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (isInvalid && existingError) {
             AppI18n.setText(existingError, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
         }
-    }
 
     form.addEventListener('submit', (event) => {
         if (!form.checkValidity()) {
@@ -85,15 +91,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        event.preventDefault();
         const formData = new FormData(form);
-        sessionStorage.setItem('pendingSignup', JSON.stringify({
-            fullName: formData.get('fullName'),
-            username: formData.get('username'),
-            email: formData.get('email'),
-            password: formData.get('password')
-        }));
-        window.location.assign('/Account/Authentication');
+        const email = String(formData.get('email')).trim().toLowerCase();
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Đang gửi mã...';
+        }
+
+        const { data, error } = await window.sb.auth.signUp({
+            email,
+            password: String(formData.get('password')),
+            options: {
+                data: {
+                    username: String(formData.get('username')).trim().toLowerCase(),
+                    display_name: String(formData.get('fullName')).trim()
+                }
+            }
+        });
+
+        if (error || !data.user) {
+            message.textContent = error?.status === 429
+                ? 'Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.'
+                : error?.message || 'Không tạo được tài khoản. Vui lòng kiểm tra lại thông tin.';
+            form.before(message);
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            }
+            return;
+        }
+
+        sessionStorage.setItem('pendingSignupEmail', email);
+        window.location.assign('/Account/Authentication?mode=signup');
     });
 
     form.addEventListener('keydown', (event) => {

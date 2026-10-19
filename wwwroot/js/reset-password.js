@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const password = form.querySelector('#newPassword');
     const confirmPassword = form.querySelector('#confirmPassword');
     const passwordToggle = form.querySelector('#newPasswordToggle');
+    const confirmPasswordToggle = form.querySelector('#confirmPasswordToggle');
+    const strength = form.querySelector('#passwordStrength');
+    const strengthText = strength?.querySelector('.password-strength__text');
+    const strengthBar = strength?.querySelector('span');
     const submitButton = form.querySelector('button[type="submit"]');
 
     const message = document.createElement('p');
@@ -26,6 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
         passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
     });
+    password.addEventListener('blur', () => setFieldErrors(password));
+    confirmPassword.addEventListener('blur', () => setFieldErrors(confirmPassword));
+    updateStrength();
 
     // Chỉ vào được trang này sau khi nhập đúng mã khôi phục (verifyOtp tạo phiên tạm).
     const { data } = window.sb ? await window.sb.auth.getSession() : { data: {} };

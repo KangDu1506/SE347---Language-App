@@ -6,6 +6,8 @@ using SE347.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+
 // Kết nối Supabase 
 var connectionString = builder.Configuration.GetConnectionString("Supabase");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -28,6 +30,21 @@ builder.Services.AddCors(options => options.AddPolicy(DevCorsPolicy, policy =>
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
+    if (!app.Environment.IsDevelopment())
+    {
+        headers["Strict-Transport-Security"] = "max-age=31536000";
+    }
+
+    await next();
+});
 
 app.UseRouting();
 
@@ -78,18 +95,6 @@ app.Use(async (context, next) =>
             var mode = context.Request.Query["mode"].ToString();
             var code = context.Request.Query["code"].ToString();
 
-            if (System.Text.RegularExpressions.Regex.IsMatch(code, @"^\d{6}$") && mode == "login")
-            {
-                context.Response.Cookies.Append("userToken", "authenticated", new CookieOptions
-                {
-                    HttpOnly = false,
-                    SameSite = SameSiteMode.Lax,
-                    Path = "/"
-                });
-                context.Response.Redirect("/Index", permanent: false, preserveMethod: false);
-                return;
-            }
-
             context.Response.Redirect("/Account/Login", permanent: false, preserveMethod: false);
             return;
         }
@@ -99,19 +104,10 @@ app.Use(async (context, next) =>
         || string.Equals(path, "/index", StringComparison.OrdinalIgnoreCase)
         || string.Equals(path, "/index.cshtml", StringComparison.OrdinalIgnoreCase);
 
-    if (isDashboardEntry)
+    if (isDashboardEntry && path == string.Empty)
     {
-        if (!context.Request.Cookies.ContainsKey("userToken"))
-        {
-            context.Response.Redirect("/Account/Login");
-            return;
-        }
-
-        if (path == string.Empty)
-        {
-            context.Response.Redirect("/Index");
-            return;
-        }
+        context.Response.Redirect("/Index");
+        return;
     }
 
     await next();
