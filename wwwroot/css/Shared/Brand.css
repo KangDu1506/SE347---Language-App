@@ -1,0 +1,60 @@
+/* Logo Wordfox (Pages/Shared/_Brand.cshtml): huy hiệu tròn vàng có đầu Foxy + chữ "wordfox".
+   Nạp ở mọi trang qua Pages/Shared/_SharedHead.cshtml. Token: assets/_colorpalettes/themes.css */
+
+.brand {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.brand__badge {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border: var(--border-sticker);
+    border-radius: 50%;
+    background: #ffe873;
+    box-shadow: var(--shadow-sticker-sm);
+    transform: rotate(-8deg);
+    transition: transform .2s ease;
+}
+
+.brand__badge svg { width: 34px; height: 34px; margin-top: 2px; }
+.brand:hover .brand__badge { transform: rotate(6deg) scale(1.06); }
+
+.brand__name {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: var(--fw-heavy);
+    line-height: 1;
+    letter-spacing: -.03em;
+}
+
+.brand__name b {
+    color: var(--fox-fur);
+    -webkit-text-stroke: 1.5px var(--ink);
+    paint-order: stroke fill;
+}
+
+.brand:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 4px; border-radius: 14px; }
+
+/* Footer nền mực cố định: chữ và viền kem */
+.site-footer .brand { color: #fffaf2; }
+.site-footer .brand__badge { border-color: #fffaf2; box-shadow: 3px 3px 0 #fffaf2; }
+.site-footer .brand__name b { -webkit-text-stroke-color: #fffaf2; }
+
+@media (max-width: 760px) {
+    .brand__badge { width: 40px; height: 40px; }
+    .brand__badge svg { width: 30px; height: 30px; }
+    .brand__name { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .brand__badge { transition: none; }
+    .brand:hover .brand__badge { transform: rotate(-8deg); }
+}

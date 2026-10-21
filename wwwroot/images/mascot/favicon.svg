@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <!-- Favicon Wordfox: huy hiệu vàng + đầu Foxy (cùng hình với logo, xem docs/ux/MASCOT.md) -->
+    <circle cx="32" cy="32" r="29.5" fill="#ffe873" stroke="#1a1209" stroke-width="4"/>
+    <g transform="translate(9 11) scale(.72)">
+        <path d="M9 34 L11 5 L30 20 Z" fill="#ff8a1f" stroke="#1a1209" stroke-width="4.5" stroke-linejoin="round"/>
+        <path d="M55 34 L53 5 L34 20 Z" fill="#ff8a1f" stroke="#1a1209" stroke-width="4.5" stroke-linejoin="round"/>
+        <path d="M15 24 L16 13 L24 20 Z" fill="#ffb4a2"/>
+        <path d="M49 24 L48 13 L40 20 Z" fill="#ffb4a2"/>
+        <ellipse cx="32" cy="37" rx="25" ry="20" fill="#ff8a1f" stroke="#1a1209" stroke-width="4.5"/>
+        <path d="M8.5 39 C12 54 28 58 32 48 C36 58 52 54 55.5 39 C47 45 38 44 32 40 C26 44 17 45 8.5 39 Z" fill="#fffaf2"/>
+        <ellipse cx="22.5" cy="34" rx="3.6" ry="4.2" fill="#1a1209"/>
+        <ellipse cx="41.5" cy="34" rx="3.6" ry="4.2" fill="#1a1209"/>
+        <ellipse cx="32" cy="43" rx="3.6" ry="2.6" fill="#1a1209"/>
+    </g>
+</svg>
