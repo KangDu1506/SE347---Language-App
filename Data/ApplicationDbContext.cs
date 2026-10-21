@@ -24,6 +24,9 @@ namespace SE347.Data
         public DbSet<UserDailyActivity> UserDailyActivities { get; set; } = null!;
         public DbSet<Achievement> Achievements { get; set; } = null!;
         public DbSet<UserAchievement> UserAchievements { get; set; } = null!;
+        public DbSet<UserLessonProgress> UserLessonProgresses { get; set; } = null!;
+        public DbSet<UserContentProgress> UserContentProgresses { get; set; } = null!;
+        public DbSet<UserQuizAttempt> UserQuizAttempts { get; set; } = null!;
 
       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,6 +42,7 @@ namespace SE347.Data
             ConfigureUserDailyActivity(modelBuilder);
             ConfigureAchievement(modelBuilder);
             ConfigureUserAchievement(modelBuilder);
+            ConfigureLearningProgress(modelBuilder);
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -368,6 +372,69 @@ namespace SE347.Data
                 entity.HasKey(e => new { e.UserId, e.AchievementCode });
 
                 entity.Property(e => e.AwardedAt)
+                      .HasDefaultValueSql("now()");
+            });
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // 8. user_lesson_progress, user_content_progress, user_quiz_attempts
+        //    (supabase/migrations/20261021120000_learning_progress.sql)
+        // ─────────────────────────────────────────────────────────────
+        private static void ConfigureLearningProgress(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<UserLessonProgress>(entity =>
+            {
+                entity.ToTable("user_lesson_progress", tb => tb.ExcludeFromMigrations());
+
+                // Composite PK
+                entity.HasKey(e => new { e.UserId, e.LessonId });
+
+                entity.HasIndex(e => new { e.UserId, e.LastStudiedAt })
+                      .HasDatabaseName("idx_lesson_progress_recent")
+                      .IsDescending(false, true);
+
+                // Defaults
+                entity.Property(e => e.Status)
+                      .HasDefaultValue(UserLessonProgress.StatusInProgress);
+
+                entity.Property(e => e.FirstOpenedAt)
+                      .HasDefaultValueSql("now()");
+
+                entity.Property(e => e.LastStudiedAt)
+                      .HasDefaultValueSql("now()");
+
+                // Relationship
+                entity.HasMany(e => e.CompletedContents)
+                      .WithOne()
+                      .HasForeignKey(c => new { c.UserId, c.LessonId })
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserContentProgress>(entity =>
+            {
+                entity.ToTable("user_content_progress", tb => tb.ExcludeFromMigrations());
+
+                // Composite PK
+                entity.HasKey(e => new { e.UserId, e.LessonId, e.ContentId });
+
+                entity.Property(e => e.CompletedAt)
+                      .HasDefaultValueSql("now()");
+            });
+
+            modelBuilder.Entity<UserQuizAttempt>(entity =>
+            {
+                entity.ToTable("user_quiz_attempts", tb => tb.ExcludeFromMigrations());
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .UseIdentityAlwaysColumn();
+
+                entity.HasIndex(e => new { e.UserId, e.LessonId, e.SubmittedAt })
+                      .HasDatabaseName("idx_quiz_attempts_lesson")
+                      .IsDescending(false, false, true);
+
+                entity.Property(e => e.SubmittedAt)
                       .HasDefaultValueSql("now()");
             });
         }

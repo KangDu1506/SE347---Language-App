@@ -36,6 +36,9 @@ builder.Services.AddSupabaseJwtAuth(builder.Configuration);
 // Services nghiệp vụ (Services/)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 
 // CORS chỉ dùng khi dev: frontend chạy ở origin khác (Live Server, Vite) gọi /api/*.
 // Production phục vụ trang và API cùng origin nên không bật. Danh sách origin: Cors:DevOrigins.
@@ -141,6 +144,7 @@ app.MapRazorPages()
 // 4. Endpoint JSON /api/* cho frontend Vue 3 (Endpoints/)
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
+app.MapProgressEndpoints();
 app.MapHealthEndpoints();
 
 // Kích hoạt Server chạy
