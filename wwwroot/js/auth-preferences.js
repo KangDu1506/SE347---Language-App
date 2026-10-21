@@ -224,40 +224,13 @@
             strengthText.textContent = translations[nextLanguage][key];
         }
         localStorage.setItem('se347-language', nextLanguage);
-        updateControls(nextLanguage);
-    }
-
-    function updateControls(currentLanguage) {
-        const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-        const themeButton = document.querySelector('[data-theme-toggle]');
-        const languageButton = document.querySelector('[data-language-toggle]');
-        if (themeButton) {
-            themeButton.querySelector('[data-theme-label]').textContent = translations[currentLanguage][`preferences.next.${theme === 'dark' ? 'light' : 'dark'}`];
-            themeButton.setAttribute('aria-label', translations[currentLanguage][`preferences.theme.${theme === 'dark' ? 'light' : 'dark'}`]);
-            themeButton.querySelector('[data-theme-icon]').textContent = theme === 'dark' ? '☀' : '☾';
-            themeButton.parentElement.setAttribute('aria-label', translations[currentLanguage]['preferences.label']);
-        }
-        if (languageButton) {
-            languageButton.textContent = translations[currentLanguage]['preferences.language'];
-            languageButton.setAttribute('aria-label', translations[currentLanguage]['preferences.language']);
-        }
     }
 
     if (storedTheme) document.documentElement.dataset.theme = storedTheme;
 
+    // Nút đổi ngôn ngữ/theme dùng partial _Preferences, do Shared/i18n.js xử lý click.
     document.addEventListener('DOMContentLoaded', () => {
         applyLanguage(language);
-
-        document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
-            const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.dataset.theme = nextTheme;
-            localStorage.setItem('se347-theme', nextTheme);
-            updateControls(language);
-        });
-
-        document.querySelector('[data-language-toggle]')?.addEventListener('click', () => {
-            applyLanguage(language === 'vi' ? 'en' : 'vi');
-        });
     });
 
     window.authUi = {

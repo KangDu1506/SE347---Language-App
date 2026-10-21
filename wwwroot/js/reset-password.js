@@ -28,8 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         passwordToggle.setAttribute('data-i18n-aria-label', isPassword ? 'ui.hide_password' : 'ui.show_password');
         passwordToggle.setAttribute('data-i18n-title', isPassword ? 'ui.hide_password' : 'ui.show_password');
     });
-    password.addEventListener('blur', () => setFieldErrors(password));
-    confirmPassword.addEventListener('blur', () => setFieldErrors(confirmPassword));
     window.PasswordStrength.attach(password, strength);
 
     // Chỉ vào được trang này sau khi nhập đúng mã khôi phục (verifyOtp tạo phiên tạm).
