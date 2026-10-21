@@ -2,7 +2,7 @@
 
 | File | Nội dung |
 |---|---|
-| `wwwroot/css/Shared/Components.css` | Style cho button, input, card, toast |
+| `wwwroot/css/Shared/Components.css` | Style cho button, input, card, tag, sticker, mascot, toast (phong cách sticker, xem `docs/ux/STYLE_GUIDE.md` mục 9) |
 | `wwwroot/js/Shared/toast.js` | API `window.AppToast` |
 | `docs/frontend/components-preview.html` | Trang preview, mở qua static server tại thư mục gốc repo |
 
@@ -17,11 +17,12 @@ Cả hai file được nạp sẵn trong `Pages/Shared/_Layout.cshtml`. Trang d�
 
 | Class | Mục đích |
 |---|---|
-| `btn--primary` | Hành động chính. Tối đa 1 nút primary trên mỗi khu vực |
+| `btn--primary` | Hành động chính (nền `--surface-orange`). Tối đa 1 nút primary trên mỗi khu vực |
+| `btn--ink` | CTA nổi bật nhất trang (nền mực, chữ kem), ví dụ "Vào học" |
 | `btn--secondary` | Hành động phụ |
 | `btn--ghost` | Hành động ít quan trọng, link dạng nút |
 | `btn--danger` | Xóa, hủy không hoàn tác |
-| `btn--sm`, `btn--lg` | Kích thước 36px / 52px (mặc định 44px) |
+| `btn--sm`, `btn--lg` | Kích thước 36px / 56px (mặc định 44px) |
 | `btn--block` | Rộng 100% |
 
 Trạng thái:
@@ -110,3 +111,13 @@ methods: {
 ```
 
 Quy tắc sử dụng: toast chỉ dùng cho phản hồi sau thao tác (lưu, gửi, lỗi mạng). Lỗi validate form hiển thị tại `field__error` của từng ô, không dùng toast.
+
+## Tiện ích sticker
+
+| Class | Mục đích |
+|---|---|
+| `.sticker` | Khối viền đậm + bóng cứng, không có padding/grid như `.card` |
+| `.press` | Hiệu ứng nhấc khi hover, ấn xuống khi bấm (dùng cùng `.sticker`) |
+| `.tag` | Nhãn viên thuốc viết hoa (eyebrow, danh mục) |
+| `.foxy` | Mascot, xem `docs/ux/MASCOT.md` |
+| `.visually-hidden` | Ẩn khỏi màn hình, trình đọc màn hình vẫn đọc |
