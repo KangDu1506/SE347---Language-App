@@ -284,10 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const verifySignup = async () => {
         const code = getCode();
-        const pendingSignup = sessionStorage.getItem('pendingSignup');
-        const pendingLogin = sessionStorage.getItem('pendingLogin');
-
-        if (!/^\d{6}$/.test(code) || (!pendingSignup && !pendingLogin)) {
+        if (!/^\d{6}$/.test(code) || !signupEmail) {
             AppI18n.setText(message, 'ui.invalid_verification_code_or_expired_registration_session');
             form.after(message);
             return false;

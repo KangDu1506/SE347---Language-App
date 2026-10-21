@@ -48,10 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.querySelectorAll('input').forEach((input) => {
         input.addEventListener('blur', () => {
-            setFieldErrors(input);
+            setFieldError(input);
         });
         input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
-            if (input.getAttribute('aria-invalid') === 'true') setFieldErrors(input);
+            if (input.getAttribute('aria-invalid') === 'true') setFieldError(input);
         });
     });
 
@@ -91,8 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
         if (!form.checkValidity()) {
-            event.preventDefault();
             form.querySelectorAll('input').forEach((input) => {
                 setFieldError(input);
             });
