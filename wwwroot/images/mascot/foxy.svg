@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <!--
+        Mascot Foxy (SCRUM-45). Sprite gồm 3 trạng thái, dùng qua <use>:
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy"/></svg>
+        #foxy       vui (mặc định): dashboard, thẻ tiếp tục học, chúc mừng
+        #foxy-wave  chào: đăng nhập, lần đầu vào app
+        #foxy-sad   buồn: lỗi, quên mật khẩu, mất chuỗi ngày học
+        #foxy-head  chỉ phần đầu: logo, favicon
+        Viền sticker thêm bằng CSS (filter drop-shadow), xem docs/ux/MASCOT.md.
+    -->
+    <defs>
+        <g id="fx-tail">
+            <path d="M150 196 C196 200 222 160 206 116 C200 104 190 102 186 112 C190 146 172 168 146 176 Z" style="fill:var(--fox-fur,#ff8a1f)"/>
+            <path d="M206 116 C200 104 190 102 186 112 C188 126 186 138 182 148 C196 146 208 134 206 116 Z" fill="#fffaf2"/>
+        </g>
+        <g id="fx-body">
+            <ellipse cx="120" cy="184" rx="48" ry="38" style="fill:var(--fox-fur,#ff8a1f)"/>
+            <ellipse cx="120" cy="192" rx="27" ry="26" fill="#fffaf2"/>
+            <ellipse cx="98" cy="219" rx="15" ry="8" style="fill:var(--fox-accent,#c2410c)"/>
+            <ellipse cx="142" cy="219" rx="15" ry="8" style="fill:var(--fox-accent,#c2410c)"/>
+            <path d="M136 150 L150 182 L136 180 L130 156 Z" style="fill:var(--fox-scarf-dark,#5b3fd6)"/>
+            <rect x="80" y="142" width="80" height="16" rx="8" style="fill:var(--fox-scarf,#7c5cff)"/>
+        </g>
+        <g id="fx-ear-l">
+            <path d="M70 84 L74 26 L114 62 Z" style="fill:var(--fox-fur,#ff8a1f);stroke:var(--fox-fur,#ff8a1f)" stroke-width="10" stroke-linejoin="round"/>
+            <path d="M80 70 L82 42 L102 60 Z" style="fill:var(--fox-ear,#ffb4a2)"/>
+        </g>
+        <g id="fx-ear-r">
+            <path d="M170 84 L166 26 L126 62 Z" style="fill:var(--fox-fur,#ff8a1f);stroke:var(--fox-fur,#ff8a1f)" stroke-width="10" stroke-linejoin="round"/>
+            <path d="M160 70 L158 42 L138 60 Z" style="fill:var(--fox-ear,#ffb4a2)"/>
+        </g>
+        <g id="fx-head">
+            <ellipse cx="120" cy="104" rx="64" ry="50" style="fill:var(--fox-fur,#ff8a1f)"/>
+            <path d="M58 108 C66 150 108 160 120 138 C132 160 174 150 182 108 C160 124 138 122 120 110 C102 122 80 124 58 108 Z" fill="#fffaf2"/>
+            <ellipse cx="78" cy="120" rx="9" ry="5" style="fill:var(--fox-cheek,#ff8fab)" opacity=".8"/>
+            <ellipse cx="162" cy="120" rx="9" ry="5" style="fill:var(--fox-cheek,#ff8fab)" opacity=".8"/>
+            <ellipse cx="120" cy="122" rx="7" ry="5" fill="#3a2a17"/>
+        </g>
+        <g id="fx-eye-l">
+            <ellipse cx="94" cy="100" rx="8" ry="10" fill="#3a2a17"/>
+            <circle cx="97" cy="96" r="3" fill="#fff"/>
+        </g>
+        <g id="fx-eye-r">
+            <ellipse cx="146" cy="100" rx="8" ry="10" fill="#3a2a17"/>
+            <circle cx="149" cy="96" r="3" fill="#fff"/>
+        </g>
+    </defs>
+
+    <symbol id="foxy" viewBox="0 0 240 240">
+        <use href="#fx-tail"/>
+        <use href="#fx-body"/>
+        <use href="#fx-ear-l"/>
+        <use href="#fx-ear-r"/>
+        <use href="#fx-head"/>
+        <use href="#fx-eye-l"/>
+        <use href="#fx-eye-r"/>
+        <path d="M108 129 Q120 146 132 129 Z" fill="#3a2a17"/>
+    </symbol>
+
+    <symbol id="foxy-wave" viewBox="0 0 240 240">
+        <use href="#fx-tail"/>
+        <use href="#fx-body"/>
+        <path d="M86 170 C68 162 58 146 56 128" fill="none" style="stroke:var(--fox-fur,#ff8a1f)" stroke-width="20" stroke-linecap="round"/>
+        <circle cx="55" cy="122" r="13" fill="#fffaf2"/>
+        <path d="M30 108 Q24 118 30 128 M18 100 Q8 118 18 136" fill="none" stroke="#3a2a17" stroke-width="4" stroke-linecap="round"/>
+        <use href="#fx-ear-l"/>
+        <use href="#fx-ear-r"/>
+        <use href="#fx-head"/>
+        <path d="M85 102 Q94 92 103 102" fill="none" stroke="#3a2a17" stroke-width="5" stroke-linecap="round"/>
+        <use href="#fx-eye-r"/>
+        <path d="M106 128 Q120 152 134 128 Z" fill="#3a2a17"/>
+        <path d="M112 135 Q120 144 128 135 Z" fill="#f4a6a0"/>
+    </symbol>
+
+    <symbol id="foxy-sad" viewBox="0 0 240 240">
+        <use href="#fx-tail"/>
+        <use href="#fx-body"/>
+        <use href="#fx-ear-l" transform="rotate(-24 92 70)"/>
+        <use href="#fx-ear-r" transform="rotate(24 148 70)"/>
+        <use href="#fx-head"/>
+        <path d="M80 86 L104 80 M136 80 L160 86" fill="none" stroke="#3a2a17" stroke-width="4" stroke-linecap="round"/>
+        <ellipse cx="94" cy="102" rx="7" ry="8" fill="#3a2a17"/>
+        <ellipse cx="146" cy="102" rx="7" ry="8" fill="#3a2a17"/>
+        <circle cx="96" cy="99" r="2.5" fill="#fff"/>
+        <circle cx="148" cy="99" r="2.5" fill="#fff"/>
+        <path d="M109 140 Q120 130 131 140" fill="none" stroke="#3a2a17" stroke-width="4" stroke-linecap="round"/>
+        <path d="M86 114 Q80 126 86 130 Q92 126 86 114 Z" fill="#7aa7ff"/>
+    </symbol>
+
+    <!-- Đầu Foxy cho logo/favicon (khung 64x64, viền mực cố định vì luôn đặt trên huy hiệu vàng) -->
+    <symbol id="foxy-head" viewBox="0 0 64 64">
+        <path d="M9 34 L11 5 L30 20 Z" style="fill:var(--fox-fur,#ff8a1f)" stroke="#1a1209" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M55 34 L53 5 L34 20 Z" style="fill:var(--fox-fur,#ff8a1f)" stroke="#1a1209" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M15 24 L16 13 L24 20 Z" style="fill:var(--fox-ear,#ffb4a2)"/>
+        <path d="M49 24 L48 13 L40 20 Z" style="fill:var(--fox-ear,#ffb4a2)"/>
+        <ellipse cx="32" cy="37" rx="25" ry="20" style="fill:var(--fox-fur,#ff8a1f)" stroke="#1a1209" stroke-width="3.5"/>
+        <path d="M8.5 39 C12 54 28 58 32 48 C36 58 52 54 55.5 39 C47 45 38 44 32 40 C26 44 17 45 8.5 39 Z" fill="#fffaf2"/>
+        <ellipse cx="22.5" cy="34" rx="3.2" ry="3.8" fill="#1a1209"/>
+        <ellipse cx="41.5" cy="34" rx="3.2" ry="3.8" fill="#1a1209"/>
+        <circle cx="23.6" cy="32.6" r="1.1" fill="#fff"/>
+        <circle cx="42.6" cy="32.6" r="1.1" fill="#fff"/>
+        <ellipse cx="32" cy="43" rx="3.2" ry="2.3" fill="#1a1209"/>
+        <ellipse cx="15.5" cy="42" rx="3.4" ry="2" style="fill:var(--fox-cheek,#ff8fab)" opacity=".85"/>
+        <ellipse cx="48.5" cy="42" rx="3.4" ry="2" style="fill:var(--fox-cheek,#ff8fab)" opacity=".85"/>
+    </symbol>
+</svg>
