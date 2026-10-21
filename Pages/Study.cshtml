@@ -1,28 +1,277 @@
 @page
+@*
+    Học tập: bàn cờ lộ trình theo unit, thư viện chủ đề và gợi ý (phong cách sticker).
+    Dữ liệu đang là dữ liệu mẫu khai báo ở @functions bên dưới, chờ API khóa học.
+*@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Học tập";
+    const string ActiveTopic = "present";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/Study.css" />
+    <link rel="stylesheet" href="~/css/Study.css" asp-append-version="true" />
 }
 
 @section Scripts {
     <script src="~/js/auth-guard.js" defer></script>
-    <script src="~/js/study.js" defer></script>
+    <script src="~/js/study.js" asp-append-version="true" defer></script>
 }
 
-		<main class="study-page">
-			<header class="study-header">
-				<div><p class="study-eyebrow" data-i18n="ui.learning_space">Không gian học tập</p><h1 data-i18n="ui.study">Học tập</h1><p data-i18n="ui.choose_a_topic_and_keep_improving_every_day">Chọn một chủ đề để tiếp tục tiến bộ mỗi ngày.</p></div>
-				<a class="study-profile" href="/Account/Profile" data-i18n-text="ui.profile">Hồ sơ <span>NA</span></a>
-			</header>
-			<section class="study-toolbar" aria-label="Bộ lọc bài học" data-i18n-aria-label="ui.lesson_filters"><button class="study-filter study-filter--active" type="button" data-i18n="ui.all">Tất cả</button><button class="study-filter" type="button" data-i18n="ui.vocabulary">Từ vựng</button><button class="study-filter" type="button" data-i18n="ui.grammar">Ngữ pháp</button><button class="study-filter" type="button" data-i18n="ui.listening">Nghe hiểu</button></section>
-			<section class="study-grid" aria-label="Danh sách bài học" data-i18n-aria-label="ui.lesson_list">
-				<article class="study-card study-card--featured"><div class="study-card__top"><span class="study-card__tag" data-i18n="ui.in_progress">Đang học</span><span data-i18n="ui.25_minutes">25 phút</span></div><h2 data-i18n="ui.everyday_communication">Giao tiếp hằng ngày</h2><p data-i18n="ui.practise_common_expressions_for_everyday_situations">Luyện những câu nói thường dùng trong các tình huống cơ bản.</p><div class="study-progress"><span><i style="width: 64%"></i></span><b>64%</b></div><a href="/TrialTest" data-i18n="ui.continue_lesson">Tiếp tục bài học &#8594;</a></article>
-				<article class="study-card"><div class="study-card__top"><span class="study-card__icon study-card__icon--blue">A1</span><span data-i18n="ui.12_lessons">12 bài</span></div><h2 data-i18n="ui.vocabulary_foundations">Từ vựng nền tảng</h2><p data-i18n="ui.essential_vocabulary_for_beginners">Các từ vựng quan trọng cho người mới bắt đầu.</p><a href="/TrialTest" data-i18n="ui.start_learning_link">Bắt đầu học &#8594;</a></article>
-				<article class="study-card"><div class="study-card__top"><span class="study-card__icon study-card__icon--green">G</span><span data-i18n="ui.8_lessons">8 bài</span></div><h2 data-i18n="ui.basic_grammar">Ngữ pháp cơ bản</h2><p data-i18n="ui.master_sentence_structure_and_the_present_tense">Nắm vững cấu trúc câu và cách sử dụng thì hiện tại.</p><a href="/TrialTest" data-i18n="ui.start_learning_link">Bắt đầu học &#8594;</a></article>
-				<article class="study-card"><div class="study-card__top"><span class="study-card__icon study-card__icon--orange">L</span><span data-i18n="ui.10_lessons">10 bài</span></div><h2 data-i18n="ui.listening_practice">Luyện nghe</h2><p data-i18n="ui.improve_your_listening_through_short_conversations">Cải thiện khả năng nghe qua các đoạn hội thoại ngắn.</p><a href="/TrialTest" data-i18n="ui.start_learning_link">Bắt đầu học &#8594;</a></article>
-			</section>
-		</main>
+<main class="study-page">
+    <div class="study-wrap">
+        <section class="study-head" aria-labelledby="study-title">
+            <h1 id="study-title"><span data-i18n="study.title_a">Học</span> <span class="study-head__accent" data-i18n="study.title_b">tập</span></h1>
+            <div class="sticker study-level">
+                <b>A2</b>
+                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small data-i18n="study.level_meta">2/6 unit · 1.247 từ Oxford</small></p>
+            </div>
+        </section>
+
+        <section class="sticker study-board" aria-labelledby="study-board-title">
+            <div class="study-board__head">
+                <div>
+                    <span class="tag" data-i18n="study.board_tag">Bàn cờ lộ trình</span>
+                    <h2 id="study-board-title" data-i18n="study.board_title">Đi hết 6 ô để lên B1</h2>
+                </div>
+                <p data-i18n="study.board_stars">⭐ 5/18 sao</p>
+            </div>
+            <ol class="study-track">
+                @for (var i = 0; i < Units.Length; i++)
+                {
+                    var unit = Units[i];
+                    if (i > 0)
+                    {
+                        <li class="study-link" aria-hidden="true"></li>
+                    }
+                    if (unit.State == "chest" || unit.State == "chest-open")
+                    {
+                        <li class="study-chest@(unit.State == "chest-open" ? " is-open" : null)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="study-chest__base" d="M3 10h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path class="study-chest__lid" d="M3 10V8a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v2z" /><rect x="10" y="9" width="4" height="5" rx="1" /></svg>
+                            <span class="visually-hidden" data-i18n="@(unit.State == "chest-open" ? "study.chest_open" : "study.chest_locked")">@(unit.State == "chest-open" ? "Rương đã mở" : "Rương thưởng")</span>
+                        </li>
+                        continue;
+                    }
+                    <li class="study-tile study-tile--@unit.State">
+                        @if (unit.State == "current")
+                        {
+                            <svg class="foxy study-tile__token" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+                        }
+                        <span class="study-tile__no">@unit.No</span>
+                        <span>
+                            <span class="study-tile__name" data-i18n="@unit.Key">@unit.Name</span>
+                            @if (unit.State == "done")
+                            {
+                                <span class="study-tile__stars" aria-label="@unit.Stars/3" role="img">@(new string('★', unit.Stars))<span class="is-off">@(new string('★', 3 - unit.Stars))</span></span>
+                            }
+                            else if (unit.State == "current")
+                            {
+                                <small data-i18n="study.unit_progress">Bài 4/6</small>
+                            }
+                        </span>
+                        @if (unit.State == "current")
+                        {
+                            <span class="study-tile__prog" role="progressbar" aria-valuenow="4" aria-valuemin="0" aria-valuemax="6"><i></i></span>
+                        }
+                        <span class="visually-hidden" data-i18n="@("study.state_" + unit.State)">@StateText[unit.State]</span>
+                    </li>
+                }
+            </ol>
+        </section>
+
+        <div class="study-lower">
+            <aside class="sticker study-lib" aria-labelledby="study-lib-title">
+                <span class="tag" data-i18n="study.library_tag">Thư viện</span>
+                <h2 id="study-lib-title" data-i18n="study.library_title">Chọn chủ đề</h2>
+                @foreach (var cat in Categories)
+                {
+                    <div class="study-cat">
+                        <button class="study-cat__toggle" type="button" aria-expanded="@(cat.Open ? "true" : "false")" aria-controls="study-cat-@cat.Id">
+                            <span class="study-cat__icon study-cat__icon--@cat.Id" aria-hidden="true">@cat.Icon</span>
+                            <span data-i18n="@cat.LabelKey">@cat.Label</span>
+                            <span class="study-cat__meta">@cat.Meta</span>
+                        </button>
+                        <div class="study-cat__list" id="study-cat-@cat.Id" hidden="@(!cat.Open)">
+                            @foreach (var group in cat.Groups)
+                            {
+                                if (group.Key is not null)
+                                {
+                                    <h3 data-i18n="@group.Key">@group.Text</h3>
+                                }
+                                foreach (var topicId in group.TopicIds)
+                                {
+                                    var topic = Topics.First(t => t.Id == topicId);
+                                    <button type="button" data-topic="@topic.Id" aria-controls="study-topic" aria-current="@(topic.Id == ActiveTopic ? "true" : null)">
+                                        <span data-i18n="@("study.t_" + topic.Id)">@topic.Title</span>
+                                        <small>@topic.Lessons.Length <span data-i18n="study.lessons_unit">bài</span></small>
+                                    </button>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </aside>
+
+            <section class="sticker study-topic" id="study-topic" aria-live="polite">
+                @foreach (var topic in Topics)
+                {
+                    <div class="study-topic__panel" data-topic-panel="@topic.Id" hidden="@(topic.Id != ActiveTopic)">
+                        <div class="study-topic__head">
+                            <div>
+                                <span class="tag" data-i18n="@("study.tc_" + topic.Id)">@topic.Category</span>
+                                <h2 data-i18n="@("study.t_" + topic.Id)">@topic.Title</h2>
+                                <p data-i18n="@("study.td_" + topic.Id)">@topic.Desc</p>
+                            </div>
+                            <span class="study-topic__xp">+@(topic.Lessons.Length * 10) XP</span>
+                        </div>
+                        <ol class="study-lessons">
+                            @for (var i = 0; i < topic.Lessons.Length; i++)
+                            {
+                                var lesson = topic.Lessons[i];
+                                <li class="study-lesson study-lesson--@lesson.State">
+                                    <span class="study-lesson__no" aria-hidden="true">@(lesson.State == "done" ? "✓" : (i + 1).ToString())</span>
+                                    <span>
+                                        <b data-i18n="@($"study.l_{topic.Id}_{i + 1}")">@lesson.Name</b>
+                                        <small data-i18n="@("study.note_" + lesson.State)">@NoteText[lesson.State]</small>
+                                    </span>
+                                    @if (lesson.State == "locked")
+                                    {
+                                        <button class="btn btn--sm" type="button" disabled data-i18n="study.action_locked">Đang khóa</button>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn--sm@(lesson.State == "current" ? " btn--ink" : null)" href="/TrialTest" data-i18n="@("study.action_" + lesson.State)">@(lesson.State == "current" ? "Bắt đầu →" : "Ôn lại")</a>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    </div>
+                }
+            </section>
+        </div>
+
+        <section class="study-recs" aria-labelledby="study-recs-title">
+            <div class="study-recs__head">
+                <div>
+                    <span class="tag" data-i18n="study.recs_tag">Dành riêng cho bạn</span>
+                    <h2 id="study-recs-title" data-i18n="study.recs_title">Gợi ý hôm nay</h2>
+                </div>
+                <p data-i18n="study.recs_text">Chọn theo điểm yếu gần đây: nghe hội thoại và câu hỏi lịch sự.</p>
+            </div>
+            <div class="study-rec-grid">
+                <article class="sticker press study-rec">
+                    <span class="study-rec__hot">HOT</span>
+                    <div class="study-rec__art study-rec__art--chat" aria-hidden="true" lang="en">
+                        <span class="study-bubble">Can I see the menu, please?</span>
+                        <span class="study-bubble study-bubble--me">Of course! Here you are.</span>
+                    </div>
+                    <span class="tag" data-i18n="study.cat_speaking">Giao tiếp</span>
+                    <h3 data-i18n="study.rec1_title">Gọi món ở nhà hàng</h3>
+                    <p data-i18n="study.rec1_text">15 câu thường dùng khi đi ăn với bạn nước ngoài.</p>
+                    <div class="study-rec__row"><span><span data-i18n="study.minutes_15">15 phút</span> · <b>+20 XP</b></span><a class="btn btn--sm" href="/TrialTest" data-i18n="study.learn_now">Học ngay →</a></div>
+                </article>
+                <article class="sticker press study-rec">
+                    <div class="study-rec__art study-rec__art--wave" aria-hidden="true">
+                        <span class="study-rec__play">▶</span>
+                        <span class="study-rec__bars">@foreach (var h in new[] { 30, 70, 45, 90, 55, 80, 35, 65, 95, 50, 75, 40, 60, 85, 30 }) { <i style="--h: @(h)%"></i> }</span>
+                        <span class="study-rec__time">0:42</span>
+                    </div>
+                    <span class="tag" data-i18n="ui.listening">Nghe hiểu</span>
+                    <h3 data-i18n="study.t_hobby">Hội thoại: Sở thích</h3>
+                    <p data-i18n="study.rec2_text">Nghe hai người bạn kể về cuối tuần, trả lời 5 câu hỏi.</p>
+                    <div class="study-rec__row"><span><span data-i18n="study.minutes_20">20 phút</span> · <b>+25 XP</b></span><a class="btn btn--sm" href="/TrialTest" data-i18n="study.learn_now">Học ngay →</a></div>
+                </article>
+                <article class="sticker press study-rec">
+                    <div class="study-rec__art study-rec__art--quest" aria-hidden="true">
+                        @foreach (var (day, state) in new[] { ("T2", "on"), ("T3", "on"), ("T4", "on"), ("T5", "now"), ("T6", "") })
+                        {
+                            <span class="study-day study-day--@(string.IsNullOrEmpty(state) ? "next" : state)" data-i18n="@("study.day_" + day)">@day</span>
+                        }
+                        <svg class="study-rec__prize" viewBox="0 0 24 24"><path class="study-chest__base" d="M3 10h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path class="study-chest__lid" d="M3 10V8a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v2z" /><rect x="10" y="9" width="4" height="5" rx="1" /></svg>
+                    </div>
+                    <span class="tag" data-i18n="study.weekly_challenge">Thử thách tuần</span>
+                    <h3 data-i18n="study.rec3_title">5 ngày, 5 bài nghe</h3>
+                    <p data-i18n="study.rec3_text">Đã xong 3/5 ngày. Hoàn thành để mở rương và nhận huy hiệu “Tai thính”.</p>
+                    <div class="study-rec__row"><span><span data-i18n="study.days_left_2">Còn 2 ngày</span> · <b>+100 XP</b></span><a class="btn btn--sm" href="/TrialTest" data-i18n="study.do_today">Làm hôm nay →</a></div>
+                </article>
+            </div>
+        </section>
+    </div>
+</main>
+
+@functions {
+    private sealed record Unit(string No, string Key, string Name, string State, int Stars = 0);
+    private sealed record Lesson(string Name, string State);
+    private sealed record Topic(string Id, string Category, string Title, string Desc, Lesson[] Lessons);
+    private sealed record Group(string? Key, string? Text, string[] TopicIds);
+    private sealed record Category(string Id, string Icon, string LabelKey, string Label, string Meta, bool Open, Group[] Groups);
+
+    private static readonly Dictionary<string, string> StateText = new()
+    {
+        ["done"] = "Đã xong", ["current"] = "Đang học", ["locked"] = "Chưa mở"
+    };
+
+    private static readonly Dictionary<string, string> NoteText = new()
+    {
+        ["done"] = "Đã xong · ★★★", ["current"] = "Đang học · +10 XP", ["locked"] = "Mở sau bài trước"
+    };
+
+    private static readonly Unit[] Units =
+    {
+        new("01", "study.unit_greetings", "Chào hỏi", "done", 3),
+        new("02", "study.unit_numbers", "Số đếm", "done", 2),
+        new("", "", "", "chest-open"),
+        new("03", "study.unit_family", "Gia đình", "current"),
+        new("04", "study.unit_food", "Đồ ăn", "locked"),
+        new("", "", "", "chest"),
+        new("05", "study.unit_travel", "Du lịch", "locked"),
+        new("06", "study.unit_shopping", "Mua sắm", "locked")
+    };
+
+    private static readonly Topic[] Topics =
+    {
+        new("present", "Ngữ pháp · Các thì", "Hiện tại đơn", "Nói về thói quen và sự thật hiển nhiên.", new Lesson[]
+        {
+            new("Cấu trúc cơ bản", "done"), new("Động từ to be và động từ thường", "done"), new("Dấu hiệu nhận biết", "current"),
+            new("Bài tập thực hành", "locked"), new("Kiểm tra cuối bài", "locked")
+        }),
+        new("past", "Ngữ pháp · Các thì", "Quá khứ đơn", "Kể lại việc đã xảy ra và kết thúc.", new Lesson[]
+        {
+            new("Cấu trúc quá khứ đơn", "current"), new("Động từ bất quy tắc", "locked"), new("Cách phát âm đuôi -ed", "locked"),
+            new("Bài tập thực hành", "locked"), new("Kiểm tra cuối bài", "locked")
+        }),
+        new("nouns", "Ngữ pháp · Từ loại", "Danh từ đếm được", "Số ít, số nhiều và cách dùng a/an/some.", new Lesson[]
+        {
+            new("Số ít và số nhiều", "current"), new("a, an, some, any", "locked"), new("Danh từ bất quy tắc", "locked"), new("Kiểm tra", "locked")
+        }),
+        new("family", "Từ vựng · Oxford 3000", "Gia đình", "42 từ về thành viên, họ hàng, nghề nghiệp.", new Lesson[]
+        {
+            new("Thành viên trong nhà", "done"), new("Họ hàng", "done"), new("Giới thiệu gia đình", "done"),
+            new("Nghề nghiệp của bố mẹ", "current"), new("Ngày lễ trong gia đình", "locked"), new("Ôn tập chương", "locked")
+        }),
+        new("food", "Từ vựng · Oxford 3000", "Đồ ăn", "Món ăn, đồ uống và cách miêu tả vị.", new Lesson[]
+        {
+            new("Món ăn hằng ngày", "locked"), new("Đồ uống", "locked"), new("Vị và cách nấu", "locked")
+        }),
+        new("order", "Giao tiếp", "Gọi món", "Đặt bàn, gọi món, thanh toán.", new Lesson[]
+        {
+            new("Đặt bàn qua điện thoại", "done"), new("Gọi món", "current"), new("Phàn nàn lịch sự", "locked"), new("Thanh toán", "locked")
+        }),
+        new("hobby", "Nghe hiểu", "Hội thoại: Sở thích", "Nghe và trả lời câu hỏi về sở thích.", new Lesson[]
+        {
+            new("Cuối tuần của Tom", "current"), new("Câu lạc bộ sách", "locked"), new("Kiểm tra nghe", "locked")
+        })
+    };
+
+    private static readonly Category[] Categories =
+    {
+        new("vocab", "Aa", "ui.vocabulary", "Từ vựng", "1.247/3.000", false, new[] { new Group(null, null, new[] { "family", "food" }) }),
+        new("grammar", "G", "ui.grammar", "Ngữ pháp", "8/24", true, new[]
+        {
+            new Group("study.g_tenses", "Các thì", new[] { "present", "past" }),
+            new Group("study.g_word_types", "Từ loại", new[] { "nouns" })
+        }),
+        new("speaking", "Hi", "study.cat_speaking", "Giao tiếp", "3/12", false, new[] { new Group(null, null, new[] { "order" }) }),
+        new("listening", "♪", "ui.listening", "Nghe hiểu", "2/10", false, new[] { new Group(null, null, new[] { "hobby" }) })
+    };
+}
