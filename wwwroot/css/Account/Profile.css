@@ -508,3 +508,55 @@ body { color: var(--text-primary); background: var(--bg-main); }
 .profile-progress-track span { background: var(--color-primary); }
 .profile-activity-icon--blue, .profile-activity-icon--orange { color: var(--color-primary); background: var(--bg-soft); }
 .profile-activity-icon--green { color: var(--status-success); background: var(--status-success-soft); }
+
+/* ---------- Sticker (Neo-brutalism) - ghi đè lớp style mềm phía trên ---------- */
+html body .profile-page { padding-top: 36px; }
+html body .profile-hero, html body .profile-stat, html body .profile-panel { border: var(--border-sticker); border-radius: var(--radius-sticker); box-shadow: var(--shadow-sticker); }
+html body .profile-hero { background: var(--surface-orange); }
+html body .profile-avatar { border: var(--border-sticker); color: var(--text-primary); background: var(--surface-pink); box-shadow: var(--shadow-sticker-sm); font-family: var(--font-display); font-size: 1.6rem; transform: rotate(-4deg); }
+html body .profile-eyebrow { display: inline-block; padding: 2px 10px; border: var(--border-sticker-thin); border-radius: var(--radius-pill); color: var(--text-primary); background: var(--bg-card); }
+html body .profile-identity h1 { margin-top: 6px; font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); line-height: 1; letter-spacing: -.02em; }
+html body .profile-email { color: var(--text-primary); font-weight: var(--fw-semibold); }
+html body .profile-edit-button { min-height: 44px; padding: 0 18px; border: var(--border-sticker); border-radius: 12px; color: var(--text-primary); background: var(--bg-card); box-shadow: var(--shadow-sticker-sm); font-weight: var(--fw-heavy); }
+html body .profile-edit-button:hover { border-color: var(--ink); background: var(--surface-sand); }
+html body .profile-stats { gap: 24px; margin: 28px 0; }
+html body .profile-stat:nth-child(1) { background: var(--surface-mint); transform: rotate(-1deg); }
+html body .profile-stat:nth-child(2) { background: var(--surface-sand); }
+html body .profile-stat:nth-child(3) { background: var(--surface-pink); transform: rotate(1deg); }
+html body .profile-stat__label { color: var(--text-primary); font-weight: var(--fw-heavy); }
+html body .profile-stat strong { font-family: var(--font-display); font-size: 3rem; line-height: 1; }
+html body .profile-stat__note { color: var(--text-primary); font-weight: var(--fw-bold); }
+html body .profile-content { gap: 24px; }
+html body .profile-panel h2 { margin-top: 6px; font-family: var(--font-display); font-size: 26px; }
+html body .profile-progress-value { color: var(--text-primary); font-family: var(--font-display); font-size: 2rem; }
+html body .profile-progress-track { height: 24px; border: var(--border-sticker); background: var(--bg-card); }
+html body .profile-progress-track span { border-right: var(--border-sticker); border-radius: 0; background: repeating-linear-gradient(-45deg, var(--ink) 0 6px, color-mix(in srgb, var(--ink) 80%, var(--bg-card)) 6px 12px); }
+html body .profile-panel__description { color: var(--text-secondary); font-weight: var(--fw-semibold); }
+html body .profile-panel__link { display: inline-flex; gap: 6px; padding: 6px 14px; border: 2.5px solid var(--ink); border-radius: 10px; color: var(--text-primary); background: var(--bg-card); box-shadow: var(--shadow-sticker-sm); font-weight: var(--fw-heavy); }
+html body .profile-activity-list li { padding-bottom: 14px; border-bottom: 2px dashed var(--border-strong); }
+html body .profile-activity-list li:last-child { padding-bottom: 0; border-bottom: 0; }
+html body .profile-activity-list b { padding: 1px 8px; border: 2px solid var(--ink); border-radius: 8px; color: var(--text-primary); background: var(--surface-mint); }
+html body .profile-activity-icon { border: 2.5px solid var(--ink); border-radius: 12px; color: var(--text-primary); font-family: var(--font-display); }
+html body .profile-activity-icon--blue { background: var(--color-secondary-soft); }
+html body .profile-activity-icon--green { color: var(--text-primary); background: var(--surface-mint); }
+html body .profile-activity-icon--orange { background: var(--surface-orange); }
+
+/* ---------- Dark mode: mảng màu là "giấy sáng" (chữ, viền bên trong tối) - token --paper-* trong themes.css ---------- */
+[data-theme="dark"] :is(
+    html body .profile-hero,
+    html body .profile-avatar,
+    html body .profile-edit-button:hover,
+    html body .profile-stat,
+    html body .profile-activity-list b,
+    html body .profile-activity-icon--green,
+    html body .profile-activity-icon--orange
+) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --bg-main: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
+[data-theme="dark"] :is(
+    html body .profile-hero,
+    html body .profile-avatar,
+    html body .profile-edit-button:hover,
+    html body .profile-stat,
+    html body .profile-activity-list b,
+    html body .profile-activity-icon--green,
+    html body .profile-activity-icon--orange
+) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px); }
