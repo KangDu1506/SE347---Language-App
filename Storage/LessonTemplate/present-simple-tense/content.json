@@ -1,0 +1,69 @@
+[
+    {
+        "id": "1",
+        "content": "S + V(s/es)",
+        "definition-en": "Affirmative: add -s or -es to the verb after he, she, it or a singular noun.",
+        "definition-vi": "Câu khẳng định: thêm -s hoặc -es vào động từ khi chủ ngữ là he, she, it hoặc danh từ số ít.",
+        "examples": [
+            {
+                "term": "I drink coffee every morning.",
+                "translation": "Tôi uống cà phê mỗi sáng."
+            },
+            {
+                "term": "She watches TV after dinner.",
+                "translation": "Cô ấy xem TV sau bữa tối."
+            }
+        ]
+    },
+
+    {
+        "id": "2",
+        "content": "S + do/does + not + V",
+        "definition-en": "Negative: use don't (do not) or doesn't (does not) before the base form of the verb.",
+        "definition-vi": "Câu phủ định: dùng don't (do not) hoặc doesn't (does not) trước động từ nguyên mẫu.",
+        "examples": [
+            {
+                "term": "They don't live in Hanoi.",
+                "translation": "Họ không sống ở Hà Nội."
+            },
+            {
+                "term": "He doesn't like spicy food.",
+                "translation": "Anh ấy không thích đồ ăn cay."
+            }
+        ]
+    },
+
+    {
+        "id": "3",
+        "content": "Do/Does + S + V?",
+        "definition-en": "Questions: start with Do or Does and keep the verb in its base form.",
+        "definition-vi": "Câu hỏi: bắt đầu bằng Do hoặc Does, động từ giữ nguyên mẫu.",
+        "examples": [
+            {
+                "term": "Do you speak English?",
+                "translation": "Bạn có nói tiếng Anh không?"
+            },
+            {
+                "term": "Does your sister work here?",
+                "translation": "Chị của bạn có làm việc ở đây không?"
+            }
+        ]
+    },
+
+    {
+        "id": "4",
+        "content": "always, usually, often, sometimes, never",
+        "definition-en": "Adverbs of frequency go before the main verb and after the verb be.",
+        "definition-vi": "Trạng từ chỉ tần suất đứng trước động từ chính và sau động từ be.",
+        "examples": [
+            {
+                "term": "We usually walk to school.",
+                "translation": "Chúng tôi thường đi bộ đến trường."
+            },
+            {
+                "term": "He is never late.",
+                "translation": "Anh ấy không bao giờ đi trễ."
+            }
+        ]
+    }
+]

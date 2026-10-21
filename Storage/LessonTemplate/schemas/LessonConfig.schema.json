@@ -1,28 +1,66 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "LessonTemplate",
+    "$id": "https://se347-language-app.local/schemas/LessonConfig.schema.json",
+    "title": "Lesson Config",
+    "description": "Metadata of a lesson. The lesson folder name (kebab-case slug) is the LessonId.",
     "type": "object",
     "additionalProperties": false,
+    "required": [
+        "name",
+        "category",
+        "topic",
+        "description",
+        "level",
+        "order",
+        "estimated-minutes",
+        "content"
+    ],
     "properties": {
         "$schema": {
             "type": "string",
             "format": "uri-reference"
         },
         "name": {
-            "type": "string",
-            "description": "The name of the lesson template."
+            "$ref": "#/$defs/nonEmptyString",
+            "description": "Display name of the lesson."
         },
         "category": {
             "type": "string",
-            "description": "The category of the lesson template."
+            "enum": ["vocabulary", "grammar", "listening"],
+            "description": "Lesson type, matches the filters on the Study page."
+        },
+        "topic": {
+            "$ref": "#/$defs/nonEmptyString",
+            "description": "Subject of the lesson, e.g. \"Adjectives\", \"Tenses\", \"Daily life\"."
         },
         "description": {
-            "type": "string",
-            "description": "A brief description of the lesson template."
+            "$ref": "#/$defs/nonEmptyString",
+            "description": "A short description of the lesson."
         },
         "level": {
             "type": "string",
-            "description": "The difficulty level of the lesson template."
+            "pattern": "^(A1|A2|B1|B2|C1)$",
+            "description": "CEFR level, matches user_learning_profiles.cefr_level in the database."
+        },
+        "order": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Position of the lesson in the learning path (1 = first)."
+        },
+        "estimated-minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 120,
+            "description": "Estimated time to finish the lesson, in minutes."
+        },
+        "image": {
+            "$ref": "#/$defs/assetPath",
+            "description": "Optional cover image, relative to the lesson folder (e.g. \"./images/cover.webp\")."
+        },
+        "content-settings": {
+            "type": "object",
+            "description": "Settings for lesson content.",
+            "additionalProperties": true
         },
         "quiz-settings": {
             "type": "object",
@@ -43,19 +81,27 @@
                 }
             }
         },
-        "content-settings": {
-            "type": "object",
-            "description": "Settings for lesson content.",
-            "additionalProperties": true
-        },
         "content": {
-            "type": "string",
-            "description": "The path to the content file for the lesson template."
+            "$ref": "#/$defs/jsonFilePath",
+            "description": "Path to the content file, relative to the lesson folder."
         },
         "quiz": {
-            "type": "string",
-            "description": "The path to the quiz file for the lesson template."
+            "$ref": "#/$defs/jsonFilePath",
+            "description": "Path to the quiz file, relative to the lesson folder. Omit if the lesson has no quiz."
         }
     },
-    "required": ["name", "category", "description", "level", "content", "quiz"]
+    "$defs": {
+        "nonEmptyString": {
+            "type": "string",
+            "minLength": 1
+        },
+        "jsonFilePath": {
+            "type": "string",
+            "pattern": "^\\./[A-Za-z0-9_./-]+\\.json$"
+        },
+        "assetPath": {
+            "type": "string",
+            "pattern": "^\\./[A-Za-z0-9_./-]+\\.(webp|png|jpg|jpeg|svg)$"
+        }
+    }
 }

@@ -1,12 +1,15 @@
 using System.Text.Json.Serialization;
 
-namespace DTOs.Lesson
+namespace SE347.DTOs.Lesson
 {
+    /// <summary>
+    /// DTO cho một mục nội dung của bài học (một phần tử trong content.json):
+    /// từ vựng (vocabulary), cấu trúc ngữ pháp (grammar) hoặc câu cần nghe (listening).
+    /// Các trường phát âm, Oxford, từ đồng/trái nghĩa chỉ có ở bài vocabulary nên có thể null.
+    /// Image / Audio: đường dẫn tương đối trong folder bài học, API đổi thành URL trước khi trả về.
+    /// </summary>
     public class LessonContentItemDto
     {
-        /// <summary>
-        /// DTO cho một mục từ vựng và các ví dụ của bài học.
-        /// </summary>
         [JsonPropertyName("id")]
         public string Id { get; set; } = null!;
 
@@ -14,10 +17,10 @@ namespace DTOs.Lesson
         public string Content { get; set; } = null!;
 
         [JsonPropertyName("pronunciation-bre")]
-        public string PronunciationBre { get; set; } = null!;
+        public string? PronunciationBre { get; set; }
 
         [JsonPropertyName("pronunciation-name")]
-        public string PronunciationName { get; set; } = null!;
+        public string? PronunciationName { get; set; }
 
         [JsonPropertyName("definition-en")]
         public string DefinitionEn { get; set; } = null!;
@@ -26,10 +29,16 @@ namespace DTOs.Lesson
         public string DefinitionVi { get; set; } = null!;
 
         [JsonPropertyName("oxford-link")]
-        public string OxfordLink { get; set; } = null!;
+        public string? OxfordLink { get; set; }
 
         [JsonPropertyName("external-source")]
         public List<string> ExternalSources { get; set; } = new();
+
+        [JsonPropertyName("image")]
+        public string? Image { get; set; }
+
+        [JsonPropertyName("audio")]
+        public string? Audio { get; set; }
 
         [JsonPropertyName("examples")]
         public List<LessonExampleDto> Examples { get; set; } = new();
@@ -39,7 +48,6 @@ namespace DTOs.Lesson
 
         [JsonPropertyName("antonyms")]
         public List<string> Antonyms { get; set; } = new();
-
     }
 
     public class LessonExampleDto

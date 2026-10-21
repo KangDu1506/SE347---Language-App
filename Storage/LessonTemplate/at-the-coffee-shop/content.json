@@ -1,0 +1,57 @@
+[
+    {
+        "id": "1",
+        "content": "Hi, can I get a large latte, please?",
+        "definition-en": "The customer orders a drink politely with \"Can I get ..., please?\".",
+        "definition-vi": "Khách gọi đồ uống một cách lịch sự với mẫu \"Can I get ..., please?\".",
+        "audio": "./audio/1.m4a",
+        "examples": [
+            {
+                "term": "Can I get a small tea, please?",
+                "translation": "Cho tôi một ly trà nhỏ được không?"
+            }
+        ]
+    },
+
+    {
+        "id": "2",
+        "content": "Sure. Would you like it hot or iced?",
+        "definition-en": "The barista offers a choice with \"Would you like ... or ...?\".",
+        "definition-vi": "Nhân viên pha chế đưa ra lựa chọn với mẫu \"Would you like ... or ...?\".",
+        "audio": "./audio/2.m4a",
+        "examples": [
+            {
+                "term": "Would you like milk or sugar?",
+                "translation": "Bạn muốn thêm sữa hay đường?"
+            }
+        ]
+    },
+
+    {
+        "id": "3",
+        "content": "Iced, please. And a chocolate muffin too.",
+        "definition-en": "The customer answers the choice and adds one more item with \"... too\".",
+        "definition-vi": "Khách trả lời lựa chọn và gọi thêm một món với \"... too\".",
+        "audio": "./audio/3.m4a",
+        "examples": [
+            {
+                "term": "A bottle of water too, please.",
+                "translation": "Cho tôi thêm một chai nước nữa nhé."
+            }
+        ]
+    },
+
+    {
+        "id": "4",
+        "content": "That's six dollars fifty. Is that for here or to go?",
+        "definition-en": "The barista says the price and asks if the customer will eat in the shop (for here) or take it away (to go).",
+        "definition-vi": "Nhân viên báo giá và hỏi khách dùng tại quán (for here) hay mang đi (to go).",
+        "audio": "./audio/4.m4a",
+        "examples": [
+            {
+                "term": "To go, please.",
+                "translation": "Mang đi nhé."
+            }
+        ]
+    }
+]

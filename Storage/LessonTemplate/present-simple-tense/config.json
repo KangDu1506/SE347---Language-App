@@ -1,0 +1,20 @@
+{
+    "$schema": "../schemas/LessonConfig.schema.json",
+    "name": "Present Simple Tense",
+    "category": "grammar",
+    "topic": "Tenses",
+    "description": "Use the present simple to talk about habits, routines and facts: affirmative, negative and question forms.",
+    "level": "A1",
+    "order": 1,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

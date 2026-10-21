@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace DTOs.Lesson
+namespace SE347.DTOs.Lesson
 {
     public class LessonQuizSettingsDto
     {

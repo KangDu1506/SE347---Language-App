@@ -6,6 +6,23 @@ using SE347.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// `dotnet run -- validate-lessons`: kiểm tra JSON trong Storage/LessonTemplate theo schema rồi thoát (không chạy web).
+if (args.Contains("validate-lessons"))
+{
+    var validator = new LessonTemplateValidator(Path.Combine(builder.Environment.ContentRootPath, "Storage", "LessonTemplate"));
+    var errors = validator.ValidateAll();
+    foreach (var error in errors)
+    {
+        Console.Error.WriteLine(error);
+    }
+
+    Console.WriteLine(errors.Count == 0
+        ? $"OK: {validator.LessonFolders().Count()} bài học hợp lệ."
+        : $"Có {errors.Count} lỗi dữ liệu bài học.");
+    Environment.ExitCode = errors.Count == 0 ? 0 : 1;
+    return;
+}
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 // Kết nối Supabase 
@@ -19,6 +36,9 @@ builder.Services.AddSupabaseJwtAuth(builder.Configuration);
 // Services nghiệp vụ (Services/)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
+builder.Services.AddScoped<IProgressService, ProgressService>();
 
 // CORS chỉ dùng khi dev: frontend chạy ở origin khác (Live Server, Vite) gọi /api/*.
 // Production phục vụ trang và API cùng origin nên không bật. Danh sách origin: Cors:DevOrigins.
@@ -124,6 +144,7 @@ app.MapRazorPages()
 // 4. Endpoint JSON /api/* cho frontend Vue 3 (Endpoints/)
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
+app.MapProgressEndpoints();
 app.MapHealthEndpoints();
 
 // Kích hoạt Server chạy

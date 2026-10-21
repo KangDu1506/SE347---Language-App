@@ -1,0 +1,20 @@
+{
+    "$schema": "../schemas/LessonConfig.schema.json",
+    "name": "At the Coffee Shop",
+    "category": "listening",
+    "topic": "Daily life",
+    "description": "Listen to a short conversation between a customer and a barista and pick out the key details.",
+    "level": "A2",
+    "order": 1,
+    "estimated-minutes": 8,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}
