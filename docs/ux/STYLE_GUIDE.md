@@ -4,6 +4,7 @@ Bộ token chung cho màu, font, bo góc, khoảng cách và đổ bóng. Mục 
 
 - Token: [`wwwroot/assets/_colorpalettes/themes.css`](../../wwwroot/assets/_colorpalettes/themes.css)
 - Xem trực quan: mở [`docs/ux/style-guide.html`](./style-guide.html) bằng trình duyệt. Trang có nút đổi Light/Dark và tự tính tỉ lệ tương phản.
+- Phong cách giao diện: **Neo-brutalism (sticker)**, xem [mục 9](#9-phong-cách-sticker-neo-brutalism). Mascot: [`MASCOT.md`](./MASCOT.md).
 
 ## 1. Cách dùng
 
@@ -28,7 +29,7 @@ Dark mode: đặt `data-theme="dark"` lên thẻ `<html>`.
 
 ## 2. Màu sắc
 
-Hướng màu đã chốt: **cam ấm là màu chính, xanh là màu phụ**. Đây là tông mà phần lớn các trang đang dùng.
+Hướng màu ban đầu: **cam ấm là màu chính, xanh là màu phụ**. Từ Sprint 2 đã đổi sang bảng "Kẹo ngọt", xem [mục 9](#9-phong-cách-sticker-neo-brutalism).
 
 ### Màu chính · cam
 
@@ -60,8 +61,8 @@ Hướng màu đã chốt: **cam ấm là màu chính, xanh là màu phụ**. Đ
 | `--bg-soft` | `#fff1d9` | `#3a2b1b` | Badge, ô được chọn |
 | `--border-color` | `#eadfcf` | `#4a3a28` | Viền thẻ |
 | `--border-strong` | `#d9c5a7` | `#6b5539` | Viền ô nhập, nút phụ |
-| `--text-primary` | `#513b22` | `#fbf3e6` | Chữ chính (10.1:1) |
-| `--text-secondary` | `#806b50` | `#d9c5a7` | Chữ phụ, mô tả (4.9:1) |
+| `--text-primary` | `#1a1209` | `#fbf3e6` | Chữ chính (17.8:1) |
+| `--text-secondary` | `#6b5a44` | `#d9c5a7` | Chữ phụ, mô tả (6.4:1) |
 | `--text-on-primary` | `#fffaf2` | `#1a140d` | Chữ trên nút chính |
 | `--text-on-brand` | `#fffaf2` | `#fffaf2` | Chữ trên hero, đặt ở nửa tối của gradient |
 
@@ -78,6 +79,7 @@ Dùng theo cặp: chữ màu `--status-*` trên nền `--status-*-soft`.
 ## 3. Typography
 
 - Font: **Be Vietnam Pro**, được thiết kế cho tiếng Việt nên dấu hiển thị chuẩn. Dự phòng là `Segoe UI` và `system-ui`.
+- Font tiêu đề (`--font-display`): **Bricolage Grotesque** 700/800 cho h1/h2, số liệu lớn (XP, chuỗi ngày), nút CTA. Không dùng cho đoạn văn. Nạp qua partial `Pages/Shared/_SharedHead.cshtml`.
 - Độ đậm: 400 cho nội dung, 600 cho điều hướng, 700 cho nhãn, 800 cho tiêu đề và nút.
 
 | Token | Cỡ | Dùng cho |
@@ -147,3 +149,50 @@ Dùng cho nhóm UI khi chuyển CSS của từng trang sang token:
 2. Nhiều file CSS có hai lớp style: một lớp tông xanh ban đầu, rồi một khối `html body ...` tông cam ghi đè lên. Khi chuyển sang token nên xóa lớp xanh cũ để file gọn hơn.
 3. Nút chính ở `Login.css` (và các nút nền `#d88920` khác) không đạt tương phản. Cần đổi sang `--color-primary`.
 4. Thư mục `Pages/Shared` chưa có layout dùng chung, nên mỗi trang phải tự nhúng font và `themes.css`. Có `_Layout.cshtml` thì chỉ cần nhúng một lần.
+
+## 9. Phong cách sticker (Neo-brutalism)
+
+Từ Sprint 2, giao diện dùng phong cách Neo-brutalism kiểu sticker: khối viền đậm, bóng cứng không mờ, mảng màu phẳng, một số khối xoay nhẹ như được dán lên trang. Bảng màu đổi sang "Kẹo ngọt" (cam chính, tím phụ, xanh chanh/vàng/hồng); mục 2 bên dưới là bảng cũ, giá trị hiện hành xem bảng token trong mục này.
+
+### Token (bảng "Kẹo ngọt")
+
+| Token | Light | Dark | Dùng cho |
+|---|---|---|---|
+| `--ink` | `#1a1209` | `#f1ebe3` | Màu viền và bóng cứng |
+| `--border-sticker` | `3px solid var(--ink)` | | Viền khối, thẻ, nút lớn |
+| `--border-sticker-thin` | `2px solid var(--ink)` | | Tag, chip nhỏ |
+| `--shadow-sticker-sm` / `--shadow-sticker` / `--shadow-sticker-lg` | `3px` / `6px` / `8px` lệch, không blur | | Nút / thẻ / thẻ khi hover |
+| `--radius-sticker` | `18px` | | Thẻ sticker |
+| `--bg-main` / `--bg-card` | `#fff9f0` / `#ffffff` | `#1c1b1f` / `#2a282f` | Nền trang / thẻ trung tính |
+| `--bg-dotted` | nền chấm 22px trên `--bg-main` | | Nền trang |
+| `--surface-orange` | `#ff9a4d` | giữ nguyên | Khối nhấn chính, nút primary, hàng "bạn" |
+| `--surface-orange-deep` | `#ff6b2c` | giữ nguyên | Vòng chuỗi ngày, bóng màu của nút mực |
+| `--surface-mint` | `#c4f25c` (xanh chanh) | giữ nguyên | Mục tiêu, trạng thái xong |
+| `--surface-pink` | `#ff9fd0` | giữ nguyên | Khối phụ, avatar |
+| `--surface-sand` | `#ffe873` (vàng) | giữ nguyên | Panel lớn, hover |
+| `--surface-blue` | `#6d4cf5` (tím) | giữ nguyên | Ô đang học, mặt sau thẻ từ (chữ `--text-on-blue`, 5.25:1) |
+| `--surface-locked` | sọc chéo sáng | sọc chéo tối | Ô/huy hiệu chưa mở (viền nét đứt) |
+| `--color-primary` / `--color-secondary` | `#b23a0a` / `#6d4cf5` | `#ffa366` / `#a996ff` | Chữ link, chữ nhấn, focus |
+| `--paper-text` / `--paper-text-2` / `--paper-card` | `#1a1209` / `#4b3d2f` / `#fffaf2` | | Chữ, chữ phụ, nền con bên trong mảng màu |
+
+Chữ trên mọi `--surface-*` (trừ blue) luôn tối, tương phản thấp nhất 6.52:1 (trên `--surface-orange-deep`).
+
+### Dark mode
+
+- Nền xám than trung tính, viền và bóng màu kem; mảng màu sticker **giữ nguyên độ tươi** như light mode, không làm tối.
+- Mỗi mảng màu là "giấy sáng": CSS của trang liệt kê các phần tử có nền `--surface-*` trong khối `[data-theme="dark"] :is(...)` ở cuối file, đặt lại `--text-primary`, `--text-secondary`, `--bg-card` bằng `--paper-*`; phần tử con nhận `--ink` tối để viền/bóng bên trong vẫn đen.
+- Thêm mảng màu mới ở trang nào thì thêm selector của nó vào khối này của file CSS đó.
+
+### Quy tắc
+
+- Mỗi khối có đúng một viền `--border-sticker` và một bóng cứng; không kết hợp với `--shadow-md`/`--shadow-lg` (bóng mờ).
+- Tương tác: hover nhấc lên `translate(-2px, -2px)` và tăng bóng; active ấn xuống `translate(4px, 4px)` và giảm bóng (class `.press`, `.btn`, `.card--interactive`).
+- Xoay khối tối đa ±2deg với thẻ, ±8deg với huy hiệu/sticker nhỏ. Không xoay ô nhập liệu và nội dung dài.
+- Trạng thái khóa/disabled: viền nét đứt, bỏ bóng.
+- Tên app: **Wordfox**. Logo: huy hiệu tròn vàng có đầu Foxy (`#foxy-head`) xoay -8deg + chữ `wordfox`, phần `fox` màu lông Foxy viền mực. Markup `Pages/Shared/_Brand.cshtml`, style `wwwroot/css/Shared/Brand.css`, favicon `wwwroot/images/mascot/favicon.svg`.
+- Logo và dải chữ chạy dùng màu cố định (`#1a1209`, `#f0a440`, `#fffaf2`) ở cả hai theme.
+- `prefers-reduced-motion`: tắt dải chữ chạy, Foxy nhảy, hiệu ứng nhấc/ấn.
+
+### Component
+
+Component dùng chung ở `wwwroot/css/Shared/Components.css`: `.btn` (`--primary`, `--ink`, `--secondary`, `--ghost`, `--danger`, `--sm`, `--lg`), `.input`, `.card` (`--soft`, `--orange`, `--mint`, `--pink`, `--interactive`), `.sticker`, `.press`, `.tag`, `.foxy`, `.visually-hidden`, toast. Xem `docs/frontend/COMPONENTS.md`.
