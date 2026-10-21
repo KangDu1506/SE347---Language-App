@@ -5,7 +5,8 @@
         <meta charset="UTF-8">
         <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-i18n="ui.verify_account">Xác thực tài khoản</title>
+        <title data-i18n="ui.verify_account" data-i18n-suffix=" · Wordfox">Xác thực tài khoản · Wordfox</title>
+        <partial name="_SharedHead" />
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
@@ -19,7 +20,7 @@
         <main class="account-page account-page--auth">
             <section class="auth-layout auth-layout--verification" aria-labelledby="authentication-title">
                 <div class="auth-layout__side">
-                    <div class="auth-mascot" aria-hidden="true">6</div>
+                    <svg class="auth-mascot" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
                     <p class="auth-layout__title" data-i18n="ui.just_one_more_step">Một bước nữa thôi</p>
                     <p class="auth-layout__text" data-i18n="ui.verify_to_protect_your_account_and_continue_learning">Xác thực để bảo vệ tài khoản và tiếp tục hành trình.</p>
                 </div>
