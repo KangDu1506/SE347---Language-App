@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     if (new URLSearchParams(window.location.search).get('logout') === '1') {
-        sessionStorage.removeItem('userToken');
-        document.cookie = 'userToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+        window.sb?.auth.signOut();
     }
 
     const form = document.querySelector('.login-card form');
@@ -60,17 +59,57 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (!matchesIdentifier || password.value !== registeredUser.password) {
-            event.preventDefault();
-            AppI18n.setText(message, 'ui.incorrect_email_username_or_password');
+        const identifier = username.value.trim().toLowerCase();
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        completion.setBusy(true);
+        submitButton.textContent = window.authUi.localize('Đang đăng nhập...');
+
+        const { error } = identifier.includes('@')
+            ? await window.sb.auth.signInWithPassword({ email: identifier, password: password.value })
+            : await signInWithUsername(identifier, password.value);
+
+        if (error) {
+            if (error.code === 'email_not_confirmed') {
+                message.textContent = window.authUi.localize('Email chưa được xác thực. Vui lòng kiểm tra hộp thư.');
+            } else if (error.status === 429) {
+                message.textContent = window.authUi.localize('Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.');
+            } else {
+                AppI18n.setText(message, 'ui.incorrect_email_username_or_password');
+            }
             form.before(message);
-            completion.refresh();
+            completion.setBusy(false);
+            submitButton.textContent = originalButtonText;
             return;
         }
 
-        document.cookie = 'userToken=authenticated; path=/; SameSite=Lax';
         window.location.assign('/Index');
     });
+
+    // Supabase chỉ đăng nhập bằng email: backend tra email theo username và trả về phiên,
+    // trình duyệt không bao giờ thấy email. Trả lỗi cùng dạng { error } như supabase-js.
+    async function signInWithUsername(usernameValue, passwordValue) {
+        try {
+            const response = await fetch('/api/auth/login-username', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: usernameValue, password: passwordValue })
+            });
+            const body = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                return { error: { code: body.error, status: response.status } };
+            }
+
+            return await window.sb.auth.setSession({
+                access_token: body.accessToken,
+                refresh_token: body.refreshToken
+            });
+        } catch (error) {
+            return { error };
+        }
+    }
 
     form.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && !event.target.closest('button')) {
