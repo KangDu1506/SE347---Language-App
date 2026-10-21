@@ -20,7 +20,7 @@
     {
         "id":"3",
         "type": "fill-in-the-blank",
-        "question": "The medical test results were equivocal, showing signs that could either mean a false alarm or the early stages of a tumor, forcing the doctors to run more tests.",
+        "question": "The medical test results were <blank>, showing signs that could either mean a false alarm or the early stages of a tumor, forcing the doctors to run more tests.",
         "answer": ["equivocal"],
         "explanation": "An equivocal reply is one that is intentionally ambiguous or misleading, often used to avoid giving a direct answer.",
         "translation": "Kết quả xét nghiệm y tế là mơ hồ, cho thấy những dấu hiệu có thể có nghĩa là báo động giả hoặc giai đoạn đầu của một khối u, buộc các bác sĩ phải thực hiện thêm các xét nghiệm."
@@ -41,7 +41,7 @@
         "question": "The detective remained skeptical of the suspect's alibi; not only was his description of the timeline incredibly <blank>, but his answer regarding who he was with was highly <blank>, leaving it unclear whether he meant his brother or his boss.",
         "answer": ["vague", "ambiguous"],
         "explanation": "The description is vague since the detective remained skeptical of the suspect's alibi. The answer is ambiguous because it can be interpreted in more than one way, leaving the detective uncertain about the suspect's true intentions.",
-        "translation": "Câu trả lời của chính trị gia cho câu hỏi là mơ hồ, khiến khán giả không chắc chắn về quan điểm của ông ấy về vấn đề này."
+        "translation": "Thám tử vẫn hoài nghi về bằng chứng ngoại phạm của nghi phạm; không chỉ phần mô tả mốc thời gian của anh ta cực kỳ mơ hồ, mà câu trả lời về việc đi cùng ai cũng rất nhập nhằng, khiến không rõ anh ta muốn nói đến anh trai hay sếp của mình."
     },
 
     {

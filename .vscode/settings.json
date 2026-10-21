@@ -1,0 +1,12 @@
+{
+	"json.schemas": [
+		{
+			"fileMatch": ["Storage/LessonTemplate/*/content.json"],
+			"url": "./Storage/LessonTemplate/schemas/LessonContent.schema.json"
+		},
+		{
+			"fileMatch": ["Storage/LessonTemplate/*/quiz.json"],
+			"url": "./Storage/LessonTemplate/schemas/LessonQuiz.schema.json"
+		}
+	]
+}

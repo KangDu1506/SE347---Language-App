@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://se347-language-app.local/schemas/LessonContent.schema.json",
     "title": "Lesson Content",
-    "description": "Vocabulary and example sentences for a lesson.",
+    "description": "Items of a lesson: words (vocabulary), structures (grammar) or sentences to listen to (listening).",
     "type": "array",
     "minItems": 1,
     "items": {
@@ -19,15 +19,9 @@
             "required": [
                 "id",
                 "content",
-                "pronunciation-bre",
-                "pronunciation-name",
                 "definition-en",
                 "definition-vi",
-                "oxford-link",
-                "external-source",
-                "examples",
-                "synonyms",
-                "antonyms"
+                "examples"
             ],
             "properties": {
                 "id": {
@@ -35,19 +29,22 @@
                     "pattern": "^[1-9][0-9]*$"
                 },
                 "content": {
-                    "$ref": "#/$defs/nonEmptyString"
+                    "$ref": "#/$defs/nonEmptyString",
+                    "description": "The word, the grammar structure or the sentence learners hear."
                 },
                 "pronunciation-bre": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "IPA, British English."
                 },
                 "pronunciation-name": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "IPA, North American English."
                 },
                 "definition-en": {
-                    "type": "string"
+                    "$ref": "#/$defs/nonEmptyString"
                 },
                 "definition-vi": {
-                    "type": "string"
+                    "$ref": "#/$defs/nonEmptyString"
                 },
                 "oxford-link": {
                     "type": "string",
@@ -60,6 +57,16 @@
                         "type": "string",
                         "format": "uri"
                     }
+                },
+                "image": {
+                    "type": "string",
+                    "pattern": "^\\./[A-Za-z0-9_./-]+\\.(webp|png|jpg|jpeg|svg)$",
+                    "description": "Optional image, relative to the lesson folder."
+                },
+                "audio": {
+                    "type": "string",
+                    "pattern": "^\\./[A-Za-z0-9_./-]+\\.(mp3|m4a|ogg|wav)$",
+                    "description": "Optional audio, relative to the lesson folder. Required in practice for listening lessons."
                 },
                 "examples": {
                     "type": "array",

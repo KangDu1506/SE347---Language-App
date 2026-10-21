@@ -1,0 +1,43 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "What size of latte does the customer order?",
+        "audio": "./audio/1.m4a",
+        "options": ["Small", "Medium", "Large"],
+        "answer": ["Large"],
+        "explanation": "The customer says \"Can I get a large latte, please?\".",
+        "translation": "Khách gọi ly latte cỡ nào?"
+    },
+
+    {
+        "id": "2",
+        "type": "true-false",
+        "question": "The customer wants a hot drink.",
+        "audio": "./audio/3.m4a",
+        "answer": ["false"],
+        "explanation": "When asked \"hot or iced?\", the customer answers \"Iced, please\".",
+        "translation": "Khách muốn một đồ uống nóng."
+    },
+
+    {
+        "id": "3",
+        "type": "fill-in-the-blank",
+        "question": "And a chocolate <blank> too.",
+        "audio": "./audio/3.m4a",
+        "answer": ["muffin"],
+        "explanation": "The customer also orders a chocolate muffin.",
+        "translation": "Và thêm một bánh muffin sô-cô-la nữa."
+    },
+
+    {
+        "id": "4",
+        "type": "single-choice",
+        "question": "How much does the order cost?",
+        "audio": "./audio/4.m4a",
+        "options": ["$5.50", "$6.15", "$6.50", "$16.50"],
+        "answer": ["$6.50"],
+        "explanation": "The barista says \"That's six dollars fifty\" ($6.50).",
+        "translation": "Đơn hàng có giá bao nhiêu?"
+    }
+]

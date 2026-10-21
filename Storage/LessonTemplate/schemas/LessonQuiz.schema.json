@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://se347-language-app.local/schemas/LessonQuiz.schema.json",
     "title": "Lesson Quiz",
-    "description": "Quiz questions associated with a lesson.",
+    "description": "Quiz questions of a lesson. answer/explanation/translation never leave the backend before grading.",
     "type": "array",
     "minItems": 1,
     "items": {
@@ -40,18 +40,21 @@
                     "description": "The interaction type used by the quiz question."
                 },
                 "question": {
-                    "$ref": "#/$defs/nonEmptyString"
+                    "$ref": "#/$defs/nonEmptyString",
+                    "description": "For fill-in-the-blank, mark each blank with <blank>; one answer per blank, in order."
+                },
+                "audio": {
+                    "type": "string",
+                    "pattern": "^\\./[A-Za-z0-9_./-]+\\.(mp3|m4a|ogg|wav)$",
+                    "description": "Optional audio played with the question (listening lessons), relative to the lesson folder."
                 },
                 "options": {
                     "type": "array",
-                    "description": "Available choices or pairs used by the question type.",
-                    "minItems": 1,
+                    "description": "Choices shown to the learner.",
+                    "minItems": 2,
+                    "uniqueItems": true,
                     "items": {
-                        "oneOf": [
-                            {
-                                "$ref": "#/$defs/nonEmptyString"
-                            }
-                        ]
+                        "$ref": "#/$defs/nonEmptyString"
                     }
                 },
                 "answer": {
@@ -67,7 +70,39 @@
                 "translation": {
                     "$ref": "#/$defs/nonEmptyString"
                 }
-            }
+            },
+            "allOf": [
+                {
+                    "if": {
+                        "properties": { "type": { "enum": ["multiple-choice", "single-choice"] } }
+                    },
+                    "then": {
+                        "required": ["options"]
+                    }
+                },
+                {
+                    "if": {
+                        "properties": { "type": { "const": "single-choice" } }
+                    },
+                    "then": {
+                        "properties": { "answer": { "maxItems": 1 } }
+                    }
+                },
+                {
+                    "if": {
+                        "properties": { "type": { "const": "true-false" } }
+                    },
+                    "then": {
+                        "properties": {
+                            "options": false,
+                            "answer": {
+                                "maxItems": 1,
+                                "items": { "enum": ["true", "false"] }
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

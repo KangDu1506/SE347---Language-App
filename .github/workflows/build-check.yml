@@ -22,3 +22,6 @@ jobs:
 
     - name: Build project
       run: dotnet build SE347.csproj --no-restore --configuration Release
+
+    - name: Validate lesson JSON (Storage/LessonTemplate)
+      run: dotnet run --project SE347.csproj --no-build --configuration Release -- validate-lessons

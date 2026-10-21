@@ -6,6 +6,23 @@ using SE347.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// `dotnet run -- validate-lessons`: kiểm tra JSON trong Storage/LessonTemplate theo schema rồi thoát (không chạy web).
+if (args.Contains("validate-lessons"))
+{
+    var validator = new LessonTemplateValidator(Path.Combine(builder.Environment.ContentRootPath, "Storage", "LessonTemplate"));
+    var errors = validator.ValidateAll();
+    foreach (var error in errors)
+    {
+        Console.Error.WriteLine(error);
+    }
+
+    Console.WriteLine(errors.Count == 0
+        ? $"OK: {validator.LessonFolders().Count()} bài học hợp lệ."
+        : $"Có {errors.Count} lỗi dữ liệu bài học.");
+    Environment.ExitCode = errors.Count == 0 ? 0 : 1;
+    return;
+}
+
 builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 // Kết nối Supabase 

@@ -1,0 +1,53 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "My brother ___ football on Sundays.",
+        "options": ["play", "plays", "playing", "is play"],
+        "answer": ["plays"],
+        "explanation": "\"My brother\" is a singular subject (he), so the verb takes -s: plays.",
+        "translation": "Anh trai tôi chơi bóng đá vào các ngày Chủ nhật."
+    },
+
+    {
+        "id": "2",
+        "type": "fill-in-the-blank",
+        "question": "She <blank> (not / like) cold weather.",
+        "answer": ["doesn't like"],
+        "explanation": "With he/she/it, the negative is doesn't + base verb.",
+        "translation": "Cô ấy không thích thời tiết lạnh."
+    },
+
+    {
+        "id": "3",
+        "type": "true-false",
+        "question": "\"Does he works here?\" is a correct question.",
+        "answer": ["false"],
+        "explanation": "After does, the verb stays in its base form: \"Does he work here?\"",
+        "translation": "\"Does he works here?\" là một câu hỏi đúng."
+    },
+
+    {
+        "id": "4",
+        "type": "multiple-choice",
+        "question": "Which sentences are correct?",
+        "options": [
+            "They often go to the cinema.",
+            "He never is late.",
+            "I usually get up at 6 a.m.",
+            "She go to work by bus."
+        ],
+        "answer": ["They often go to the cinema.", "I usually get up at 6 a.m."],
+        "explanation": "Frequency adverbs go before the main verb but after be (\"He is never late\"), and she takes goes.",
+        "translation": "Những câu nào đúng?"
+    },
+
+    {
+        "id": "5",
+        "type": "fill-in-the-blank",
+        "question": "<blank> you <blank> tea or coffee in the morning?",
+        "answer": ["Do", "drink"],
+        "explanation": "With you, the question starts with Do and the verb stays in its base form.",
+        "translation": "Buổi sáng bạn uống trà hay cà phê?"
+    }
+]
