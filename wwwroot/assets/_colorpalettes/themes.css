@@ -1,8 +1,10 @@
 /* Design tokens (SCRUM-46) - xem docs/ux/STYLE_GUIDE.md
-   Màu chính: cam ấm. Màu phụ: xanh. Tỉ lệ tương phản ghi theo nền --bg-main. */
+   Bảng "Kẹo ngọt": cam chính, tím phụ, mảng màu xanh chanh/vàng/hồng. Tỉ lệ tương phản ghi theo nền --bg-main.
+   Phong cách: Neo-brutalism (sticker) - viền đậm, bóng cứng không mờ, mảng màu phẳng. */
 :root {
     /* Typography */
     --font-sans: "Be Vietnam Pro", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-display: "Bricolage Grotesque", "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif; /* tiêu đề, số liệu, nút lớn */
     --fs-xs: .75rem;     /* 12px - nhãn, badge */
     --fs-sm: .875rem;    /* 14px - chữ phụ, nav */
     --fs-md: 1rem;       /* 16px - nội dung */
@@ -34,7 +36,7 @@
     --space-8: 64px;
 
     /* Nền & viền */
-    --bg-main: #fffaf2;
+    --bg-main: #fff9f0;
     --bg-surface: #fffdf9;
     --bg-card: #ffffff;
     --bg-soft: #fff1d9;          /* nền nhấn nhẹ: badge, ô được chọn */
@@ -42,23 +44,23 @@
     --border-strong: #d9c5a7;
 
     /* Chữ */
-    --text-primary: #513b22;     /* 10.1:1 */
-    --text-secondary: #806b50;   /* 4.9:1 */
+    --text-primary: #1a1209;     /* 17.8:1 */
+    --text-secondary: #6b5a44;   /* 6.3:1 */
     --text-on-primary: #fffaf2;
     --text-on-brand: #fffaf2;      /* chữ trên hero/gradient, đặt ở nửa tối */
 
     /* Màu chính - cam */
-    --color-primary: #a65f12;        /* nút, link, tab active - 4.7:1 */
-    --color-primary-hover: #8f5410;  /* 5.9:1 */
-    --color-brand: #d88920;          /* chỉ dùng cho icon, hình minh họa, gradient - KHÔNG đặt chữ lên trên */
-    --color-brand-dark: #69451f;
+    --color-primary: #b23a0a;        /* link, chữ nhấn - 5.7:1 */
+    --color-primary-hover: #8f2f08;
+    --color-brand: #ff6b2c;          /* chỉ dùng cho icon, hình minh họa - KHÔNG đặt chữ lên trên */
+    --color-brand-dark: #7a2e0e;
     /* Keep the brand hue, with enough darkness for --text-on-brand at both ends. */
     --gradient-hero: linear-gradient(120deg, var(--color-brand-dark), color-mix(in srgb, var(--color-brand-dark) 65%, var(--color-brand)));
 
-    /* Màu phụ - xanh */
-    --color-secondary: #2563eb;      /* 5.0:1 */
-    --color-secondary-dark: #17345f; /* 11.9:1 */
-    --color-secondary-soft: #dbe5f5;
+    /* Màu phụ - tím */
+    --color-secondary: #6d4cf5;      /* link phụ, focus - 5.0:1 */
+    --color-secondary-dark: #3b2a8f;
+    --color-secondary-soft: #e6e0ff;
 
     /* Trạng thái */
     --status-success: #16805b;
@@ -69,38 +71,78 @@
     --status-warning-soft: #fff1d9;
 
     /* Focus - dùng màu phụ để nổi trên nền cam */
-    --focus-ring: 0 0 0 3px rgb(37 99 235 / 45%);
+    --focus-ring: 0 0 0 3px rgb(109 76 245 / 45%);
 
-    /* Đổ bóng ánh nâu */
+    /* Đổ bóng mờ (chỉ dùng ngoài phong cách sticker) */
     --shadow-sm: 0 1px 2px rgb(105 75 31 / 8%);
     --shadow-md: 0 8px 24px rgb(105 75 31 / 8%);
     --shadow-lg: 0 18px 42px rgb(105 75 31 / 20%);
 
     --transition-fast: .2s ease;
+
+    /* Sticker (Neo-brutalism) */
+    --ink: #1a1209;                          /* viền và bóng cứng */
+    --line: 3px;
+    --line-thin: 2px;
+    --border-sticker: var(--line) solid var(--ink);
+    --border-sticker-thin: var(--line-thin) solid var(--ink);
+    --radius-sticker: 18px;
+    --shadow-sticker-sm: 3px 3px 0 var(--ink);
+    --shadow-sticker: 6px 6px 0 var(--ink);
+    --shadow-sticker-lg: 8px 8px 0 var(--ink);
+    --dot-color: #efe0cc;                    /* chấm nền trang */
+    --bg-dotted: radial-gradient(circle, var(--dot-color) 1.4px, transparent 1.6px) 0 0 / 22px 22px, var(--bg-main);
+
+    /* Mảng màu sticker (bảng "Kẹo ngọt") - giữ nguyên ở cả hai theme, chữ trên các nền này luôn tối.
+       Tên token giữ theo vai trò cũ: sand = vàng, mint = xanh chanh, blue = tím. */
+    --surface-orange: #ff9a4d;
+    --surface-orange-deep: #ff6b2c;
+    --surface-mint: #c4f25c;
+    --surface-pink: #ff9fd0;
+    --surface-sand: #ffe873;
+    --surface-blue: #6d4cf5;                 /* chữ trên nền này dùng --text-on-blue (5.3:1) */
+    --text-on-blue: #ffffff;
+    --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px);
+
+    /* "Giấy sáng": màu chữ/viền bên trong các mảng màu ở dark mode (xem khối [data-theme="dark"]) */
+    --paper-text: #1a1209;
+    --paper-text-2: #4b3d2f;
+    --paper-card: #fffaf2;
+    --paper-line: #c9b28f;
+
+    /* Mascot Foxy (wwwroot/images/mascot/foxy.svg) */
+    --fox-fur: #ff8a1f;
+    --fox-ear: #ffb4a2;
+    --fox-accent: #c2410c;
+    --fox-cheek: #ff8fab;
+    --fox-scarf: #7c5cff;
+    --fox-scarf-dark: #5b3fd6;
 }
 
-/* Dark mode */
+/* Dark mode: nền xám than trung tính, viền kem; mảng màu sticker giữ tươi như light mode.
+   CSS của từng trang khai báo các mảng màu là "giấy sáng" bằng cách đặt lại
+   --text-primary/--text-secondary/--bg-card = --paper-* và --ink của phần tử con = --paper-text. */
 [data-theme="dark"] {
-    --bg-main: #1a140d;
-    --bg-surface: #241b12;
-    --bg-card: #2e2318;
-    --bg-soft: #3a2b1b;
-    --border-color: #4a3a28;
-    --border-strong: #6b5539;
+    --bg-main: #1c1b1f;
+    --bg-surface: #232127;
+    --bg-card: #2a282f;
+    --bg-soft: #34313a;
+    --border-color: #3f3c46;
+    --border-strong: #57535f;
 
-    --text-primary: #fbf3e6;     /* 16.6:1 */
-    --text-secondary: #d9c5a7;
-    --text-on-primary: #1a140d;
+    --text-primary: #f7f3ee;     /* 15.5:1 */
+    --text-secondary: #c9c3cc;   /* 8.4:1 trên --bg-card */
+    --text-on-primary: #1c1b1f;
     --text-on-brand: #fffaf2;
 
-    --color-primary: #f0a440;        /* 8.8:1 */
-    --color-primary-hover: #f5b660;
-    --color-brand: #d88920;
-    --color-brand-dark: #3a2610;
+    --color-primary: #ffa366;        /* 8.7:1 */
+    --color-primary-hover: #ffbb8c;
+    --color-brand: #ff6b2c;
+    --color-brand-dark: #4a1c08;
 
-    --color-secondary: #7aa7ff;
-    --color-secondary-dark: #bcd4ff;
-    --color-secondary-soft: #1e2b45;
+    --color-secondary: #a996ff;      /* 5.9:1 trên --bg-card */
+    --color-secondary-dark: #d4caff;
+    --color-secondary-soft: #2e2848;
 
     --status-success: #4ade80;
     --status-success-soft: #12301f;
@@ -109,9 +151,13 @@
     --status-warning: #facc15;
     --status-warning-soft: #3a2f0d;
 
-    --focus-ring: 0 0 0 3px rgb(122 167 255 / 55%);
+    --focus-ring: 0 0 0 3px rgb(169 150 255 / 55%);
 
     --shadow-sm: 0 1px 2px rgb(0 0 0 / 50%);
     --shadow-md: 0 8px 24px rgb(0 0 0 / 40%);
     --shadow-lg: 0 18px 42px rgb(0 0 0 / 55%);
+
+    --ink: #f1ebe3;
+    --dot-color: #2c2a31;
+    --surface-locked: repeating-linear-gradient(45deg, #2a282f 0 10px, #232127 10px 20px);
 }
