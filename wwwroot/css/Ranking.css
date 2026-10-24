@@ -54,3 +54,60 @@ body { color: var(--text-primary); background: var(--bg-main); }
 .ranking-avatar--green { background: var(--status-success); }
 .ranking-bar { background: var(--border-color); }
 .ranking-bar i { background: var(--color-primary); }
+
+/* ---------- Sticker (Neo-brutalism) - ghi đè lớp style mềm phía trên ---------- */
+html body .ranking-page { width: min(1080px, calc(100% - 40px)); padding-top: 36px; }
+html body .ranking-header { align-items: center; margin-bottom: 30px; }
+html body .ranking-eyebrow { display: inline-block; margin: 0 0 10px; padding: 2px 10px; border: var(--border-sticker-thin); border-radius: var(--radius-pill); color: var(--text-primary); background: var(--bg-card); font-size: var(--fs-xs); }
+html body .ranking-header h1 { font-family: var(--font-display); font-size: clamp(44px, 6vw, 80px); line-height: .95; letter-spacing: -.035em; }
+html body .ranking-header p:last-child { font-weight: var(--fw-semibold); }
+.ranking-fox { flex: 0 0 auto; width: 150px; height: 150px; transform: rotate(6deg); }
+html body .ranking-tabs { gap: 10px; margin-bottom: 24px; }
+html body .ranking-tab { min-height: 40px; padding: 0 16px; border: 2.5px solid var(--ink); border-radius: var(--radius-pill); color: var(--text-primary); background: var(--bg-card); font-weight: var(--fw-heavy); }
+html body .ranking-tab:hover { border-color: var(--ink); color: var(--text-primary); background: var(--surface-sand); }
+html body .ranking-tab--active, html body .ranking-tab--active:hover { border-color: var(--ink); color: var(--bg-main); background: var(--ink); }
+html body .ranking-table-wrap { border: var(--border-sticker); border-radius: var(--radius-sticker); box-shadow: var(--shadow-sticker); }
+html body .ranking-table-heading { border-bottom: var(--border-sticker); background: var(--surface-sand); }
+html body .ranking-table-heading h2 { font-family: var(--font-display); font-size: 26px; }
+html body .ranking-table-heading span { font-weight: var(--fw-heavy); }
+html body .ranking-row { border-bottom: 2px dashed var(--border-strong); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+html body .ranking-row > strong:first-child { font-family: var(--font-display); font-size: 22px; }
+html body .ranking-row > strong:last-child { font-family: var(--font-display); font-size: 18px; }
+html body .ranking-row--header { color: var(--text-secondary); }
+html body .ranking-row--highlight { background: var(--surface-orange); }
+html body .ranking-row--you { margin: 10px 14px; border: var(--border-sticker); border-radius: 14px; background: var(--surface-pink); box-shadow: var(--shadow-sticker-sm); }
+html body .ranking-user small { padding: 1px 6px; border: 2px solid var(--ink); border-radius: 6px; color: var(--text-primary); background: var(--bg-card); font-weight: var(--fw-heavy); }
+html body .ranking-avatar { border: 2.5px solid var(--ink); color: var(--text-primary); box-shadow: 2px 2px 0 var(--ink); }
+html body .ranking-avatar--gold { background: var(--bg-card); }
+html body .ranking-avatar--blue { background: var(--surface-mint); }
+html body .ranking-avatar--green { background: var(--surface-pink); }
+html body .ranking-avatar--self { background: var(--surface-orange); }
+html body .ranking-bar { height: 14px; border: 2px solid var(--ink); background: var(--bg-card); }
+html body .ranking-bar i { border-right: 2px solid var(--ink); border-radius: 0; background: var(--ink); }
+
+@media (max-width: 700px) {
+    html body .ranking-page { width: calc(100% - 32px); }
+    html body .ranking-header { flex-direction: row; align-items: center; }
+    .ranking-fox { width: 96px; height: 96px; }
+    html body .ranking-row--you { margin: 8px; }
+}
+
+/* ---------- Dark mode: mảng màu là "giấy sáng" (chữ, viền bên trong tối) - token --paper-* trong themes.css ---------- */
+[data-theme="dark"] :is(
+    html body .ranking-tab:hover,
+    html body .ranking-table-heading,
+    html body .ranking-row--highlight,
+    html body .ranking-row--you,
+    html body .ranking-avatar--blue,
+    html body .ranking-avatar--green,
+    html body .ranking-avatar--self
+) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --bg-main: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
+[data-theme="dark"] :is(
+    html body .ranking-tab:hover,
+    html body .ranking-table-heading,
+    html body .ranking-row--highlight,
+    html body .ranking-row--you,
+    html body .ranking-avatar--blue,
+    html body .ranking-avatar--green,
+    html body .ranking-avatar--self
+) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px); }

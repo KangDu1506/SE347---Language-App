@@ -2,58 +2,128 @@
 @*
     Index
     Summary:
-    This is the main index page of the application.
+    Dashboard sau khi đăng nhập (phong cách sticker). Số liệu đang là dữ liệu mẫu,
+    chờ API tiến độ học / XP / bảng xếp hạng.
 *@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Trang chủ";
+    var marqueeWords = new[] { "achieve", "cousin", "daughter", "nephew", "husband", "relative", "parent", "sibling", "marry", "grandparent" };
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/index.css" />
+    <link rel="stylesheet" href="~/css/index.css" asp-append-version="true" />
 }
 
 @section Scripts {
     <partial name="_SupabaseClient" />
     <script src="~/js/auth-guard.js" defer></script>
-    <script src="~/js/index.js" defer></script>
+    <script src="~/js/index.js" asp-append-version="true" defer></script>
 }
 
-        <main class="home-page">
-            <section class="home-hero" aria-labelledby="home-title">
-                <div class="home-hero__content">
-                    <p class="home-eyebrow" data-i18n="ui.welcome_back">Chào mừng bạn trở lại</p>
-                    <h1 id="home-title" data-i18n="ui.one_step_closer_to_your_goal_every_day">Mỗi ngày một bước gần hơn đến mục tiêu.</h1>
-                    <p data-i18n="ui.learn_vocabulary_practise_grammar_and_track_your_progress_in_one_learning_space">Học từ vựng, luyện ngữ pháp và kiểm tra tiến độ trong một không gian học tập rõ ràng.</p>
-                    <div class="home-actions">
-                        <a class="home-button home-button--primary" href="/Study" data-i18n="ui.start_learning">Bắt đầu học</a>
-                        <a class="home-button home-button--secondary" href="/TrialTest" data-i18n="ui.try_a_test">Làm bài thử</a>
-                    </div>
-                </div>
-                <div class="home-hero__visual" aria-label="Tiến độ học tập hiện tại" data-i18n-aria-label="ui.current_learning_progress">
-                    <div class="home-progress-ring"><strong>68%</strong><span data-i18n="ui.progress">tiến độ</span></div>
-                    <div class="home-streak"><strong>12</strong><span data-i18n="ui.day_streak">ngày liên tục</span></div>
-                </div>
-            </section>
+<main class="home-page dash">
+    <div class="dash-wrap">
+        <section class="dash-hero" aria-labelledby="dash-title">
+            <div>
+                <h1 id="dash-title">
+                    <span data-i18n="dash.hello">Chào</span> <span data-user-name data-i18n="dash.friend">bạn</span>!<br>
+                    <span data-i18n="dash.today_learn">Hôm nay học</span> <span class="dash-hl" data-i18n="dash.topic_family">gia đình</span><span data-i18n="dash.today_learn_end"> nhé.</span>
+                </h1>
+                <p data-i18n="dash.hero_text">Còn 2 bài nữa là xong Unit 3. Học xong hôm nay bạn mở được rương thưởng và giữ chuỗi 13 ngày.</p>
+            </div>
+            <div class="dash-streak" role="img" aria-label="Chuỗi 12 ngày, hôm nay chưa học" data-i18n-aria-label="dash.streak_label">
+                <svg class="dash-streak__flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4.5 5.2 4.5 9.7a4.5 4.5 0 0 1-9 0c0-1.6.6-2.8 1.5-3.8.2 1.4.9 2.3 1.8 2.6C10.4 8 11 5 12 2.5z" /></svg>
+                <strong>12</strong>
+                <span data-i18n="dash.day_streak">ngày liền</span>
+                <div class="dash-streak__week" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i class="is-today"></i><i class="is-off"></i></div>
+            </div>
+        </section>
+    </div>
 
-            <section class="home-section" aria-labelledby="home-continue-title">
-                <div class="home-section__heading">
-                    <div><p class="home-eyebrow" data-i18n="ui.your_learning_path">Lộ trình của bạn</p><h2 id="home-continue-title" data-i18n="ui.continue_learning">Tiếp tục học</h2></div>
-                    <a href="/Study" data-i18n="ui.view_all_link">Xem tất cả &#8594;</a>
+    <div class="dash-marquee" aria-label="Một số từ đã thuộc" data-i18n-aria-label="dash.marquee_label">
+        <div class="dash-marquee__track" aria-hidden="true">
+            @for (var copy = 0; copy < 2; copy++)
+            {
+                for (var i = 0; i < marqueeWords.Length; i++)
+                {
+                    <span>@marqueeWords[i]</span>
+                    if (i == 0)
+                    {
+                        <span data-i18n="dash.words_mastered">✦ 1.247 từ đã thuộc ✦</span>
+                    }
+                    else if (i % 3 == 0)
+                    {
+                        <span>✦</span>
+                    }
+                }
+            }
+        </div>
+    </div>
+
+    <div class="dash-wrap dash-bento">
+        <section class="sticker dash-continue" aria-labelledby="dash-continue-title">
+            <span class="tag" data-i18n="dash.continue_tag">Tiếp tục · Unit 3</span>
+            <h2 id="dash-continue-title" data-i18n="dash.continue_title">Bài 4: Nghề nghiệp của bố mẹ</h2>
+            <p data-i18n="dash.continue_meta">Đang ở câu 6/10 · còn khoảng 5 phút</p>
+            <div class="dash-segs" role="img" aria-label="Unit 3: xong 3 bài, bài 4 đang học 60%" data-i18n-aria-label="dash.segments_label"><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-half"></i><i></i><i></i></div>
+            <a class="btn btn--ink btn--lg" href="/Study" data-i18n="dash.go_learn">Vào học →</a>
+            <svg class="foxy dash-continue__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+        </section>
+
+        <div class="dash-word" id="dash-word" role="button" tabindex="0" aria-pressed="false" aria-label="Từ của ngày: achieve. Bấm để xem nghĩa" data-i18n-aria-label="dash.word_label">
+            <div class="dash-word__inner">
+                <div class="dash-face dash-face--front">
+                    <span class="tag" data-i18n="dash.word_tag">Từ của ngày · A2</span>
+                    <div>
+                        <b lang="en">achieve</b>
+                        <div class="dash-face__ipa">/əˈtʃiːv/ · verb</div>
+                    </div>
+                    <span class="dash-face__hint" data-i18n="dash.flip_hint">↻ Bấm để lật thẻ</span>
                 </div>
-                <div class="home-course-grid">
-                    <a class="home-course-card home-course-card--blue" href="/Study">
-                        <span class="home-course-card__icon">A1</span><span class="home-course-card__level" data-i18n="ui.beginner">Cơ bản</span>
-                        <strong data-i18n="ui.everyday_vocabulary">Từ vựng hằng ngày</strong><span data-i18n="ui.12_lessons_35_minutes">12 bài học &#183; 35 phút</span>
-                    </a>
-                    <a class="home-course-card home-course-card--green" href="/Study">
-                        <span class="home-course-card__icon">G</span><span class="home-course-card__level" data-i18n="ui.practice">Luyện tập</span>
-                        <strong data-i18n="ui.grammar_foundations">Ngữ pháp nền tảng</strong><span data-i18n="ui.8_lessons_25_minutes">8 bài học &#183; 25 phút</span>
-                    </a>
-                    <a class="home-course-card home-course-card--orange" href="/TrialTest">
-                        <span class="home-course-card__icon">&#9733;</span><span class="home-course-card__level" data-i18n="ui.challenge">Thử thách</span>
-                        <strong data-i18n="ui.comprehensive_test">Kiểm tra tổng hợp</strong><span data-i18n="ui.20_questions_15_minutes">20 câu hỏi &#183; 15 phút</span>
-                    </a>
+                <div class="dash-face dash-face--back">
+                    <span class="tag" data-i18n="dash.meaning">Nghĩa</span>
+                    <div>
+                        <b data-i18n="dash.word_meaning">đạt được</b>
+                        <q lang="en">She achieved her goal of learning twenty words a day.</q>
+                    </div>
+                    <span class="dash-face__hint" lang="en">achievement · achievable · achiever</span>
                 </div>
-            </section>
-        </main>
+            </div>
+        </div>
+
+        <section class="sticker dash-goal" aria-labelledby="dash-goal-title">
+            <span class="tag" id="dash-goal-title" data-i18n="dash.goal_tag">Mục tiêu hôm nay</span>
+            <strong>18<small>/30 XP</small></strong>
+            <div class="dash-bar" role="progressbar" aria-valuenow="18" aria-valuemin="0" aria-valuemax="30" aria-label="XP hôm nay" data-i18n-aria-label="dash.goal_label"><i style="width: 60%"></i></div>
+            <p data-i18n="dash.goal_text">Còn 12 XP → mở rương thưởng</p>
+        </section>
+
+        <section class="sticker dash-review" aria-labelledby="dash-review-title">
+            <span class="tag" data-i18n="dash.review_tag">Ôn tập</span>
+            <h3 id="dash-review-title" data-i18n="dash.review_title">15 từ sắp quên</h3>
+            <div class="dash-chips" lang="en"><span>cousin</span><span>daughter</span><span>nephew</span><span>husband</span><span>relative</span><span>+10</span></div>
+            <a class="btn" href="/Study" data-i18n="dash.review_cta">Ôn bằng flashcard →</a>
+        </section>
+
+        <section class="sticker dash-league" aria-labelledby="dash-league-title">
+            <span class="tag" data-i18n="dash.league_tag">Giải Đồng · còn 2 ngày</span>
+            <h3 id="dash-league-title"><a href="/Ranking" data-i18n="dash.league_title">Bảng tuần</a></h3>
+            <ol>
+                <li><span>01 Khánh Linh</span><span>2.450</span></li>
+                <li><span>02 Tuấn Dương</span><span>2.120</span></li>
+                <li class="is-me"><span>03 <span data-i18n="ui.you">Bạn</span></span><span>1.890</span></li>
+                <li><span>04 Đức Huy</span><span>1.750</span></li>
+            </ol>
+            <div class="dash-league__sum"><span data-i18n="dash.league_gap">Cách #2</span><span>230 XP</span></div>
+        </section>
+
+        <section class="sticker dash-badges" aria-labelledby="dash-badges-title">
+            <h3 id="dash-badges-title" data-i18n="dash.badges_title">Huy hiệu</h3>
+            <span class="dash-medal"><b>7</b><span data-i18n="dash.badge_streak7">ngày liền</span></span>
+            <span class="dash-medal"><b>1K</b><span data-i18n="dash.badge_words">từ đã thuộc</span></span>
+            <span class="dash-medal"><b>A1</b><span data-i18n="dash.badge_level">hoàn thành</span></span>
+            <span class="dash-medal is-locked"><b>30</b><span data-i18n="dash.badge_streak30">ngày liền</span></span>
+            <p class="dash-badges__next" data-i18n="dash.badges_next">Còn 18 ngày nữa để nhận huy hiệu 30 ngày liền.</p>
+        </section>
+    </div>
+</main>

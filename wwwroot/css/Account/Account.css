@@ -751,3 +751,112 @@ button {
         padding: var(--space-5);
     }
 }
+
+/* ---------- Sticker (Neo-brutalism) - ghi đè lớp style mềm phía trên ---------- */
+html body { background: var(--bg-dotted); }
+
+html body .account-toolbar .app-preferences__language,
+html body .account-toolbar .app-preferences__theme { border: 2.5px solid var(--ink); border-radius: 12px; color: var(--text-primary); background: var(--bg-card); }
+html body .account-toolbar .app-preferences__language:hover,
+html body .account-toolbar .app-preferences__theme:hover { border-color: var(--ink); background: var(--surface-sand); box-shadow: var(--shadow-sticker-sm); }
+
+/* Khung đăng nhập/đăng ký: cột trái màu cam có Foxy, cột phải là form */
+html body .auth-layout { border: var(--border-sticker); border-radius: var(--radius-sticker); box-shadow: 10px 10px 0 var(--ink); }
+html body .auth-layout__side { border-right: var(--border-sticker); background: var(--surface-orange); }
+html body .auth-mascot {
+    display: block;
+    width: 190px;
+    height: 190px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    filter: drop-shadow(3px 0 0 var(--ink)) drop-shadow(-3px 0 0 var(--ink)) drop-shadow(0 3px 0 var(--ink)) drop-shadow(0 -3px 0 var(--ink));
+    transform: rotate(-4deg);
+}
+html body .auth-layout__title { font-family: var(--font-display); font-size: clamp(26px, 3vw, 34px); line-height: 1.05; letter-spacing: -.02em; }
+html body .auth-layout__text { color: var(--text-primary); font-weight: var(--fw-semibold); }
+
+html body .account-card:not(.auth-layout > .account-card) { border: var(--border-sticker); border-radius: var(--radius-sticker); box-shadow: var(--shadow-sticker-lg); }
+html body .account-eyebrow { display: inline-block; padding: 2px 10px; border: var(--border-sticker-thin); border-radius: var(--radius-pill); color: var(--text-primary); background: var(--surface-sand); }
+html body .account-card h1, html body .login-card > h2 { font-family: var(--font-display); font-size: clamp(34px, 4vw, 44px); line-height: 1; letter-spacing: -.02em; }
+
+/* Form */
+html body .account-form input:not([type="checkbox"]),
+html body .login-card form input { min-height: 46px; border: 2.5px solid var(--ink); border-radius: 12px; background: var(--bg-card); }
+html body .account-form input:not([type="checkbox"]):focus,
+html body .login-card form input:focus { border-color: var(--ink); box-shadow: 4px 4px 0 var(--color-secondary); }
+html body .account-form label.has-error input { border-color: var(--status-error); box-shadow: 4px 4px 0 var(--status-error); }
+html body .account-form > button,
+html body .login-card form > button {
+    min-height: 52px;
+    border: var(--border-sticker);
+    border-radius: 14px;
+    color: var(--bg-main);
+    background: var(--ink);
+    box-shadow: 4px 4px 0 var(--surface-orange-deep);
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    transition: transform .12s ease, box-shadow .12s ease, opacity var(--transition-fast);
+}
+html body .account-form > button:hover,
+html body .login-card form > button:hover { color: var(--text-on-blue); background: var(--surface-blue); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--surface-orange-deep); }
+html body .account-form > button[type="submit"]:disabled,
+html body .login-card form > button[type="submit"]:disabled,
+html body .auth-layout--verification .account-form > button:disabled { border-style: dashed; color: var(--text-secondary); background: var(--bg-card); box-shadow: none; transform: none; opacity: 1; }
+html body .password-toggle { color: var(--text-primary); }
+
+html body .account-checkbox { border: 2px dashed var(--border-strong); color: var(--text-primary); background: var(--surface-sand); }
+html body .login-options .account-checkbox { border: 0; background: transparent; }
+html body .account-checkbox input { accent-color: var(--surface-orange-deep); }
+html body .login-forgot-link,
+html body .login-signup-prompt a,
+html body .account-switch a { color: var(--text-primary); text-decoration: underline 2px var(--surface-orange-deep); text-underline-offset: 3px; }
+
+html body .login-card hr { height: 0; border-top: 2px dashed var(--border-strong); background: none; }
+html body .other-login-button,
+html body .login-action-button { min-height: 48px; border: var(--border-sticker); border-radius: 12px; background: var(--bg-card); box-shadow: var(--shadow-sticker-sm); }
+html body .other-login-button:hover,
+html body .login-action-button:hover { border-color: var(--ink); background: var(--surface-sand); }
+
+/* Mã xác thực */
+html body .verification-inputs input { border: 2.5px solid var(--ink); border-radius: 12px; font-family: var(--font-display); }
+html body .verification-inputs input.verification-input--filled-disabled { border-color: var(--ink); background: var(--surface-mint); }
+
+/* Độ mạnh mật khẩu */
+html body .password-strength__bar { height: 12px; border: 2px solid var(--ink); background: var(--bg-card); }
+html body .password-strength__bar span { border-radius: 0; }
+
+/* Điều khoản */
+html body .terms-content h2 { font-family: var(--font-display); font-size: 22px; }
+
+@media (max-width: 800px) {
+    html body .auth-layout__side { border-right: 0; border-bottom: var(--border-sticker); }
+    html body .auth-mascot { width: 140px; height: 140px; }
+}
+
+@media (max-width: 520px) {
+    html body .auth-layout { box-shadow: var(--shadow-sticker); }
+    html body .auth-mascot { width: 112px; height: 112px; }
+}
+
+/* ---------- Dark mode: mảng màu là "giấy sáng" (chữ, viền bên trong tối) - token --paper-* trong themes.css ---------- */
+[data-theme="dark"] :is(
+    html body .account-toolbar .app-preferences__language:hover,
+    html body .account-toolbar .app-preferences__theme:hover,
+    html body .auth-layout__side,
+    html body .account-eyebrow,
+    html body .account-checkbox:not(.login-options .account-checkbox),
+    html body .other-login-button:hover,
+    html body .login-action-button:hover,
+    html body .verification-inputs input.verification-input--filled-disabled
+) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --bg-main: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
+[data-theme="dark"] :is(
+    html body .account-toolbar .app-preferences__language:hover,
+    html body .account-toolbar .app-preferences__theme:hover,
+    html body .auth-layout__side,
+    html body .account-eyebrow,
+    html body .account-checkbox:not(.login-options .account-checkbox),
+    html body .other-login-button:hover,
+    html body .login-action-button:hover,
+    html body .verification-inputs input.verification-input--filled-disabled
+) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px); }

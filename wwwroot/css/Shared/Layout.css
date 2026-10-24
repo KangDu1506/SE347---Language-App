@@ -1,12 +1,16 @@
-/* Header, footer và khung trang dùng chung (SCRUM-32). Markup: Pages/Shared/_Header.cshtml, _Footer.cshtml */
+/* Header, footer và khung trang dùng chung (SCRUM-32). Markup: Pages/Shared/_Header.cshtml, _Footer.cshtml
+   Phong cách sticker: nav dạng viên thuốc viền đậm, footer nền mực. Logo: Brand.css. */
 
 /* Mặc định cho mọi trang dùng _Layout; CSS riêng của trang có thể ghi đè */
+html { overflow-x: clip; }
+
 body {
     margin: 0;
     color: var(--text-primary);
-    background: var(--bg-main);
+    background: var(--bg-dotted);
     font-family: var(--font-sans);
     line-height: var(--lh-body);
+    overflow-x: clip;
 }
 
 body.has-site-chrome {
@@ -22,36 +26,24 @@ body.has-site-chrome > main { flex: 1 0 auto; }
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 1px solid var(--border-color);
-    background: color-mix(in srgb, var(--bg-main) 92%, transparent);
-    backdrop-filter: blur(8px);
+    border-bottom: var(--border-sticker);
+    background: var(--bg-main);
 }
 
 .site-header__inner {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
-    width: min(1120px, calc(100% - 40px));
-    min-height: 64px;
+    gap: var(--space-5);
+    width: min(1240px, calc(100% - 40px));
+    min-height: 76px;
     margin: 0 auto;
 }
-
-.site-brand {
-    color: var(--text-primary);
-    font-family: var(--font-sans);
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-heavy);
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.site-brand span { color: var(--color-brand); }
 
 .site-nav {
     display: flex;
     flex: 1;
-    justify-content: center;
-    gap: var(--space-2);
+    align-items: center;
+    gap: 10px;
 }
 
 .site-nav__link {
@@ -59,58 +51,68 @@ body.has-site-chrome > main { flex: 1 0 auto; }
     align-items: center;
     gap: var(--space-2);
     min-height: 40px;
-    padding: 0 var(--space-3);
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
+    padding: 0 var(--space-4);
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+    color: var(--text-primary);
+    background: var(--bg-card);
     font-family: var(--font-sans);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
+    font-weight: var(--fw-heavy);
     text-decoration: none;
-    transition: color var(--transition-fast), background-color var(--transition-fast);
+    transition: transform .12s ease, box-shadow .12s ease, background-color var(--transition-fast);
 }
 
-.site-nav__link:hover { color: var(--color-primary); background: var(--bg-soft); }
-.site-nav__link.is-active { color: var(--color-primary); background: var(--bg-soft); }
+.site-nav__link:hover { background: var(--surface-sand); box-shadow: var(--shadow-sticker-sm); transform: translate(-1px, -1px); }
+.site-nav__link.is-active { color: var(--bg-main); background: var(--ink); box-shadow: none; transform: none; }
 .site-nav__link:focus-visible,
-.site-brand:focus-visible,
 .site-header__logout:focus-visible,
-.site-footer a:focus-visible { outline: none; border-radius: var(--radius-sm); box-shadow: var(--focus-ring); }
+.site-footer a:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; }
 
 .site-nav__icon {
     width: 18px;
     height: 18px;
     fill: none;
     stroke: currentColor;
-    stroke-width: 1.8;
+    stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
-/* Desktop: Hồ sơ hiện dạng link bên phải cùng nút đăng xuất, ẩn icon */
+/* Desktop: Hồ sơ dồn sang phải cạnh nút đăng xuất, ẩn icon */
 @media (min-width: 761px) {
     .site-nav__icon { display: none; }
-    .site-nav__link[href="/Account/Profile"] { order: 1; margin-left: auto; }
-    .site-nav { justify-content: flex-start; }
+    .site-nav__link[href="/Account/Profile"] { order: 1; margin-left: auto; background: var(--surface-pink); }
+    .site-nav__link[href="/Account/Profile"].is-active { background: var(--ink); }
 }
 
 .site-header__logout {
     color: var(--text-secondary);
     font-family: var(--font-sans);
     font-size: var(--fs-sm);
-    font-weight: var(--fw-bold);
-    text-decoration: none;
+    font-weight: var(--fw-heavy);
+    text-decoration: underline 2px transparent;
+    text-underline-offset: 4px;
     white-space: nowrap;
 }
 
-.site-header__logout:hover { color: var(--status-error); }
+.site-header__logout:hover { color: var(--status-error); text-decoration-color: currentColor; }
+
+/* Nút tùy chọn giao diện trong header */
+.site-header .preferences-menu__trigger { border: 2.5px solid var(--ink); border-radius: 12px; color: var(--text-primary); background: var(--bg-card); }
+.site-header .preferences-menu__trigger:hover,
+.site-header .preferences-menu[open] > .preferences-menu__trigger { border-color: var(--ink); background: var(--surface-sand); box-shadow: var(--shadow-sticker-sm); }
+.site-header .preferences-menu__panel { border: var(--border-sticker); border-radius: 14px; box-shadow: var(--shadow-sticker); }
 
 /* ---------- Footer ---------- */
 .site-footer {
     margin-top: var(--space-7);
-    border-top: 1px solid var(--border-color);
-    color: var(--text-secondary);
+    border-top: var(--border-sticker);
+    color: #fffaf2;
+    background: #1a1209;
     font-family: var(--font-sans);
     font-size: var(--fs-sm);
+    font-weight: var(--fw-bold);
 }
 
 .site-footer__inner {
@@ -118,21 +120,19 @@ body.has-site-chrome > main { flex: 1 0 auto; }
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-2) var(--space-5);
-    width: min(1120px, calc(100% - 40px));
+    gap: var(--space-3) var(--space-5);
+    width: min(1240px, calc(100% - 40px));
     margin: 0 auto;
     padding: var(--space-5) 0;
 }
 
 .site-footer p { margin: 0; }
-.site-footer a { color: inherit; font-weight: var(--fw-semibold); text-decoration: none; }
-.site-footer a:hover { color: var(--color-primary); }
+.site-footer a { color: inherit; text-decoration: none; }
+.site-footer a:not(.brand):hover { color: #ff9a4d; }
 
 /* ---------- Mobile: thanh tab ở đáy ---------- */
 @media (max-width: 760px) {
-    /* backdrop-filter tạo containing block cho phần tử fixed, làm thanh tab bị neo vào header thay vì đáy màn hình */
-    .site-header { background: var(--bg-main); backdrop-filter: none; }
-    .site-header__inner { gap: var(--space-4); min-height: 56px; width: calc(100% - 24px); }
+    .site-header__inner { gap: var(--space-4); min-height: 64px; width: calc(100% - 32px); }
     .site-header__logout { margin-left: auto; }
 
     .site-nav {
@@ -143,10 +143,9 @@ body.has-site-chrome > main { flex: 1 0 auto; }
         z-index: 100;
         justify-content: space-around;
         gap: 0;
-        padding: var(--space-1) 0 calc(var(--space-1) + env(safe-area-inset-bottom));
-        border-top: 1px solid var(--border-color);
-        background: var(--bg-card);
-        box-shadow: 0 -4px 16px rgb(0 0 0 / 6%);
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+        border-top: var(--border-sticker);
+        background: var(--bg-main);
     }
 
     .site-nav__link {
@@ -154,20 +153,40 @@ body.has-site-chrome > main { flex: 1 0 auto; }
         flex-direction: column;
         justify-content: center;
         gap: 2px;
-        min-height: 52px;
+        min-height: 54px;
         padding: 0;
+        border-color: transparent;
+        border-radius: 14px;
+        background: transparent;
         font-size: 11px;
     }
 
-    .site-nav__link:hover { background: transparent; }
-    .site-nav__link.is-active { background: transparent; }
+    .site-nav__link:hover { background: transparent; box-shadow: none; transform: none; }
+    .site-nav__link.is-active { border-color: var(--ink); color: var(--text-primary); background: var(--surface-orange); box-shadow: var(--shadow-sticker-sm); }
+    [data-theme="dark"] .site-nav__link.is-active { color: var(--paper-text); }
     .site-nav__icon { width: 22px; height: 22px; }
 
     /* Chừa chỗ cho thanh tab */
-    body.has-site-header { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+    body.has-site-header { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
     .site-footer { margin-top: var(--space-5); }
+    .site-footer__inner { width: calc(100% - 32px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .site-nav__link { transition: none; }
+    .site-nav__link:hover { transform: none; }
 }
+
+/* ---------- Dark mode: mảng màu là "giấy sáng" (chữ, viền bên trong tối) - token --paper-* trong themes.css ---------- */
+[data-theme="dark"] :is(
+    .site-nav__link:hover,
+    .site-nav__link[href="/Account/Profile"]:not(.is-active),
+    .site-header .preferences-menu__trigger:hover,
+    .site-header .preferences-menu[open] > .preferences-menu__trigger
+) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --bg-main: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
+[data-theme="dark"] :is(
+    .site-nav__link:hover,
+    .site-nav__link[href="/Account/Profile"]:not(.is-active),
+    .site-header .preferences-menu__trigger:hover,
+    .site-header .preferences-menu[open] > .preferences-menu__trigger
+) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px); }

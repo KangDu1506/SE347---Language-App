@@ -10,7 +10,8 @@
         <meta charset="UTF-8">
         <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-i18n="ui.sign_in">Đăng nhập</title>
+        <title data-i18n="ui.sign_in" data-i18n-suffix=" · Wordfox">Đăng nhập · Wordfox</title>
+        <partial name="_SharedHead" />
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css"/>
         <link rel="stylesheet" href="~/css/Account/Account.css"/>
         <partial name="_SupabaseClient" />
@@ -24,7 +25,7 @@
         <main class="account-page account-page--auth">
             <section class="auth-layout auth-layout--login" aria-labelledby="login-title">
                 <div class="auth-layout__side">
-                    <div class="auth-mascot" aria-hidden="true">SE</div>
+                    <svg class="auth-mascot" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-wave" /></svg>
                     <p class="auth-layout__title"><span data-i18n="ui.a_little_every_day">Mỗi ngày một chút,</span><br><span data-i18n="ui.a_lot_of_progress">tiến bộ thật nhiều</span></p>
                     <p class="auth-layout__text" data-i18n="ui.continue_your_english_learning_journey">Tiếp tục hành trình học tiếng Anh của bạn.</p>
                 </div>
