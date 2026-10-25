@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Simple Greetings 2",
+    "category": "vocabulary",
+    "topic": "Greetings",
+    "description": "Practice introducing yourself, asking where someone is from, and saying goodbye.",
+    "level": "A1",
+    "order": 2,
+    "estimated-minutes": 8,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

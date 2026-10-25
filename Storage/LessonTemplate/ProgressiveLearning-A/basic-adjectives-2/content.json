@@ -1,0 +1,322 @@
+[
+    {
+        "id": "1",
+        "content": "Big",
+        "definition-en": "Large in size, amount, or importance.",
+        "definition-vi": "To, lớn về kích thước, số lượng hoặc tầm quan trọng.",
+        "examples": [
+            {
+                "term": "They live in a big house near the river.",
+                "translation": "Họ sống trong một ngôi nhà lớn gần con sông."
+            },
+            {
+                "term": "We saw a big dog in the park.",
+                "translation": "Chúng tôi nhìn thấy một con chó lớn trong công viên."
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "Small",
+        "definition-en": "Little in size or amount.",
+        "definition-vi": "Nhỏ về kích thước hoặc số lượng.",
+        "examples": [
+            {
+                "term": "She keeps her keys in a small bag.",
+                "translation": "Cô ấy để chìa khóa trong một chiếc túi nhỏ."
+            },
+            {
+                "term": "There is a small garden behind the house.",
+                "translation": "Có một khu vườn nhỏ phía sau ngôi nhà."
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "Tall",
+        "definition-en": "Having greater than average height, especially for a person or building.",
+        "definition-vi": "Cao, thường dùng để nói về người hoặc tòa nhà có chiều cao lớn.",
+        "examples": [
+            {
+                "term": "The tall boy plays basketball.",
+                "translation": "Cậu bé cao chơi bóng rổ."
+            },
+            {
+                "term": "A tall tree stands beside the gate.",
+                "translation": "Một cái cây cao đứng bên cạnh cổng."
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "Short",
+        "definition-en": "Not tall, or having little length or duration.",
+        "definition-vi": "Thấp, hoặc có chiều dài hay thời lượng ngắn.",
+        "examples": [
+            {
+                "term": "My younger brother is short for his age.",
+                "translation": "Em trai tôi thấp so với tuổi của em."
+            },
+            {
+                "term": "We watched a short film in class.",
+                "translation": "Chúng tôi xem một bộ phim ngắn trong lớp."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "Long",
+        "definition-en": "Having a great distance from one end to the other or lasting a lot of time.",
+        "definition-vi": "Dài về khoảng cách từ đầu này đến đầu kia hoặc kéo dài lâu.",
+        "examples": [
+            {
+                "term": "She has long hair.",
+                "translation": "Cô ấy có mái tóc dài."
+            },
+            {
+                "term": "It was a long trip by train.",
+                "translation": "Đó là một chuyến đi dài bằng tàu hỏa."
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "content": "New",
+        "definition-en": "Recently made, bought, or introduced; not used before.",
+        "definition-vi": "Mới được làm, mua hoặc giới thiệu gần đây; chưa từng được sử dụng.",
+        "examples": [
+            {
+                "term": "He bought a new phone yesterday.",
+                "translation": "Hôm qua anh ấy mua một chiếc điện thoại mới."
+            },
+            {
+                "term": "There is a new student in our class.",
+                "translation": "Có một học sinh mới trong lớp chúng tôi."
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "content": "Old",
+        "definition-en": "Having existed or been used for a long time.",
+        "definition-vi": "Cũ, đã tồn tại hoặc được sử dụng trong một thời gian dài.",
+        "examples": [
+            {
+                "term": "This is an old photograph of my grandparents.",
+                "translation": "Đây là một bức ảnh cũ của ông bà tôi."
+            },
+            {
+                "term": "The old bridge is made of stone.",
+                "translation": "Cây cầu cũ được làm bằng đá."
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "content": "Clean",
+        "definition-en": "Not dirty; free from marks or unwanted substances.",
+        "definition-vi": "Sạch, không bẩn hoặc không có vết không mong muốn.",
+        "examples": [
+            {
+                "term": "Please put your clean clothes in the drawer.",
+                "translation": "Hãy cất quần áo sạch vào ngăn kéo."
+            },
+            {
+                "term": "The kitchen is clean after dinner.",
+                "translation": "Nhà bếp sạch sẽ sau bữa tối."
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "content": "Dirty",
+        "definition-en": "Not clean.",
+        "definition-vi": "Bẩn, không sạch.",
+        "examples": [
+            {
+                "term": "His shoes are dirty after the game.",
+                "translation": "Giày của cậu ấy bị bẩn sau trận đấu."
+            },
+            {
+                "term": "We need to wash the dirty dishes.",
+                "translation": "Chúng ta cần rửa đống bát đĩa bẩn."
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "content": "Hot",
+        "definition-en": "Having a high temperature.",
+        "definition-vi": "Nóng, có nhiệt độ cao.",
+        "examples": [
+            {
+                "term": "The soup is too hot to eat.",
+                "translation": "Món súp nóng quá nên chưa ăn được."
+            },
+            {
+                "term": "It gets very hot here in July.",
+                "translation": "Ở đây trời rất nóng vào tháng Bảy."
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "content": "Cold",
+        "definition-en": "Having a low temperature.",
+        "definition-vi": "Lạnh, có nhiệt độ thấp.",
+        "examples": [
+            {
+                "term": "My hands are cold.",
+                "translation": "Tay tôi bị lạnh."
+            },
+            {
+                "term": "Would you like a cold drink?",
+                "translation": "Bạn có muốn uống nước lạnh không?"
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "content": "Fast",
+        "definition-en": "Moving or happening quickly.",
+        "definition-vi": "Nhanh, di chuyển hoặc diễn ra với tốc độ cao.",
+        "examples": [
+            {
+                "term": "That is a fast train.",
+                "translation": "Đó là một chuyến tàu nhanh."
+            },
+            {
+                "term": "My sister can run very fast.",
+                "translation": "Chị gái tôi có thể chạy rất nhanh."
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "content": "Slow",
+        "definition-en": "Moving or happening without speed.",
+        "definition-vi": "Chậm, di chuyển hoặc diễn ra với tốc độ thấp.",
+        "examples": [
+            {
+                "term": "The bus was slow because of the traffic.",
+                "translation": "Xe buýt chạy chậm vì tắc đường."
+            },
+            {
+                "term": "Please speak slowly; I am learning English.",
+                "translation": "Làm ơn nói chậm thôi; tôi đang học tiếng Anh."
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "content": "Easy",
+        "definition-en": "Not difficult to do, understand, or use.",
+        "definition-vi": "Dễ, không khó để làm, hiểu hoặc sử dụng.",
+        "examples": [
+            {
+                "term": "This question is easy.",
+                "translation": "Câu hỏi này dễ."
+            },
+            {
+                "term": "The app is easy to use.",
+                "translation": "Ứng dụng này dễ sử dụng."
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "content": "Difficult",
+        "definition-en": "Not easy to do, understand, or solve.",
+        "definition-vi": "Khó, không dễ để làm, hiểu hoặc giải quyết.",
+        "examples": [
+            {
+                "term": "The last exercise was difficult.",
+                "translation": "Bài tập cuối cùng rất khó."
+            },
+            {
+                "term": "It is difficult to find a taxi at night.",
+                "translation": "Rất khó để tìm taxi vào ban đêm."
+            }
+        ]
+    },
+    {
+        "id": "16",
+        "content": "Beautiful",
+        "definition-en": "Very attractive to look at or listen to.",
+        "definition-vi": "Đẹp, có vẻ ngoài hoặc âm thanh rất cuốn hút.",
+        "examples": [
+            {
+                "term": "We saw a beautiful sunset at the beach.",
+                "translation": "Chúng tôi ngắm một hoàng hôn tuyệt đẹp ở bãi biển."
+            },
+            {
+                "term": "She has a beautiful voice.",
+                "translation": "Cô ấy có một giọng hát tuyệt đẹp."
+            }
+        ]
+    },
+    {
+        "id": "17",
+        "content": "Cheap",
+        "definition-en": "Low in price; not costing much money.",
+        "definition-vi": "Rẻ, có giá thấp và không tốn nhiều tiền.",
+        "examples": [
+            {
+                "term": "We found a cheap hotel near the station.",
+                "translation": "Chúng tôi tìm được một khách sạn giá rẻ gần nhà ga."
+            },
+            {
+                "term": "These apples are cheap at the market.",
+                "translation": "Những quả táo này có giá rẻ ở chợ."
+            }
+        ]
+    },
+    {
+        "id": "18",
+        "content": "Expensive",
+        "definition-en": "Costing a lot of money.",
+        "definition-vi": "Đắt, có giá cao và tốn nhiều tiền.",
+        "examples": [
+            {
+                "term": "That restaurant is too expensive for us.",
+                "translation": "Nhà hàng đó quá đắt đối với chúng tôi."
+            },
+            {
+                "term": "He wants to buy an expensive watch.",
+                "translation": "Anh ấy muốn mua một chiếc đồng hồ đắt tiền."
+            }
+        ]
+    },
+    {
+        "id": "19",
+        "content": "Heavy",
+        "definition-en": "Weighing a lot; difficult to lift or carry.",
+        "definition-vi": "Nặng, có trọng lượng lớn và khó nâng hoặc mang.",
+        "examples": [
+            {
+                "term": "This box is too heavy for me to carry.",
+                "translation": "Chiếc hộp này quá nặng để tôi mang."
+            },
+            {
+                "term": "He put the heavy books on the table.",
+                "translation": "Anh ấy đặt những quyển sách nặng lên bàn."
+            }
+        ]
+    },
+    {
+        "id": "20",
+        "content": "Soft",
+        "definition-en": "Pleasant to touch because it is smooth or not hard.",
+        "definition-vi": "Mềm, dễ chịu khi chạm vào vì nhẵn hoặc không cứng.",
+        "examples": [
+            {
+                "term": "The baby has a soft blanket.",
+                "translation": "Em bé có một chiếc chăn mềm."
+            },
+            {
+                "term": "This bread is still soft and fresh.",
+                "translation": "Ổ bánh mì này vẫn mềm và tươi."
+            }
+        ]
+    }
+]

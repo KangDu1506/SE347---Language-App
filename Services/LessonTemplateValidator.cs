@@ -39,7 +39,7 @@ namespace SE347.Services
             var schemas = Path.Combine(_root, SchemasFolder);
             _configSchema = JsonSchema.FromFile(Path.Combine(schemas, "LessonConfig.schema.json"));
             _contentSchema = JsonSchema.FromFile(Path.Combine(schemas, "LessonContent.schema.json"));
-            _quizSchema = JsonSchema.FromFile(Path.Combine(schemas, "LessonQuiz.schema.json"));
+            _quizSchema = JsonSchema.FromFile(Path.Combine(schemas, "QuizContent.schema.json"));
         }
 
         /// <summary>Tên các folder bài học (trừ schemas/), sắp theo tên.</summary>

@@ -1,12 +1,20 @@
 {
 	"json.schemas": [
 		{
-			"fileMatch": ["Storage/LessonTemplate/*/content.json"],
+			"fileMatch": ["Storage/LessonTemplate/**/content.json"],
 			"url": "./Storage/LessonTemplate/schemas/LessonContent.schema.json"
 		},
 		{
-			"fileMatch": ["Storage/LessonTemplate/*/quiz.json"],
-			"url": "./Storage/LessonTemplate/schemas/LessonQuiz.schema.json"
+			"fileMatch": ["Storage/LessonTemplate/**/quiz.json"],
+			"url": "./Storage/LessonTemplate/schemas/QuizContent.schema.json"
+		},
+		{
+			"fileMatch": ["Storage/QuizTemplate/*/questions.json"],
+			"url": "./Storage/LessonTemplate/schemas/QuizContent.schema.json"
+		},
+		{
+			"fileMatch": ["Storage/QuizTemplate/*/config.json"],
+			"url": "./Storage/LessonTemplate/schemas/QuizConfig.schema.json"
 		}
 	]
 }

@@ -1,0 +1,64 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/LearningPathProgress.schema.json",
+    "title": "Learning Path Progress",
+    "description": "One user's progress record for a single lesson or branch in a learning path participation.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "recordId",
+        "participationId",
+        "pathItemId",
+        "status",
+        "startedAt",
+        "completedAt"
+    ],
+    "properties": {
+        "recordId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for this progress row."
+        },
+        "participationId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "References the user's LearningPathRecord participation."
+        },
+        "pathItemId": {
+            "type": "string",
+            "pattern": "^(lesson|branch)-[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Stable ID of a lesson or branch declared in the learning path."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "locked",
+                "available",
+                "in_progress",
+                "completed"
+            ]
+        },
+        "startedAt": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        },
+        "completedAt": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        }
+    }
+}

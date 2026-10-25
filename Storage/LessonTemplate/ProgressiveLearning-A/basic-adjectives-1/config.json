@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Basic Adjectives 1",
+    "category": "vocabulary",
+    "topic": "Adjectives",
+    "description": "Learn common adjectives for describing people's feelings, personalities, and everyday states.",
+    "level": "A1",
+    "order": 5,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

@@ -1,0 +1,40 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/QuizRecord.schema.json",
+    "title": "Quiz Record",
+    "description": "A learner's recorded answer to one quiz question.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "quizConfigId",
+        "questionId",
+        "userAnswer",
+        "isCorrect"
+    ],
+    "properties": {
+        "quizConfigId": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "questionId": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+        },
+        "userAnswer": {
+            "oneOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            ]
+        },
+        "isCorrect": {
+            "type": "boolean"
+        }
+    }
+}

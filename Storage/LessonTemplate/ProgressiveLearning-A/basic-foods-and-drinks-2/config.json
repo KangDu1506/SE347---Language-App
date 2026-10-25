@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Basic Foods and Drinks 2",
+    "category": "vocabulary",
+    "topic": "Food and Drinks",
+    "description": "Build food vocabulary with common ingredients, meals, and drinks.",
+    "level": "A1",
+    "order": 8,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

@@ -1,0 +1,72 @@
+[
+    {
+        "id": "1",
+        "content": "1st, 2nd, 3rd — first, second, third",
+        "definition-en": "The first three ordinal numbers are irregular: one becomes first, two becomes second, and three becomes third.",
+        "definition-vi": "Ba số thứ tự đầu tiên là dạng bất quy tắc: one thành first, two thành second và three thành third.",
+        "examples": [{"term": "Mia finished third in the race.", "translation": "Mia về thứ ba trong cuộc đua."}]
+    },
+    {
+        "id": "2",
+        "content": "4th–10th — fourth, fifth, sixth, seventh, eighth, ninth, tenth",
+        "definition-en": "Most numbers in this group take -th. Remember the spelling changes in fifth, eighth, and ninth.",
+        "definition-vi": "Phần lớn các số trong nhóm này thêm -th. Lưu ý cách viết đặc biệt của fifth, eighth và ninth.",
+        "examples": [{"term": "This is my eighth lesson.", "translation": "Đây là bài học thứ tám của tôi."}]
+    },
+    {
+        "id": "3",
+        "content": "11th–19th — eleventh to nineteenth",
+        "definition-en": "Form most ordinals from eleven to nineteen with -th: eleventh, twelfth, thirteenth, fourteenth, and so on. Twelve changes to twelfth.",
+        "definition-vi": "Phần lớn số thứ tự từ 11 đến 19 được tạo bằng cách thêm -th: eleventh, twelfth, thirteenth, fourteenth... Twelve đổi thành twelfth.",
+        "examples": [{"term": "Our classroom is on the twelfth floor.", "translation": "Lớp học của chúng tôi ở tầng mười hai."}]
+    },
+    {
+        "id": "4",
+        "content": "20th, 30th, 40th — twentieth, thirtieth, fortieth",
+        "definition-en": "For a number ending in -y, change y to -ieth: twenty becomes twentieth, thirty becomes thirtieth, and forty becomes fortieth.",
+        "definition-vi": "Với số kết thúc bằng -y, đổi y thành -ieth: twenty thành twentieth, thirty thành thirtieth và forty thành fortieth.",
+        "examples": [{"term": "The library is on the fortieth street.", "translation": "Thư viện nằm trên con phố thứ bốn mươi."}]
+    },
+    {
+        "id": "5",
+        "content": "Compound numbers ending in 1, 2, or 3",
+        "definition-en": "For a compound number, change only the final part to its ordinal form: twenty-one becomes twenty-first, forty-two becomes forty-second, and ninety-three becomes ninety-third.",
+        "definition-vi": "Với số ghép, chỉ đổi thành phần cuối sang dạng số thứ tự: twenty-one thành twenty-first, forty-two thành forty-second, ninety-three thành ninety-third.",
+        "examples": [{"term": "She lives on the twenty-first floor.", "translation": "Cô ấy sống ở tầng hai mươi mốt."}]
+    },
+    {
+        "id": "6",
+        "content": "Other compound numbers below 100",
+        "definition-en": "Keep the tens as a cardinal number and make only the final unit ordinal: sixty-four becomes sixty-fourth. Use a hyphen in the written compound number.",
+        "definition-vi": "Giữ hàng chục ở dạng số đếm và chỉ đổi hàng đơn vị cuối thành số thứ tự: sixty-four thành sixty-fourth. Dùng dấu gạch nối trong số ghép.",
+        "examples": [{"term": "He finished sixty-fourth in the competition.", "translation": "Anh ấy xếp thứ sáu mươi tư trong cuộc thi."}]
+    },
+    {
+        "id": "7",
+        "content": "Exact hundreds and hundreds with a remainder",
+        "definition-en": "For an exact hundred, add -th to hundred: three hundredth (300th). With a remainder, make only the final part ordinal: 325th is three hundred and twenty-fifth.",
+        "definition-vi": "Với số tròn trăm, thêm -th vào hundred: three hundredth (300th). Nếu còn phần lẻ, chỉ đổi phần cuối: 325th là three hundred and twenty-fifth.",
+        "examples": [{"term": "The three hundredth customer received a gift.", "translation": "Vị khách thứ ba trăm nhận được một món quà."}]
+    },
+    {
+        "id": "8",
+        "content": "Exact thousands and thousands with a remainder",
+        "definition-en": "For an exact thousand, add -th to thousand: two thousandth (2,000th). For a non-exact thousand, make the final number ordinal: 2,347th is two thousand three hundred and forty-seventh.",
+        "definition-vi": "Với số tròn nghìn, thêm -th vào thousand: two thousandth (2.000th). Với số không tròn nghìn, đổi phần số cuối thành số thứ tự: 2.347th là two thousand three hundred and forty-seventh.",
+        "examples": [{"term": "The two thousandth runner crossed the finish line.", "translation": "Vận động viên thứ hai nghìn đã vượt qua vạch đích."}]
+    },
+    {
+        "id": "9",
+        "content": "Compound ordinals from 1,000 to 9,999",
+        "definition-en": "Read the thousands and hundreds as cardinal numbers, then make only the last non-zero part ordinal: 4,106th is four thousand one hundred and sixth; 9,999th is nine thousand nine hundred and ninety-ninth.",
+        "definition-vi": "Đọc hàng nghìn và hàng trăm dưới dạng số đếm, sau đó chỉ đổi thành phần khác 0 cuối cùng thành số thứ tự: 4.106th là four thousand one hundred and sixth; 9.999th là nine thousand nine hundred and ninety-ninth.",
+        "examples": [{"term": "She was the nine thousand nine hundred and ninety-ninth visitor.", "translation": "Cô ấy là vị khách thứ chín nghìn chín trăm chín mươi chín."}]
+    },
+    {
+        "id": "10",
+        "content": "Ordinal numerals and their suffixes",
+        "definition-en": "Write ordinal numerals with st after numbers ending in 1, nd after 2, rd after 3, and th for most others. Exceptions include 11th, 12th, and 13th. In a compound number, use the suffix for its final two digits: 1,021st, 1,022nd, 1,023rd, 1,024th.",
+        "definition-vi": "Số thứ tự dạng chữ số thường dùng st sau số tận cùng bằng 1, nd sau 2, rd sau 3 và th với phần lớn số còn lại. Ngoại lệ gồm 11th, 12th, 13th. Với số ghép, chọn hậu tố theo hai chữ số cuối: 1.021st, 1.022nd, 1.023rd, 1.024th.",
+        "examples": [{"term": "This is the 1,024th page of the book.", "translation": "Đây là trang thứ 1.024 của cuốn sách."}]
+    }
+]

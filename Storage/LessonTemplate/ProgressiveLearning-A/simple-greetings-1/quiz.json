@@ -1,0 +1,44 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "Which greeting do you use in the morning?",
+        "options": ["Good night!", "Good morning!", "Goodbye!", "See you later!"],
+        "answer": ["Good morning!"],
+        "explanation": "\"Good morning!\" is used as a greeting in the morning.",
+        "translation": "Bạn dùng lời chào nào vào buổi sáng?"
+    },
+    {
+        "id": "2",
+        "type": "fill-in-the-blank",
+        "question": "How <blank> you?",
+        "answer": ["are"],
+        "explanation": "The correct question is \"How are you?\"",
+        "translation": "Bạn khỏe không?"
+    },
+    {
+        "id": "3",
+        "type": "true-false",
+        "question": "\"Nice to meet you\" is often said when you meet someone for the first time.",
+        "answer": ["true"],
+        "explanation": "This expression is commonly used when meeting someone for the first time.",
+        "translation": "\"Rất vui được gặp bạn\" thường được nói khi bạn gặp ai đó lần đầu."
+    },
+    {
+        "id": "4",
+        "type": "single-choice",
+        "question": "Choose a polite response to \"How are you?\"",
+        "options": ["I'm fine, thank you.", "Good morning!", "Nice to meet you.", "Goodbye!"],
+        "answer": ["I'm fine, thank you."],
+        "explanation": "\"I'm fine, thank you\" is a polite response to \"How are you?\"",
+        "translation": "Chọn câu trả lời lịch sự cho câu \"Bạn khỏe không?\""
+    },
+    {
+        "id": "5",
+        "type": "fill-in-the-blank",
+        "question": "<blank> to meet you.",
+        "answer": ["Nice"],
+        "explanation": "The expression is \"Nice to meet you.\"",
+        "translation": "Rất vui được gặp bạn."
+    }
+]

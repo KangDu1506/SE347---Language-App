@@ -1,0 +1,70 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "A colleague looks overwhelmed. Which expression is a considerate way to open a supportive conversation?",
+        "options": ["You seem to have a lot on your plate.", "I was wondering when you'd resurface.", "Fancy seeing you here!", "You haven't changed a bit!"],
+        "answer": ["You seem to have a lot on your plate."],
+        "explanation": "\"A lot on your plate\" recognizes that someone may be busy or under pressure and can lead to an offer of help.",
+        "translation": "Một đồng nghiệp trông có vẻ quá tải. Câu nào là cách mở lời quan tâm để bắt đầu cuộc trò chuyện hỗ trợ?"
+    },
+    {
+        "id": "2",
+        "type": "fill-in-the-blank",
+        "question": "You haven't been in touch for a while. You can invite a friend to share news by asking, \"What's the <blank>?\"",
+        "answer": ["latest"],
+        "explanation": "\"What's the latest?\" is an informal prompt for recent news or developments.",
+        "translation": "Bạn đã lâu không liên lạc. Bạn có thể mời bạn mình kể tin mới bằng câu: \"Có gì mới <blank>?\""
+    },
+    {
+        "id": "3",
+        "type": "single-choice",
+        "question": "A friend has been unusually quiet in your group chat. Which phrase may gently invite them to explain what they have been doing?",
+        "options": ["You've been keeping a low profile.", "You must be Elena.", "I see you found the place.", "It's been ages!"],
+        "answer": ["You've been keeping a low profile."],
+        "explanation": "This observation can open a conversation about why someone has been less visible, though it should be said gently.",
+        "translation": "Một người bạn gần đây ít nói bất thường trong nhóm chat. Câu nào có thể nhẹ nhàng gợi họ chia sẻ dạo này đang làm gì?"
+    },
+    {
+        "id": "4",
+        "type": "true-false",
+        "question": "\"I was wondering when you'd resurface\" is a safe, formal expression to use with a new client.",
+        "answer": ["false"],
+        "explanation": "It is teasing and familiar, so it is better reserved for friends or close colleagues.",
+        "translation": "\"Tôi đang tự hỏi bao giờ bạn mới xuất hiện lại\" là câu trang trọng, an toàn để nói với khách hàng mới."
+    },
+    {
+        "id": "5",
+        "type": "single-choice",
+        "question": "You want to ask an old friend for a general update without starting with a direct \"How are you?\" Which expression fits?",
+        "options": ["How's life treating you?", "You must be Jordan.", "I don't think we've been introduced.", "I see you found the place."],
+        "answer": ["How's life treating you?"],
+        "explanation": "This idiomatic question invites a general update on someone's life.",
+        "translation": "Bạn muốn hỏi thăm khái quát một người bạn cũ mà không bắt đầu bằng câu \"Bạn khỏe không?\". Câu nào phù hợp?"
+    },
+    {
+        "id": "6",
+        "type": "fill-in-the-blank",
+        "question": "To reconnect by referring to a previous conversation, say: \"Last time we <blank>, you were waiting for the results.\"",
+        "answer": ["spoke"],
+        "explanation": "\"Last time we spoke...\" recalls an earlier conversation and creates a natural opening for an update.",
+        "translation": "Để nối lại câu chuyện bằng cách nhắc đến lần nói chuyện trước, hãy nói: \"Lần trước chúng ta <blank>, bạn đang chờ kết quả.\""
+    },
+    {
+        "id": "7",
+        "type": "single-choice",
+        "question": "A teammate has just returned after recovering from an illness. Which greeting is supportive and contextually appropriate?",
+        "options": ["Good to have you back on your feet.", "I was beginning to think you'd forgotten about us.", "What's the latest?", "Fancy seeing you here!"],
+        "answer": ["Good to have you back on your feet."],
+        "explanation": "This expression warmly welcomes someone back after recovery; use it sensitively.",
+        "translation": "Một thành viên trong nhóm vừa quay lại sau khi hồi phục bệnh. Lời chào nào thể hiện sự động viên và phù hợp với ngữ cảnh?"
+    },
+    {
+        "id": "8",
+        "type": "true-false",
+        "question": "\"We have a lot to catch up on\" suggests that two people have news or experiences to share after time apart.",
+        "answer": ["true"],
+        "explanation": "The expression signals that you would like to share updates after not seeing or speaking to someone for a while.",
+        "translation": "\"Chúng ta có nhiều chuyện để kể cho nhau\" ngụ ý hai người có tin tức hoặc trải nghiệm muốn chia sẻ sau một thời gian xa cách."
+    }
+]

@@ -1,0 +1,322 @@
+[
+    {
+        "id": "1",
+        "content": "Happy",
+        "definition-en": "Feeling pleased or showing pleasure.",
+        "definition-vi": "Vui vẻ, cảm thấy vui hoặc thể hiện niềm vui.",
+        "examples": [
+            {
+                "term": "The children are happy to see their friends.",
+                "translation": "Bọn trẻ vui khi gặp bạn bè."
+            },
+            {
+                "term": "She looks happy with her new job.",
+                "translation": "Cô ấy trông vui vẻ với công việc mới."
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "Sad",
+        "definition-en": "Feeling unhappy, often because something unpleasant has happened.",
+        "definition-vi": "Buồn, cảm thấy không vui, thường vì một chuyện không hay đã xảy ra.",
+        "examples": [
+            {
+                "term": "He felt sad when his friend moved away.",
+                "translation": "Cậu ấy cảm thấy buồn khi bạn mình chuyển đi."
+            },
+            {
+                "term": "That is a sad story.",
+                "translation": "Đó là một câu chuyện buồn."
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "Angry",
+        "definition-en": "Feeling or showing strong displeasure.",
+        "definition-vi": "Tức giận, cảm thấy hoặc thể hiện sự bực tức mạnh mẽ.",
+        "examples": [
+            {
+                "term": "Dad was angry about the broken window.",
+                "translation": "Bố tức giận vì chiếc cửa sổ bị vỡ."
+            },
+            {
+                "term": "She gets angry when people are rude.",
+                "translation": "Cô ấy tức giận khi mọi người cư xử thô lỗ."
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "Tired",
+        "definition-en": "Needing rest or sleep.",
+        "definition-vi": "Mệt, cần được nghỉ ngơi hoặc ngủ.",
+        "examples": [
+            {
+                "term": "I am tired after a long day at work.",
+                "translation": "Tôi mệt sau một ngày làm việc dài."
+            },
+            {
+                "term": "The tired children went to bed early.",
+                "translation": "Những đứa trẻ mệt mỏi đã đi ngủ sớm."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "Hungry",
+        "definition-en": "Needing or wanting food.",
+        "definition-vi": "Đói, cần hoặc muốn ăn.",
+        "examples": [
+            {
+                "term": "Are you hungry? Lunch is ready.",
+                "translation": "Bạn đói chưa? Bữa trưa sẵn sàng rồi."
+            },
+            {
+                "term": "The hungry dog waited by its bowl.",
+                "translation": "Chú chó đói bụng chờ bên chiếc bát của nó."
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "content": "Thirsty",
+        "definition-en": "Needing or wanting a drink.",
+        "definition-vi": "Khát, cần hoặc muốn uống nước.",
+        "examples": [
+            {
+                "term": "We were thirsty after the walk.",
+                "translation": "Chúng tôi khát nước sau chuyến đi bộ."
+            },
+            {
+                "term": "Would you like some water if you are thirsty?",
+                "translation": "Bạn có muốn uống chút nước nếu đang khát không?"
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "content": "Sleepy",
+        "definition-en": "Ready to fall asleep or wanting to sleep.",
+        "definition-vi": "Buồn ngủ, sắp ngủ hoặc muốn đi ngủ.",
+        "examples": [
+            {
+                "term": "The baby gets sleepy after a warm bath.",
+                "translation": "Em bé buồn ngủ sau khi tắm nước ấm."
+            },
+            {
+                "term": "I feel sleepy during the long bus ride.",
+                "translation": "Tôi cảm thấy buồn ngủ trong chuyến xe buýt dài."
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "content": "Busy",
+        "definition-en": "Having a lot of things to do.",
+        "definition-vi": "Bận rộn, có nhiều việc cần làm.",
+        "examples": [
+            {
+                "term": "My parents are busy this morning.",
+                "translation": "Sáng nay bố mẹ tôi bận."
+            },
+            {
+                "term": "It is a busy restaurant on weekends.",
+                "translation": "Nhà hàng này đông khách vào cuối tuần."
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "content": "Free",
+        "definition-en": "Not busy and available to do something.",
+        "definition-vi": "Rảnh, không bận và có thể làm việc gì đó.",
+        "examples": [
+            {
+                "term": "Are you free after class?",
+                "translation": "Bạn có rảnh sau giờ học không?"
+            },
+            {
+                "term": "I am free to help you this afternoon.",
+                "translation": "Chiều nay tôi rảnh để giúp bạn."
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "content": "Kind",
+        "definition-en": "Caring about other people and treating them well.",
+        "definition-vi": "Tốt bụng, quan tâm đến người khác và đối xử tử tế với họ.",
+        "examples": [
+            {
+                "term": "Our kind neighbor brought us some soup.",
+                "translation": "Người hàng xóm tốt bụng mang cho chúng tôi ít súp."
+            },
+            {
+                "term": "It was kind of you to carry my bag.",
+                "translation": "Bạn thật tốt bụng khi xách giúp tôi chiếc túi."
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "content": "Friendly",
+        "definition-en": "Kind and pleasant toward other people.",
+        "definition-vi": "Thân thiện, tử tế và dễ mến với người khác.",
+        "examples": [
+            {
+                "term": "The new students are friendly.",
+                "translation": "Các học sinh mới rất thân thiện."
+            },
+            {
+                "term": "Our friendly teacher always answers questions.",
+                "translation": "Thầy giáo thân thiện của chúng tôi luôn trả lời các câu hỏi."
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "content": "Nice",
+        "definition-en": "Pleasant, enjoyable, or kind.",
+        "definition-vi": "Dễ chịu, thú vị hoặc tử tế.",
+        "examples": [
+            {
+                "term": "We had a nice time at the park.",
+                "translation": "Chúng tôi đã có khoảng thời gian vui vẻ ở công viên."
+            },
+            {
+                "term": "Your sister is very nice to everyone.",
+                "translation": "Chị gái bạn rất tử tế với mọi người."
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "content": "Funny",
+        "definition-en": "Making people laugh or feel amused.",
+        "definition-vi": "Hài hước, khiến mọi người cười hoặc cảm thấy vui.",
+        "examples": [
+            {
+                "term": "Leo told us a funny story.",
+                "translation": "Leo kể cho chúng tôi nghe một câu chuyện hài hước."
+            },
+            {
+                "term": "That little dog looks funny in its hat.",
+                "translation": "Chú chó nhỏ trông thật ngộ nghĩnh khi đội chiếc mũ đó."
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "content": "Quiet",
+        "definition-en": "Making little or no noise, or not talking much.",
+        "definition-vi": "Yên lặng, ít gây tiếng ồn hoặc ít nói.",
+        "examples": [
+            {
+                "term": "The library is quiet in the afternoon.",
+                "translation": "Thư viện yên tĩnh vào buổi chiều."
+            },
+            {
+                "term": "He is quiet around new people.",
+                "translation": "Cậu ấy ít nói khi ở cạnh người lạ."
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "content": "Loud",
+        "definition-en": "Making a lot of noise.",
+        "definition-vi": "Ồn ào, tạo ra nhiều tiếng động.",
+        "examples": [
+            {
+                "term": "The music is too loud for the baby.",
+                "translation": "Nhạc quá to đối với em bé."
+            },
+            {
+                "term": "They heard a loud noise outside.",
+                "translation": "Họ nghe thấy một tiếng động lớn ở bên ngoài."
+            }
+        ]
+    },
+    {
+        "id": "16",
+        "content": "Shy",
+        "definition-en": "Nervous or uncomfortable when meeting or talking to other people.",
+        "definition-vi": "Nhút nhát, cảm thấy lo lắng hoặc không thoải mái khi gặp hay nói chuyện với người khác.",
+        "examples": [
+            {
+                "term": "She was shy on her first day at school.",
+                "translation": "Cô bé nhút nhát trong ngày đầu tiên đến trường."
+            },
+            {
+                "term": "My shy cat hides when visitors arrive.",
+                "translation": "Con mèo nhút nhát của tôi trốn đi khi khách đến."
+            }
+        ]
+    },
+    {
+        "id": "17",
+        "content": "Brave",
+        "definition-en": "Ready to face danger, difficulty, or fear.",
+        "definition-vi": "Can đảm, sẵn sàng đối mặt với nguy hiểm, khó khăn hoặc nỗi sợ.",
+        "examples": [
+            {
+                "term": "The brave firefighter entered the building.",
+                "translation": "Người lính cứu hỏa dũng cảm bước vào tòa nhà."
+            },
+            {
+                "term": "It was brave of him to speak in front of the class.",
+                "translation": "Cậu ấy thật can đảm khi phát biểu trước lớp."
+            }
+        ]
+    },
+    {
+        "id": "18",
+        "content": "Careful",
+        "definition-en": "Giving attention to what you are doing to avoid mistakes or danger.",
+        "definition-vi": "Cẩn thận, chú ý đến việc mình làm để tránh sai sót hoặc nguy hiểm.",
+        "examples": [
+            {
+                "term": "Be careful when you cross the street.",
+                "translation": "Hãy cẩn thận khi băng qua đường."
+            },
+            {
+                "term": "She is careful with her little brother.",
+                "translation": "Cô ấy cẩn thận khi chăm sóc em trai nhỏ."
+            }
+        ]
+    },
+    {
+        "id": "19",
+        "content": "Helpful",
+        "definition-en": "Willing to help or useful to someone.",
+        "definition-vi": "Hay giúp đỡ hoặc có ích cho ai đó.",
+        "examples": [
+            {
+                "term": "The helpful clerk showed us the way.",
+                "translation": "Nhân viên bán hàng nhiệt tình chỉ đường cho chúng tôi."
+            },
+            {
+                "term": "This map is helpful for new visitors.",
+                "translation": "Bản đồ này hữu ích cho khách mới đến."
+            }
+        ]
+    },
+    {
+        "id": "20",
+        "content": "Polite",
+        "definition-en": "Behaving in a way that shows respect and good manners.",
+        "definition-vi": "Lịch sự, cư xử thể hiện sự tôn trọng và phép tắc tốt.",
+        "examples": [
+            {
+                "term": "Please be polite to the guests.",
+                "translation": "Hãy cư xử lịch sự với khách."
+            },
+            {
+                "term": "He gave a polite answer to the teacher.",
+                "translation": "Cậu ấy đưa ra câu trả lời lịch sự với giáo viên."
+            }
+        ]
+    }
+]

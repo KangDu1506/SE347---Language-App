@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Occupations",
+    "category": "vocabulary",
+    "topic": "Jobs",
+    "description": "Learn common job titles and what people do at work.",
+    "level": "A1",
+    "order": 11,
+    "estimated-minutes": 20,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

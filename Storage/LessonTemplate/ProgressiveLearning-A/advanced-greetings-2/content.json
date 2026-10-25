@@ -1,0 +1,182 @@
+[
+    {
+        "id": "1",
+        "content": "You look like you've got a story to tell.",
+        "definition-en": "An inviting, informal way to suggest that someone seems to have news or an experience to share.",
+        "definition-vi": "Cách gợi chuyện thân mật, mời ai đó kể tin tức hoặc trải nghiệm mà họ có vẻ muốn chia sẻ.",
+        "examples": [
+            {
+                "term": "You look like you've got a story to tell—how did the interview go?",
+                "translation": "Trông bạn như có chuyện muốn kể—buổi phỏng vấn thế nào?"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "You seem to have a lot on your plate.",
+        "definition-en": "A considerate observation that someone appears busy or under pressure, often used to open a supportive conversation.",
+        "definition-vi": "Lời nhận xét thể hiện sự quan tâm rằng ai đó có vẻ bận rộn hoặc chịu nhiều áp lực, thường dùng để mở đầu cuộc trò chuyện hỗ trợ.",
+        "examples": [
+            {
+                "term": "You seem to have a lot on your plate lately. Is there anything I can take off your hands?",
+                "translation": "Dạo này có vẻ bạn đang có quá nhiều việc. Có việc gì mình có thể làm giúp bạn không?"
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "You've been keeping a low profile.",
+        "definition-en": "A casual observation that someone has been less visible or social than usual, which can invite them to share an update.",
+        "definition-vi": "Lời nhận xét thân mật rằng gần đây ai đó ít xuất hiện hoặc giao lưu hơn thường lệ, có thể mở lời để họ chia sẻ tình hình.",
+        "examples": [
+            {
+                "term": "You've been keeping a low profile since the move. How are you settling in?",
+                "translation": "Từ sau khi chuyển nhà, bạn ít xuất hiện hẳn. Bạn đã dần ổn định chưa?"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "I was wondering when you'd resurface.",
+        "definition-en": "A teasing expression for a friend who has been out of contact; use only when the relationship is familiar.",
+        "definition-vi": "Câu nói trêu đùa dành cho người bạn đã lâu không liên lạc; chỉ nên dùng khi hai người thân thiết.",
+        "examples": [
+            {
+                "term": "I was wondering when you'd resurface! The book club hasn't been the same without you.",
+                "translation": "Tôi đang tự hỏi bao giờ bạn mới xuất hiện lại đây! Câu lạc bộ sách thiếu bạn chẳng còn như trước."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "What's been keeping you busy?",
+        "definition-en": "A friendly, open-ended way to invite someone to talk about recent activities or changes in their life.",
+        "definition-vi": "Cách hỏi thân thiện, mở để mời ai đó kể về những hoạt động gần đây hoặc thay đổi trong cuộc sống.",
+        "examples": [
+            {
+                "term": "It's been a while. What's been keeping you busy these days?",
+                "translation": "Cũng lâu rồi nhỉ. Dạo này điều gì khiến bạn bận rộn vậy?"
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "content": "What's the latest?",
+        "definition-en": "A brief, informal prompt inviting someone to share recent news or developments.",
+        "definition-vi": "Câu gợi chuyện ngắn gọn, thân mật, mời ai đó kể tin tức hoặc diễn biến mới đây.",
+        "examples": [
+            {
+                "term": "We haven't had a chance to talk since the conference. What's the latest?",
+                "translation": "Từ sau hội nghị chúng ta chưa có dịp nói chuyện. Có tin gì mới không?"
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "content": "How's life treating you?",
+        "definition-en": "An idiomatic, conversational way to invite someone to give a general update on how things are going.",
+        "definition-vi": "Cách hỏi thăm mang tính thành ngữ, thân mật, mời ai đó kể khái quát mọi việc dạo này ra sao.",
+        "examples": [
+            {
+                "term": "How's life treating you over in Seattle?",
+                "translation": "Cuộc sống ở Seattle dạo này đối xử với bạn thế nào?"
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "content": "Still holding the fort?",
+        "definition-en": "A familiar, light-hearted way to ask whether someone is managing responsibilities while others are away or things are difficult.",
+        "definition-vi": "Cách hỏi thăm thân mật, vui vẻ xem ai đó có đang xoay xở ổn với trách nhiệm khi người khác vắng mặt hoặc lúc khó khăn không.",
+        "examples": [
+            {
+                "term": "The manager's away again—still holding the fort?",
+                "translation": "Quản lý lại đi vắng rồi—bạn vẫn đang quán xuyến ổn chứ?"
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "content": "You seem in good spirits.",
+        "definition-en": "A positive observation that someone appears cheerful, which can lead into a friendly conversation.",
+        "definition-vi": "Lời nhận xét tích cực rằng ai đó có vẻ vui vẻ, có thể dẫn vào một cuộc trò chuyện thân thiện.",
+        "examples": [
+            {
+                "term": "You seem in good spirits today. Did something nice happen?",
+                "translation": "Hôm nay trông bạn có vẻ vui. Có chuyện gì tốt đẹp xảy ra à?"
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "content": "You look as though you've been run off your feet.",
+        "definition-en": "A sympathetic observation that someone has been extremely busy, often followed by an offer of help.",
+        "definition-vi": "Lời nhận xét đầy cảm thông rằng ai đó đã rất bận rộn, thường đi kèm lời đề nghị giúp đỡ.",
+        "examples": [
+            {
+                "term": "You look as though you've been run off your feet. Sit down and I'll get you some tea.",
+                "translation": "Trông bạn như vừa bận tối mắt tối mũi. Ngồi xuống đi, tôi lấy trà cho bạn."
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "content": "Last time we spoke, you were...",
+        "definition-en": "A thoughtful way to reconnect by recalling something the other person previously mentioned.",
+        "definition-vi": "Cách hỏi thăm tinh tế bằng việc nhắc lại điều người kia từng kể trong lần nói chuyện trước.",
+        "examples": [
+            {
+                "term": "Last time we spoke, you were waiting to hear about the grant. Any news?",
+                "translation": "Lần trước nói chuyện, bạn đang chờ tin về khoản tài trợ. Có tin gì chưa?"
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "content": "You were missed around here.",
+        "definition-en": "A warm way to let someone know their absence was noticed and that they are welcome back.",
+        "definition-vi": "Cách nói ấm áp cho ai đó biết mọi người đã nhận ra sự vắng mặt và vui mừng khi họ quay lại.",
+        "examples": [
+            {
+                "term": "You were missed around here while you were away. The team will be glad you're back.",
+                "translation": "Mọi người ở đây nhớ bạn khi bạn đi vắng. Cả nhóm sẽ rất vui khi bạn trở lại."
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "content": "Good to have you back on your feet.",
+        "definition-en": "A supportive welcome for someone recovering from illness or a difficult period; use sensitively.",
+        "definition-vi": "Lời chào đón và động viên người vừa hồi phục sau bệnh hoặc giai đoạn khó khăn; cần dùng tế nhị.",
+        "examples": [
+            {
+                "term": "Good to have you back on your feet, Rosa. Take it easy this week.",
+                "translation": "Rosa, thật vui khi thấy bạn đã khỏe lại. Tuần này cứ nghỉ ngơi nhé."
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "content": "That smile tells me things are looking up.",
+        "definition-en": "A warm observation suggesting that someone seems happier or that their situation may be improving.",
+        "definition-vi": "Lời nhận xét thân tình, ngụ ý ai đó có vẻ vui hơn hoặc tình hình của họ đang khá lên.",
+        "examples": [
+            {
+                "term": "That smile tells me things are looking up. Did you get the news you were hoping for?",
+                "translation": "Nhìn nụ cười là biết mọi việc đang khá lên rồi. Bạn nhận được tin mình mong đợi à?"
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "content": "We have a lot to catch up on.",
+        "definition-en": "A friendly way to say that you and someone have plenty of news or experiences to share after time apart.",
+        "definition-vi": "Cách nói thân thiện rằng bạn và ai đó có nhiều chuyện cần kể cho nhau sau một thời gian không gặp.",
+        "examples": [
+            {
+                "term": "We have a lot to catch up on—shall we grab coffee next week?",
+                "translation": "Chúng ta có nhiều chuyện để kể cho nhau đấy—tuần sau đi uống cà phê nhé?"
+            }
+        ]
+    }
+]

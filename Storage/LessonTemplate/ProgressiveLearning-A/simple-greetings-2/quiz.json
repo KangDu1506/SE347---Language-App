@@ -1,0 +1,44 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "Which question asks for someone's name?",
+        "options": ["Where are you from?", "What's your name?", "How are you?", "See you later!"],
+        "answer": ["What's your name?"],
+        "explanation": "\"What's your name?\" asks someone to tell you their name.",
+        "translation": "Câu nào dùng để hỏi tên của ai đó?"
+    },
+    {
+        "id": "2",
+        "type": "fill-in-the-blank",
+        "question": "My name <blank> Linh.",
+        "answer": ["is"],
+        "explanation": "Use \"My name is...\" to introduce yourself.",
+        "translation": "Tên tôi là Linh."
+    },
+    {
+        "id": "3",
+        "type": "true-false",
+        "question": "\"Where are you from?\" asks about someone's country or place.",
+        "answer": ["true"],
+        "explanation": "This question asks which place or country someone comes from.",
+        "translation": "\"Bạn đến từ đâu?\" hỏi về đất nước hoặc địa điểm của ai đó."
+    },
+    {
+        "id": "4",
+        "type": "single-choice",
+        "question": "Choose the correct answer to \"Where are you from?\"",
+        "options": ["I'm fine, thank you.", "My name is Tom.", "I'm from Vietnam.", "Nice to meet you."],
+        "answer": ["I'm from Vietnam."],
+        "explanation": "\"I'm from...\" is used to say where you come from.",
+        "translation": "Chọn câu trả lời phù hợp cho câu \"Bạn đến từ đâu?\""
+    },
+    {
+        "id": "5",
+        "type": "fill-in-the-blank",
+        "question": "See you <blank>!",
+        "answer": ["later"],
+        "explanation": "The expression is \"See you later!\"",
+        "translation": "Hẹn gặp lại!"
+    }
+]

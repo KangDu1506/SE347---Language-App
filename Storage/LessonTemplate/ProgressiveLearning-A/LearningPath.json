@@ -1,0 +1,79 @@
+{
+    "id": "english-foundations-and-everyday-communication",
+    "title": "English Foundations and Everyday Communication",
+    "description": "A progressive path through greetings, adjectives, everyday vocabulary, occupations, and common verbs.",
+    "version": 1,
+    "lessons": [
+        { "itemId": "lesson-simple-greetings-1", "order": 1, "lessonId": "simple-greetings-1", "folder": "simple-greetings-1" },
+        { "itemId": "lesson-simple-greetings-2", "order": 2, "lessonId": "simple-greetings-2", "folder": "simple-greetings-2" },
+        { "itemId": "lesson-cardinal-numbers", "order": 3, "lessonId": "cardinal-numbers", "folder": "cardinal-numbers" },
+        { "itemId": "lesson-basic-adjectives-1", "order": 4, "lessonId": "basic-adjectives-1", "folder": "basic-adjectives-1" },
+        { "itemId": "lesson-basic-adjectives-2", "order": 5, "lessonId": "basic-adjectives-2", "folder": "basic-adjectives-2" },
+        { "itemId": "lesson-basic-foods-and-drinks-1", "order": 6, "lessonId": "basic-foods-and-drinks-1", "folder": "basic-foods-and-drinks-1" },
+        { "itemId": "lesson-locations-and-destinations-1", "order": 7, "lessonId": "locations-and-destinations-1", "folder": "locations-and-destinations-1" },
+        { "itemId": "lesson-occupations", "order": 8, "lessonId": "occupations", "folder": "occupations" },
+        { "itemId": "lesson-daily-routine-verbs", "order": 9, "lessonId": "daily-routine-verbs", "folder": "daily-routine-verbs" },
+        { "itemId": "lesson-action-verbs", "order": 10, "lessonId": "action-verbs", "folder": "action-verbs" },
+        { "itemId": "lesson-communication-verbs", "order": 11, "lessonId": "communication-verbs", "folder": "communication-verbs" },
+        { "itemId": "lesson-advanced-greetings-1", "order": 12, "lessonId": "advanced-greetings-1", "folder": "advanced-greetings-1" },
+        { "itemId": "lesson-advanced-greetings-2", "order": 13, "lessonId": "advanced-greetings-2", "folder": "advanced-greetings-2" }
+    ],
+    "branches": [
+        {
+            "id": "ordinal-numbers-and-time",
+            "itemId": "branch-ordinal-numbers-and-time",
+            "title": "Ordinal Numbers and Time",
+            "type": "branch",
+            "required": true,
+            "afterLessonId": "cardinal-numbers",
+            "lessons": [
+                {
+                    "itemId": "lesson-ordinal-numbers",
+                    "order": 1,
+                    "lessonId": "ordinal-numbers",
+                    "folder": "ordinal-numbers",
+                    "prerequisites": ["cardinal-numbers"]
+                },
+                {
+                    "itemId": "lesson-time",
+                    "order": 2,
+                    "lessonId": "time",
+                    "folder": "time",
+                    "prerequisites": ["ordinal-numbers"]
+                }
+            ]
+        },
+        {
+            "id": "foods-and-drinks",
+            "itemId": "branch-foods-and-drinks",
+            "title": "Foods and Drinks",
+            "type": "branch",
+            "required": true,
+            "lessons": [
+                {
+                    "itemId": "lesson-basic-foods-and-drinks-2",
+                    "order": 1,
+                    "lessonId": "basic-foods-and-drinks-2",
+                    "folder": "basic-foods-and-drinks-2",
+                    "prerequisites": ["basic-foods-and-drinks-1"]
+                }
+            ]
+        },
+        {
+            "id": "locations-and-destinations",
+            "itemId": "branch-locations-and-destinations",
+            "title": "Locations and Destinations",
+            "type": "branch",
+            "required": true,
+            "lessons": [
+                {
+                    "itemId": "lesson-locations-and-destinations-2",
+                    "order": 1,
+                    "lessonId": "locations-and-destinations-2",
+                    "folder": "locations-and-destinations-2",
+                    "prerequisites": ["locations-and-destinations-1"]
+                }
+            ]
+        }
+    ]
+}
