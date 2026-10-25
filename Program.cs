@@ -37,6 +37,7 @@ builder.Services.AddSupabaseJwtAuth(builder.Configuration);
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<ILessonService, LessonService>();
 builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 
@@ -145,6 +146,7 @@ app.MapRazorPages()
 app.MapUserEndpoints();
 app.MapAuthEndpoints();
 app.MapProgressEndpoints();
+app.MapLessonEndpoints();
 app.MapHealthEndpoints();
 
 // Kích hoạt Server chạy
