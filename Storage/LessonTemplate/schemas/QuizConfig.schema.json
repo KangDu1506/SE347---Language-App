@@ -1,0 +1,77 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/QuizConfig.schema.json",
+    "title": "Quiz Config",
+    "description": "Metadata and question-content path for an independent quiz.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "title",
+        "description",
+        "questions",
+        "shuffle-questions",
+        "shuffle-answers",
+        "show-results-immediately",
+        "allow-retake",
+        "show-explanations"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "format": "uri-reference"
+        },
+        "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "Unique kebab-case quiz identifier, usually matching its folder name."
+        },
+        "title": {
+            "$ref": "#/$defs/nonEmptyString",
+            "description": "Display title of the quiz."
+        },
+        "description": {
+            "$ref": "#/$defs/nonEmptyString",
+            "description": "Short description of the quiz and what it covers."
+        },
+        "questions": {
+            "$ref": "#/$defs/jsonFilePath",
+            "description": "Path to the QuizContent JSON array, relative to the quiz folder."
+        },
+        "time-limit-seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Optional time limit in seconds. Omit to allow unlimited time."
+        },
+        "shuffle-questions": {
+            "type": "boolean",
+            "description": "Whether to randomize the order of questions for each attempt."
+        },
+        "shuffle-answers": {
+            "type": "boolean",
+            "description": "Whether to randomize answer options for each question."
+        },
+        "show-results-immediately": {
+            "type": "boolean",
+            "description": "Whether to show the quiz result immediately after submission."
+        },
+        "allow-retake": {
+            "type": "boolean",
+            "description": "Whether learners may attempt the quiz again after submitting."
+        },
+        "show-explanations": {
+            "type": "boolean",
+            "description": "Whether to show question explanations with the result."
+        }
+    },
+    "$defs": {
+        "nonEmptyString": {
+            "type": "string",
+            "minLength": 1
+        },
+        "jsonFilePath": {
+            "type": "string",
+            "pattern": "^\\./[A-Za-z0-9_./-]+\\.json$"
+        }
+    }
+}

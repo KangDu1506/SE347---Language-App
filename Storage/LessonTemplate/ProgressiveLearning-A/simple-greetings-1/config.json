@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Simple Greetings 1",
+    "category": "vocabulary",
+    "topic": "Greetings",
+    "description": "Learn common greetings and simple ways to ask and answer how someone is.",
+    "level": "A1",
+    "order": 1,
+    "estimated-minutes": 8,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

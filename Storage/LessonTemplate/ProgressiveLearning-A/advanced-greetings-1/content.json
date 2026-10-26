@@ -1,0 +1,182 @@
+[
+    {
+        "id": "1",
+        "content": "Well, if it isn't [someone]!",
+        "definition-en": "A warm, often playful way to show surprise and welcome when you unexpectedly see someone you know.",
+        "definition-vi": "Cách nói thân mật, thường pha chút vui vẻ, để thể hiện sự ngạc nhiên và chào đón khi bất ngờ gặp người quen.",
+        "examples": [
+            {
+                "term": "Well, if it isn't Maya! I didn't know you were in town.",
+                "translation": "Ồ, chẳng phải Maya đây sao! Mình không biết bạn đang ở trong thành phố."
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "Look who it is!",
+        "definition-en": "A cheerful, informal remark used to welcome someone you recognize, especially as a pleasant surprise.",
+        "definition-vi": "Câu nói thân mật, vui vẻ để chào đón người bạn nhận ra, nhất là khi gặp họ bất ngờ.",
+        "examples": [
+            {
+                "term": "Look who it is! We were just talking about you.",
+                "translation": "Xem ai đây này! Bọn mình vừa nhắc đến bạn."
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "Fancy seeing you here!",
+        "definition-en": "An informal expression of surprise when you meet someone somewhere unexpectedly.",
+        "definition-vi": "Cách nói thân mật thể hiện sự ngạc nhiên khi tình cờ gặp ai đó ở một nơi không ngờ tới.",
+        "examples": [
+            {
+                "term": "Fancy seeing you here! I thought you lived on the other side of town.",
+                "translation": "Thật bất ngờ khi gặp bạn ở đây! Mình tưởng bạn sống ở phía bên kia thành phố."
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "What a pleasant surprise!",
+        "definition-en": "A polite, positive reaction to an unexpected meeting.",
+        "definition-vi": "Câu cảm thán lịch sự, tích cực khi bất ngờ gặp ai đó.",
+        "examples": [
+            {
+                "term": "What a pleasant surprise! It's lovely to run into you.",
+                "translation": "Thật là một bất ngờ thú vị! Gặp bạn ở đây vui quá."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "It's been ages!",
+        "definition-en": "An informal way to say that a long time has passed since you last saw someone.",
+        "definition-vi": "Cách nói thân mật cho biết đã rất lâu kể từ lần cuối bạn gặp ai đó.",
+        "examples": [
+            {
+                "term": "It's been ages! We should find an evening to catch up.",
+                "translation": "Lâu lắm rồi đấy! Chúng ta nên tìm một buổi tối để trò chuyện cập nhật tình hình."
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "content": "Long time no see.",
+        "definition-en": "A familiar, informal expression used when meeting someone after a long absence.",
+        "definition-vi": "Cách nói quen thuộc, thân mật khi gặp lại ai đó sau một thời gian dài.",
+        "examples": [
+            {
+                "term": "Long time no see, Daniel. How have things been at the studio?",
+                "translation": "Lâu rồi không gặp, Daniel. Công việc ở xưởng dạo này thế nào?"
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "content": "It's good to see you again.",
+        "definition-en": "A warm, neutral expression for welcoming someone you have met before.",
+        "definition-vi": "Cách nói ấm áp, trung tính để chào đón người bạn đã từng gặp.",
+        "examples": [
+            {
+                "term": "It's good to see you again. I hope the move went smoothly.",
+                "translation": "Rất vui được gặp lại bạn. Mong là việc chuyển nhà diễn ra suôn sẻ."
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "content": "You haven't changed a bit!",
+        "definition-en": "A friendly, often light-hearted comment when seeing someone after a long time.",
+        "definition-vi": "Lời nhận xét thân thiện, thường mang sắc thái vui vẻ khi gặp lại ai đó sau thời gian dài.",
+        "examples": [
+            {
+                "term": "You haven't changed a bit! You still laugh at the same terrible jokes.",
+                "translation": "Bạn chẳng thay đổi chút nào! Bạn vẫn cười vì mấy câu đùa dở tệ ấy."
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "content": "I was just thinking about you.",
+        "definition-en": "A personal, warm opening that tells someone they recently came to mind.",
+        "definition-vi": "Cách mở đầu thân tình cho biết gần đây bạn vừa nghĩ đến người kia.",
+        "examples": [
+            {
+                "term": "I was just thinking about you when your message came through.",
+                "translation": "Mình vừa nghĩ đến bạn thì tin nhắn của bạn gửi đến."
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "content": "I don't think we've been introduced.",
+        "definition-en": "A polite way to begin speaking to someone whose name you do not know, often in a group setting.",
+        "definition-vi": "Cách lịch sự để bắt chuyện với người bạn chưa biết tên, thường trong một buổi gặp mặt có nhiều người.",
+        "examples": [
+            {
+                "term": "I don't think we've been introduced. I'm Priya, from the design team.",
+                "translation": "Hình như chúng ta chưa được giới thiệu với nhau. Tôi là Priya, ở nhóm thiết kế."
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "content": "You must be [someone].",
+        "definition-en": "A polite way to greet a person you have been expecting or have heard about.",
+        "definition-vi": "Cách lịch sự để chào người mà bạn đang chờ gặp hoặc đã nghe nhắc đến.",
+        "examples": [
+            {
+                "term": "You must be Elena. Sam has told me so much about your research.",
+                "translation": "Chắc hẳn bạn là Elena. Sam đã kể với tôi rất nhiều về nghiên cứu của bạn."
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "content": "I see you found the place.",
+        "definition-en": "A casual, welcoming remark to someone arriving at a venue or gathering.",
+        "definition-vi": "Câu nói thân mật, chào đón người vừa đến địa điểm hoặc buổi gặp mặt.",
+        "examples": [
+            {
+                "term": "I see you found the place! Come in; everyone's in the garden.",
+                "translation": "Vậy là bạn tìm được chỗ này rồi! Vào đi; mọi người đang ở ngoài vườn."
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "content": "You've picked a good day to show up.",
+        "definition-en": "A light-hearted welcome suggesting that something enjoyable or interesting is happening today.",
+        "definition-vi": "Lời chào vui vẻ, ngụ ý hôm nay đang có điều thú vị hoặc đáng mong đợi.",
+        "examples": [
+            {
+                "term": "You've picked a good day to show up—we've just brought out the fresh pastries.",
+                "translation": "Bạn chọn đúng ngày để ghé qua đấy—bánh mới vừa được mang ra."
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "content": "I was beginning to think you'd forgotten about us.",
+        "definition-en": "A teasing, familiar way to welcome someone who has not visited or joined in for a while.",
+        "definition-vi": "Cách chào đón mang tính trêu đùa, thân mật với người đã lâu không ghé thăm hoặc tham gia.",
+        "examples": [
+            {
+                "term": "I was beginning to think you'd forgotten about us! Pull up a chair.",
+                "translation": "Tôi bắt đầu nghĩ là bạn quên bọn tôi rồi đấy! Kéo ghế ngồi đi."
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "content": "It's lovely to finally put a face to the name.",
+        "definition-en": "A friendly expression used when meeting someone in person after hearing or communicating about them before.",
+        "definition-vi": "Cách nói thân thiện khi gặp trực tiếp người mà trước đây bạn chỉ nghe nhắc đến hoặc liên lạc qua mạng.",
+        "examples": [
+            {
+                "term": "It's lovely to finally put a face to the name, Jordan. I've read your articles for years.",
+                "translation": "Jordan, thật vui vì cuối cùng cũng được gặp bạn ngoài đời. Tôi đã đọc bài viết của bạn nhiều năm rồi."
+            }
+        ]
+    }
+]

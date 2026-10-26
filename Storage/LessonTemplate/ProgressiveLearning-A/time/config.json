@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Time",
+    "category": "vocabulary",
+    "topic": "Time and Dates",
+    "description": "Learn years, seasons, months, dates, weekdays, and how to tell exact times using direct and past/to forms.",
+    "level": "A1",
+    "order": 4,
+    "estimated-minutes": 20,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

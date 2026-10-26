@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Action Verbs",
+    "category": "vocabulary",
+    "topic": "Verbs",
+    "description": "Learn common verbs for physical actions and practical activities.",
+    "level": "A1",
+    "order": 13,
+    "estimated-minutes": 20,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

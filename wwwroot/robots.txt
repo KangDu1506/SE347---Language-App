@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /Index
+Disallow: /Study
+Disallow: /TrialTest
+Disallow: /Ranking
+Disallow: /CreateQuiz
+Disallow: /Account/Profile
+Disallow: /Account/Login
+Disallow: /Account/Signup
+Disallow: /Account/Authentication
+Disallow: /Account/ForgetPassword
+Disallow: /Account/ResetPassword
+Disallow: /api/
+
+Sitemap: https://hononu-ead7cjd2f2ftb4hr.malaysiawest-01.azurewebsites.net/sitemap.xml

@@ -1,0 +1,112 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/LearningPath.schema.json",
+    "title": "Learning Path",
+    "description": "LearningPath.json of a learning path folder. Each lesson of the path is a sub-folder named by its lessonId.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["id", "title", "description", "version", "lessons"],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "format": "uri-reference"
+        },
+        "id": {
+            "$ref": "#/$defs/slug",
+            "description": "Stable learning path ID, stored as learning_path_records.learning_path_id."
+        },
+        "title": {
+            "$ref": "#/$defs/nonEmptyString"
+        },
+        "description": {
+            "$ref": "#/$defs/nonEmptyString"
+        },
+        "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Increase when lessons/branches change in a way that affects existing participations."
+        },
+        "lessons": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/lesson" },
+            "description": "Main lessons of the path, in learning order."
+        },
+        "branches": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/branch" }
+        }
+    },
+    "$defs": {
+        "nonEmptyString": {
+            "type": "string",
+            "minLength": 1
+        },
+        "slug": {
+            "type": "string",
+            "maxLength": 100,
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+        },
+        "lesson": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["itemId", "order", "lessonId", "folder"],
+            "properties": {
+                "itemId": {
+                    "type": "string",
+                    "pattern": "^lesson-[a-z0-9]+(-[a-z0-9]+)*$",
+                    "description": "Stable path item ID, stored as learning_path_progress.path_item_id."
+                },
+                "order": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "lessonId": {
+                    "$ref": "#/$defs/slug"
+                },
+                "folder": {
+                    "$ref": "#/$defs/slug",
+                    "description": "Lesson sub-folder inside the learning path folder; must equal lessonId."
+                },
+                "prerequisites": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": { "$ref": "#/$defs/slug" },
+                    "description": "lessonIds of this path that must be completed first."
+                }
+            }
+        },
+        "branch": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "itemId", "title", "type", "required", "lessons"],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/slug"
+                },
+                "itemId": {
+                    "type": "string",
+                    "pattern": "^branch-[a-z0-9]+(-[a-z0-9]+)*$"
+                },
+                "title": {
+                    "$ref": "#/$defs/nonEmptyString"
+                },
+                "type": {
+                    "const": "branch"
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "afterLessonId": {
+                    "$ref": "#/$defs/slug",
+                    "description": "Main lesson after which the branch is shown."
+                },
+                "lessons": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "$ref": "#/$defs/lesson" }
+                }
+            }
+        }
+    }
+}

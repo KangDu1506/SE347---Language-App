@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Locations and Destinations 2",
+    "category": "vocabulary",
+    "topic": "Places",
+    "description": "Learn words for travel destinations, public places, and getting around.",
+    "level": "A1",
+    "order": 10,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

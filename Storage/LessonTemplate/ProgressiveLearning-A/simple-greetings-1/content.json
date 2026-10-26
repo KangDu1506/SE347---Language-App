@@ -1,0 +1,62 @@
+[
+    {
+        "id": "1",
+        "content": "Hello!",
+        "definition-en": "A friendly and polite greeting used when meeting someone.",
+        "definition-vi": "Lời chào thân thiện và lịch sự khi gặp ai đó.",
+        "examples": [
+            {
+                "term": "Hello, Anna!",
+                "translation": "Xin chào, Anna!"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "Good morning!",
+        "definition-en": "A greeting used in the morning.",
+        "definition-vi": "Lời chào được dùng vào buổi sáng.",
+        "examples": [
+            {
+                "term": "Good morning, Mr. Lee.",
+                "translation": "Chào buổi sáng, ông Lee."
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "How are you?",
+        "definition-en": "A common question used to ask about someone's health or feelings.",
+        "definition-vi": "Câu hỏi phổ biến dùng để hỏi thăm sức khỏe hoặc cảm xúc của ai đó.",
+        "examples": [
+            {
+                "term": "Hi, Ben. How are you?",
+                "translation": "Chào Ben. Bạn khỏe không?"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "I'm fine, thank you.",
+        "definition-en": "A polite response meaning that you are well.",
+        "definition-vi": "Câu trả lời lịch sự có nghĩa là bạn vẫn khỏe.",
+        "examples": [
+            {
+                "term": "I'm fine, thank you. And you?",
+                "translation": "Tôi khỏe, cảm ơn bạn. Còn bạn thì sao?"
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "Nice to meet you.",
+        "definition-en": "A polite expression used when you meet someone for the first time.",
+        "definition-vi": "Cách nói lịch sự khi bạn gặp ai đó lần đầu.",
+        "examples": [
+            {
+                "term": "I'm Mia. Nice to meet you.",
+                "translation": "Tôi là Mia. Rất vui được gặp bạn."
+            }
+        ]
+    }
+]

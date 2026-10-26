@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Advanced Greetings 1",
+    "category": "vocabulary",
+    "topic": "Greetings",
+    "description": "Use natural, indirect expressions to open conversations when you unexpectedly meet someone or reconnect after a long time.",
+    "level": "B2",
+    "order": 3,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

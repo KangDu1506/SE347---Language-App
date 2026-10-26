@@ -1,0 +1,62 @@
+[
+    {
+        "id": "1",
+        "content": "What's your name?",
+        "definition-en": "A question used to ask someone for their name.",
+        "definition-vi": "Câu hỏi dùng để hỏi tên của ai đó.",
+        "examples": [
+            {
+                "term": "Hi! What's your name?",
+                "translation": "Chào bạn! Bạn tên là gì?"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "content": "My name is...",
+        "definition-en": "A simple way to tell someone your name.",
+        "definition-vi": "Cách đơn giản để cho ai đó biết tên của bạn.",
+        "examples": [
+            {
+                "term": "My name is Alex.",
+                "translation": "Tên tôi là Alex."
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "content": "Where are you from?",
+        "definition-en": "A question used to ask about someone's home country or place.",
+        "definition-vi": "Câu hỏi dùng để hỏi quê quán hoặc đất nước của ai đó.",
+        "examples": [
+            {
+                "term": "Where are you from, Sara?",
+                "translation": "Sara, bạn đến từ đâu?"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "content": "I'm from...",
+        "definition-en": "A phrase used to say which place or country you come from.",
+        "definition-vi": "Cụm từ dùng để nói bạn đến từ địa điểm hoặc đất nước nào.",
+        "examples": [
+            {
+                "term": "I'm from Vietnam.",
+                "translation": "Tôi đến từ Việt Nam."
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "content": "See you later!",
+        "definition-en": "A friendly expression used to say goodbye when you expect to see someone again.",
+        "definition-vi": "Cách nói thân thiện để tạm biệt khi bạn dự định sẽ gặp lại ai đó.",
+        "examples": [
+            {
+                "term": "Thanks for today. See you later!",
+                "translation": "Cảm ơn bạn về hôm nay. Hẹn gặp lại!"
+            }
+        ]
+    }
+]

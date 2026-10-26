@@ -1,0 +1,70 @@
+[
+    {
+        "id": "1",
+        "type": "single-choice",
+        "question": "You unexpectedly meet a colleague at a concert. Which expression best shows friendly surprise?",
+        "options": ["Fancy seeing you here!", "I don't think we've been introduced.", "It's lovely to put a face to the name.", "I was beginning to think you'd forgotten about us."],
+        "answer": ["Fancy seeing you here!"],
+        "explanation": "\"Fancy seeing you here!\" is a natural informal reaction to an unexpected meeting.",
+        "translation": "Bạn tình cờ gặp một đồng nghiệp ở buổi hòa nhạc. Câu nào thể hiện sự ngạc nhiên thân thiện phù hợp nhất?"
+    },
+    {
+        "id": "2",
+        "type": "fill-in-the-blank",
+        "question": "You are meeting a friend again after many years: \"It's been <blank>!\"",
+        "answer": ["ages"],
+        "explanation": "\"It's been ages!\" means that a very long time has passed since you last met.",
+        "translation": "Bạn gặp lại một người bạn sau nhiều năm: \"Lâu <blank> rồi!\""
+    },
+    {
+        "id": "3",
+        "type": "single-choice",
+        "question": "At a work event, you want to start a polite conversation with someone whose name you do not know. What can you say?",
+        "options": ["Look who it is!", "I don't think we've been introduced.", "You haven't changed a bit!", "I was just thinking about you."],
+        "answer": ["I don't think we've been introduced."],
+        "explanation": "This is a polite way to open a conversation and introduce yourself in a group setting.",
+        "translation": "Tại một sự kiện công việc, bạn muốn lịch sự bắt chuyện với người chưa biết tên. Bạn có thể nói gì?"
+    },
+    {
+        "id": "4",
+        "type": "true-false",
+        "question": "\"I was beginning to think you'd forgotten about us\" is a neutral, formal greeting for a first meeting.",
+        "answer": ["false"],
+        "explanation": "It is a teasing expression for someone familiar who has been away; it is not a neutral formal greeting.",
+        "translation": "\"Tôi bắt đầu nghĩ là bạn quên bọn tôi rồi\" là lời chào trang trọng, trung tính khi gặp lần đầu."
+    },
+    {
+        "id": "5",
+        "type": "single-choice",
+        "question": "Someone arrives at your home after finding the address. Which welcoming remark fits best?",
+        "options": ["I see you found the place.", "You haven't changed a bit.", "It's been ages.", "I was just thinking about you."],
+        "answer": ["I see you found the place."],
+        "explanation": "This casual remark welcomes someone who has just arrived at a venue.",
+        "translation": "Một người vừa tìm được địa chỉ và đến nhà bạn. Câu chào đón nào phù hợp nhất?"
+    },
+    {
+        "id": "6",
+        "type": "fill-in-the-blank",
+        "question": "When you meet someone in person after hearing about them, you can say: \"It's lovely to put a <blank> to the name.\"",
+        "answer": ["face"],
+        "explanation": "The expression is \"put a face to the name,\" meaning to meet someone you previously only knew about.",
+        "translation": "Khi gặp trực tiếp người mà trước đây bạn chỉ nghe nhắc đến, bạn có thể nói: \"Thật vui vì cuối cùng cũng được gắn một <blank> với cái tên ấy.\""
+    },
+    {
+        "id": "7",
+        "type": "single-choice",
+        "question": "Which phrase is a warm way to greet a person you were expecting and have heard about?",
+        "options": ["You must be Elena.", "Long time no see.", "You've picked a good day to show up.", "Look who it is!"],
+        "answer": ["You must be Elena."],
+        "explanation": "\"You must be...\" is a polite way to recognize and welcome someone you were expecting.",
+        "translation": "Câu nào là cách chào đón thân thiện một người bạn đang chờ gặp và đã nghe nhắc đến?"
+    },
+    {
+        "id": "8",
+        "type": "true-false",
+        "question": "\"Look who it is!\" is usually an informal, cheerful way to welcome someone you recognize.",
+        "answer": ["true"],
+        "explanation": "The phrase is an informal, often playful greeting for someone familiar.",
+        "translation": "\"Xem ai đây này!\" thường là cách thân mật, vui vẻ để chào người bạn nhận ra."
+    }
+]

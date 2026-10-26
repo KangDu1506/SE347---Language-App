@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Ordinal Numbers",
+    "category": "grammar",
+    "topic": "Numbers",
+    "description": "Learn how to form and spell ordinal numbers from first to numbers below ten thousand.",
+    "level": "A2",
+    "order": 4,
+    "estimated-minutes": 12,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

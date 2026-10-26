@@ -1,0 +1,65 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://se347-language-app.local/schemas/LearningPathRecord.schema.json",
+    "title": "Learning Path Record",
+    "description": "One user's participation in a specific version of a learning path. Progress for each path item is stored separately.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "recordId",
+        "userId",
+        "learningPathId",
+        "learningPathVersion",
+        "status",
+        "startedAt",
+        "lastActivityAt",
+        "completedAt"
+    ],
+    "properties": {
+        "recordId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for this participation; a user can have multiple records for separate enrollments."
+        },
+        "userId": {
+            "type": "string",
+            "format": "uuid"
+        },
+        "learningPathId": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "learningPathVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Version of the learning path followed in this participation."
+        },
+        "status": {
+            "type": "string",
+            "enum": [
+                "in_progress",
+                "completed",
+                "abandoned"
+            ]
+        },
+        "startedAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "lastActivityAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "completedAt": {
+            "oneOf": [
+                {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                {
+                    "type": "null"
+                }
+            ]
+        }
+    }
+}

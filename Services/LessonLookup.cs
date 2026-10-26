@@ -1,7 +1,7 @@
 namespace SE347.Services
 {
     /// <summary>
-    /// Kiểm tra bài học / mục nội dung có tồn tại trong Storage/LessonTemplate trước khi ghi tiến độ
+    /// Kiểm tra bài học / mục nội dung có tồn tại trong Storage/LessonTemplate (bài lẻ hoặc trong lộ trình) trước khi ghi tiến độ
     /// (bảng tiến độ không có FK tới bài học vì bài học nằm ở file JSON).
     /// Delegate sang ILessonService đã cache toàn bộ bài học trong memory.
     /// </summary>

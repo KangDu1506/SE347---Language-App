@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Basic Adjectives 2",
+    "category": "vocabulary",
+    "topic": "Adjectives",
+    "description": "Learn common adjectives for describing size, age, condition, temperature, speed, and difficulty.",
+    "level": "A1",
+    "order": 6,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": false,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}
