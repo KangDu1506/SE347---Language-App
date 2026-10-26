@@ -124,6 +124,8 @@ namespace SE347.Services
                     {
                         CheckQuestion(lessonFolder, quizFile!, i, quiz[i], errors);
                         CheckAsset(folder, quizFile!, $"/{i}/audio", quiz[i].Audio, errors);
+                        CheckAsset(folder, quizFile!, $"/{i}/image", quiz[i].Image, errors);
+                        CheckAsset(folder, quizFile!, $"/{i}/text", quiz[i].Text, errors);
                     }
                 }
             }
