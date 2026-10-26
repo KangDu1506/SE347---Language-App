@@ -9,6 +9,10 @@
 			"url": "./Storage/LessonTemplate/schemas/QuizContent.schema.json"
 		},
 		{
+			"fileMatch": ["Storage/LessonTemplate/*/LearningPath.json"],
+			"url": "./Storage/LessonTemplate/schemas/LearningPath.schema.json"
+		},
+		{
 			"fileMatch": ["Storage/QuizTemplate/*/questions.json"],
 			"url": "./Storage/LessonTemplate/schemas/QuizContent.schema.json"
 		},
