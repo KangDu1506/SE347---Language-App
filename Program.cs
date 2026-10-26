@@ -6,7 +6,7 @@ using SE347.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// `dotnet run -- validate-lessons`: kiểm tra JSON trong Storage/LessonTemplate theo schema rồi thoát (không chạy web).
+// `dotnet run -- validate-lessons`: kiểm tra JSON bài học + lộ trình trong Storage/LessonTemplate theo schema rồi thoát (không chạy web).
 if (args.Contains("validate-lessons"))
 {
     var validator = new LessonTemplateValidator(Path.Combine(builder.Environment.ContentRootPath, "Storage", "LessonTemplate"));
@@ -17,7 +17,7 @@ if (args.Contains("validate-lessons"))
     }
 
     Console.WriteLine(errors.Count == 0
-        ? $"OK: {validator.LessonFolders().Count()} bài học hợp lệ."
+        ? $"OK: {validator.LessonFolders().Count()} bài học, {validator.LearningPathFolders().Count()} lộ trình hợp lệ."
         : $"Có {errors.Count} lỗi dữ liệu bài học.");
     Environment.ExitCode = errors.Count == 0 ? 0 : 1;
     return;
