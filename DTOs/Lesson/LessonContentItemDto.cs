@@ -48,6 +48,15 @@ namespace SE347.DTOs.Lesson
 
         [JsonPropertyName("antonyms")]
         public List<string> Antonyms { get; set; } = new();
+
+        /// <summary>Bản sao với Image / Audio đã đổi thành URL, để trả xuống trình duyệt.</summary>
+        public LessonContentItemDto WithAssetUrls(Func<string?, string?> assetUrl)
+        {
+            var copy = (LessonContentItemDto)MemberwiseClone();
+            copy.Image = assetUrl(Image);
+            copy.Audio = assetUrl(Audio);
+            return copy;
+        }
     }
 
     public class LessonExampleDto

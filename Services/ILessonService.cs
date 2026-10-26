@@ -33,5 +33,11 @@ namespace SE347.Services
         /// Trả về null nếu bài học không tồn tại.
         /// </summary>
         IReadOnlyList<LessonQuizQuestionDto>? GetQuizQuestions(string lessonId);
+
+        /// <summary>
+        /// Đường dẫn đầy đủ tới file audio/ảnh/txt của bài học (assetPath tương đối với folder bài học).
+        /// Trả về null nếu bài không tồn tại, đuôi file không được phép, đường dẫn ra ngoài folder bài hoặc file không có.
+        /// </summary>
+        string? GetAssetPath(string lessonId, string assetPath);
     }
 }

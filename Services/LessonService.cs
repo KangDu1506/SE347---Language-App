@@ -4,8 +4,10 @@ using SE347.DTOs.Lesson;
 namespace SE347.Services
 {
     /// <summary>
-    /// Service Singleton đọc và cache toàn bộ bài học từ Storage/LessonTemplate lúc khởi động.
+    /// Service Singleton đọc và cache toàn bộ bài học từ Storage/LessonTemplate lúc khởi động
+    /// (bài lẻ và bài trong folder lộ trình, xem <see cref="LessonTemplateLayout"/>); sửa JSON thì phải restart app.
     /// Không trả dữ liệu hard-code và xử lý rõ ràng các trường hợp thiếu file, JSON lỗi.
+    /// Đường dẫn image/audio/text trong JSON được đổi thành URL GET /api/lessons/{lessonId}/assets/...
     /// </summary>
     public class LessonService : ILessonService
     {
@@ -15,6 +17,12 @@ namespace SE347.Services
             PropertyNameCaseInsensitive = true
         };
 
+        /// <summary>Đuôi file được phép tải qua API assets (khớp pattern trong schema), không bao giờ là .json.</summary>
+        private static readonly HashSet<string> AssetExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".mp3", ".m4a", ".ogg", ".wav", ".webp", ".png", ".jpg", ".jpeg", ".svg", ".txt"
+        };
+
         private readonly string _root;
         private readonly ILogger<LessonService> _logger;
         private readonly Dictionary<string, CachedLesson> _lessons = new(StringComparer.Ordinal);
@@ -22,7 +30,7 @@ namespace SE347.Services
         public LessonService(IWebHostEnvironment environment, ILogger<LessonService> logger)
         {
             _logger = logger;
-            _root = Path.Combine(environment.ContentRootPath, "Storage", "LessonTemplate");
+            _root = Path.GetFullPath(Path.Combine(environment.ContentRootPath, "Storage", "LessonTemplate"));
 
             LoadAllLessons();
         }
@@ -88,6 +96,19 @@ namespace SE347.Services
             return _lessons.TryGetValue(lessonId, out var lesson) ? lesson.QuizQuestions : null;
         }
 
+        public string? GetAssetPath(string lessonId, string assetPath)
+        {
+            if (string.IsNullOrWhiteSpace(lessonId) || string.IsNullOrWhiteSpace(assetPath)
+                || !_lessons.TryGetValue(lessonId, out var lesson)
+                || !AssetExtensions.Contains(Path.GetExtension(assetPath)))
+            {
+                return null;
+            }
+
+            var full = ResolveSafePath(lesson.Folder, assetPath);
+            return full is not null && File.Exists(full) ? full : null;
+        }
+
         private void LoadAllLessons()
         {
             if (!Directory.Exists(_root))
@@ -96,24 +117,28 @@ namespace SE347.Services
                 return;
             }
 
-            foreach (var folder in Directory.EnumerateDirectories(_root))
+            foreach (var relativeFolder in LessonTemplateLayout.LessonFolders(_root))
             {
-                var folderName = Path.GetFileName(folder);
-                if (string.IsNullOrEmpty(folderName) || folderName == LessonTemplateValidator.SchemasFolder)
-                {
-                    continue;
-                }
+                var folder = Path.Combine(_root, relativeFolder);
+                var folderName = Path.GetFileName(relativeFolder);
 
                 if (!LessonIds.IsValid(folderName))
                 {
-                    _logger.LogWarning("Bỏ qua thư mục '{Folder}' vì tên thư mục không đúng định dạng slug kebab-case.", folderName);
+                    _logger.LogWarning("Bỏ qua thư mục '{Folder}' vì tên thư mục không đúng định dạng slug kebab-case.", relativeFolder);
                     continue;
                 }
 
-                var configPath = Path.Combine(folder, LessonTemplateValidator.ConfigFile);
+                if (_lessons.TryGetValue(folderName, out var existing))
+                {
+                    _logger.LogWarning("Bỏ qua thư mục '{Folder}' vì LessonId '{LessonId}' đã có ở '{Existing}'.",
+                        relativeFolder, folderName, Path.GetRelativePath(_root, existing.Folder));
+                    continue;
+                }
+
+                var configPath = Path.Combine(folder, LessonTemplateLayout.ConfigFile);
                 if (!File.Exists(configPath))
                 {
-                    _logger.LogWarning("Bài học '{LessonId}' thiếu file '{ConfigFile}'. Bỏ qua bài học này.", folderName, LessonTemplateValidator.ConfigFile);
+                    _logger.LogWarning("Bài học '{LessonId}' thiếu file '{ConfigFile}'. Bỏ qua bài học này.", folderName, LessonTemplateLayout.ConfigFile);
                     continue;
                 }
 
@@ -204,6 +229,8 @@ namespace SE347.Services
                     }
                 }
 
+                string? AssetUrl(string? path) => ToAssetUrl(folderName, path);
+
                 var summary = new LessonSummaryDto(
                     LessonId: folderName,
                     Name: config.Name,
@@ -213,7 +240,7 @@ namespace SE347.Services
                     Level: config.Level,
                     Order: config.Order,
                     EstimatedMinutes: config.EstimatedMinutes,
-                    Image: config.Image,
+                    Image: AssetUrl(config.Image),
                     ContentCount: content.Count,
                     QuestionCount: quizQuestions.Count
                 );
@@ -227,9 +254,9 @@ namespace SE347.Services
                     Level: config.Level,
                     Order: config.Order,
                     EstimatedMinutes: config.EstimatedMinutes,
-                    Image: config.Image,
-                    Contents: content,
-                    Quiz: quizQuestions.Select(QuizQuestionResponseDto.From).ToList(),
+                    Image: AssetUrl(config.Image),
+                    Contents: content.Select(item => item.WithAssetUrls(AssetUrl)).ToList(),
+                    Quiz: quizQuestions.Select(q => QuizQuestionResponseDto.From(q, AssetUrl)).ToList(),
                     QuizSettings: config.QuizSettings ?? new LessonQuizSettingsDto()
                 );
 
@@ -237,6 +264,7 @@ namespace SE347.Services
 
                 _lessons[folderName] = new CachedLesson(
                     LessonId: folderName,
+                    Folder: folder,
                     Config: config,
                     Content: content,
                     QuizQuestions: quizQuestions,
@@ -269,6 +297,12 @@ namespace SE347.Services
             return full;
         }
 
+        /// <summary>"./audio/1.m4a" → "/api/lessons/{lessonId}/assets/audio/1.m4a"; null giữ nguyên null.</summary>
+        private static string? ToAssetUrl(string lessonId, string? relativePath) =>
+            string.IsNullOrWhiteSpace(relativePath)
+                ? null
+                : $"/api/lessons/{lessonId}/assets/{(relativePath.StartsWith("./", StringComparison.Ordinal) ? relativePath[2..] : relativePath)}";
+
         private static int GetCefrLevelOrder(string? level)
         {
             if (string.IsNullOrWhiteSpace(level))
@@ -282,6 +316,7 @@ namespace SE347.Services
 
         private sealed record CachedLesson(
             string LessonId,
+            string Folder,
             LessonConfigDto Config,
             LessonContentDto Content,
             List<LessonQuizQuestionDto> QuizQuestions,

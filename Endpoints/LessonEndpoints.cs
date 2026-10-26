@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.StaticFiles;
 using SE347.Auth;
 using SE347.DTOs.Lesson;
 using SE347.Services;
@@ -12,6 +13,8 @@ namespace SE347.Endpoints
     /// </summary>
     public static class LessonEndpoints
     {
+        private static readonly FileExtensionContentTypeProvider ContentTypes = new();
+
         public static IEndpointRouteBuilder MapLessonEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/lessons").RequireAuthorization();
@@ -22,6 +25,18 @@ namespace SE347.Endpoints
                 if (user.GetUserId() is not Guid)
                 {
                     return Results.Unauthorized();
+                }
+
+                if (!string.IsNullOrWhiteSpace(category)
+                    && !LessonCategories.All.Contains(category.Trim(), StringComparer.OrdinalIgnoreCase))
+                {
+                    return Results.BadRequest(new { error = $"category phải là một trong: {string.Join(", ", LessonCategories.All)}." });
+                }
+
+                if (!string.IsNullOrWhiteSpace(level)
+                    && !CefrLevels.All.Contains(level.Trim(), StringComparer.OrdinalIgnoreCase))
+                {
+                    return Results.BadRequest(new { error = $"level phải là một trong: {string.Join(", ", CefrLevels.All)}." });
                 }
 
                 var lessons = lessonService.GetAll(category, level);
@@ -46,6 +61,21 @@ namespace SE347.Endpoints
                     ? Results.NotFound(new { error = $"Không tìm thấy bài học '{lessonId}'." })
                     : Results.Ok(detail);
             });
+
+            // GET /api/lessons/{lessonId}/assets/{path}: file audio/ảnh/txt của bài học (URL có sẵn trong response chi tiết).
+            // Không yêu cầu đăng nhập vì <audio>/<img> không gửi được Bearer token; chỉ trả đuôi file media/txt,
+            // không bao giờ trả config.json/quiz.json (quiz.json có đáp án).
+            app.MapGet("/api/lessons/{lessonId}/assets/{**path}", (string lessonId, string path, ILessonService lessonService) =>
+            {
+                var file = LessonIds.IsValid(lessonId) ? lessonService.GetAssetPath(lessonId, path) : null;
+                if (file is null)
+                {
+                    return Results.NotFound();
+                }
+
+                var contentType = ContentTypes.TryGetContentType(file, out var type) ? type : "application/octet-stream";
+                return Results.File(file, contentType, enableRangeProcessing: true);
+            }).AllowAnonymous();
 
             return app;
         }

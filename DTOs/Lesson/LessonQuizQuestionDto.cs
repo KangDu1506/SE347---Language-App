@@ -25,6 +25,13 @@ namespace SE347.DTOs.Lesson
         [JsonPropertyName("audio")]
         public string? Audio { get; set; }
 
+        [JsonPropertyName("image")]
+        public string? Image { get; set; }
+
+        /// <summary>File .txt kèm câu hỏi (vd đoạn văn để đọc).</summary>
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
+
         [JsonPropertyName("options")]
         public List<string> Options { get; set; } = new();
 
