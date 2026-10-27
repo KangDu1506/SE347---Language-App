@@ -33,7 +33,7 @@
         <meta charset="UTF-8">
         <partial name="_PreferencesHead" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title data-i18n="@(ViewContext.RouteData.Values["page"]?.ToString() switch { "/Index" => "ui.home", "/Study" => "ui.study", "/Ranking" => "ui.leaderboard", "/Account/Profile" => "ui.profile", "/CreateQuiz" => "ui.create_a_test", "/TrialTest" => "ui.try_a_test", _ => "" })" data-i18n-suffix=" · Wordfox">@(ViewData["Title"] is string title ? $"{title} · Wordfox" : "Wordfox")</title>
+        <title data-i18n="@(ViewContext.RouteData.Values["page"]?.ToString() switch { "/Index" => "ui.home", "/Study" => "ui.study", "/Ranking" => "ui.leaderboard", "/Account/Profile" => "ui.profile", "/CreateQuiz" => "ui.create_a_test", "/TrialTest" => "ui.try_a_test", "/Lesson" => "lesson.page_title", _ => "" })" data-i18n-suffix=" · Wordfox">@(ViewData["Title"] is string title ? $"{title} · Wordfox" : "Wordfox")</title>
         <partial name="_SharedHead" />
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css" />
         <link rel="stylesheet" href="~/css/Shared/Components.css" />

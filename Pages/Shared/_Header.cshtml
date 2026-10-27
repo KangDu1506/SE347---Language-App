@@ -21,7 +21,9 @@
         <nav class="site-nav" aria-label="Điều hướng chính" data-i18n-aria-label="ui.main_navigation">
             @foreach (var link in links)
             {
-                var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase);
+                // Trang chi tiết bài học thuộc mục Học tập
+                var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase)
+                    || (link.Href == "/Study" && string.Equals(currentPage, "/Lesson", StringComparison.OrdinalIgnoreCase));
                 <a class="site-nav__link@(isActive ? " is-active" : string.Empty)" href="@link.Href" aria-current="@(isActive ? "page" : null)">
                     <svg class="site-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="@link.Icon" /></svg>
                     <span data-i18n="@(link.Href switch { "/Index" => "ui.home", "/Study" => "ui.study", "/TrialTest" => "ui.practice_test", "/Ranking" => "ui.rankings", _ => "ui.profile" })">@link.Label</span>
