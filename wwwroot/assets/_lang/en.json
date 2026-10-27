@@ -418,5 +418,10 @@
     "lesson.error_title": "Couldn't load the lesson",
     "lesson.network_text": "Can't reach the server. Check your connection and try again.",
     "lesson.error_text": "The server ran into a problem. Please try again in a few minutes.",
-    "lesson.audio_error": "Couldn't play the audio for this item."
+    "lesson.audio_error": "Couldn't play the audio for this item.",
+    "lesson.aside": "Review and contents",
+    "lesson.review_tag": "Review",
+    "lesson.review_title": "Ready to review?",
+    "lesson.review_text": "Flip cards to remember each item, then answer the check questions.",
+    "lesson.toc": "Contents"
 }
