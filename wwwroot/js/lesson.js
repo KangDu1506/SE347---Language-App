@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Route trang flashcard (SCRUM-58) mà nút "Bắt đầu ôn tập" trỏ tới
     const reviewUrl = id => `/Flashcard/${encodeURIComponent(id)}`;
 
+    // Giọng đọc của trình duyệt cho mục không có file ghi âm; null nếu trình duyệt không hỗ trợ
+    const speech = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window ? window.speechSynthesis : null;
+
     const $ = (selector, root = page) => root.querySelector(selector);
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
 
@@ -104,9 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ipa.hidden = false;
         }
 
+        // Nút nghe: có file ghi âm thì phát file, không có thì đọc bằng giọng tiếng Anh của trình duyệt
+        const audio = field('audio');
         if (item.audio) {
-            const audio = field('audio');
             audio.dataset.src = item.audio;
+            audio.hidden = false;
+        } else if (speech) {
+            audio.dataset.speak = item.content;
             audio.hidden = false;
         }
 
@@ -157,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------- Audio: một trình phát dùng chung, bấm lại để dừng ----------
+    // File ghi âm (item.audio) ưu tiên; mục không có file đọc bằng Web Speech API (speechSynthesis).
     const player = new Audio();
     let playingButton = null;
 
@@ -165,25 +173,60 @@ document.addEventListener('DOMContentLoaded', () => {
         playingButton = null;
     }
 
+    function stopAll() {
+        player.pause();
+        speech?.cancel();
+        resetAudioButton();
+    }
+
+    function audioError(button) {
+        if (playingButton === button) resetAudioButton();
+        window.AppToast?.error(t('lesson.audio_error', 'Không phát được âm thanh của mục này.'));
+    }
+
+    // Giọng tiếng Anh: ưu tiên Anh-Mỹ, không có thì giọng tiếng Anh bất kỳ (danh sách giọng tải không đồng bộ)
+    function englishVoice() {
+        const voices = speech.getVoices().filter(voice => /^en[-_]/i.test(voice.lang));
+        return voices.find(voice => /^en[-_]US/i.test(voice.lang)) || voices[0] || null;
+    }
+
+    function speak(button, text) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.voice = englishVoice();
+        utterance.rate = 0.9;
+        utterance.onend = () => { if (playingButton === button) resetAudioButton(); };
+        utterance.onerror = event => {
+            if (event.error === 'canceled' || event.error === 'interrupted') return; // bị ngắt do bấm sang mục khác
+            audioError(button);
+        };
+        speech.speak(utterance);
+    }
+
     player.addEventListener('ended', resetAudioButton);
 
     page.addEventListener('click', event => {
         const button = event.target.closest('[data-field="audio"]');
         if (!button) return;
         const wasPlaying = playingButton === button;
-        player.pause();
-        resetAudioButton();
+        stopAll();
         if (wasPlaying) return;
 
         playingButton = button;
         button.setAttribute('aria-pressed', 'true');
-        player.src = button.dataset.src;
-        player.play().catch(error => {
-            if (error?.name === 'AbortError') return; // bị ngắt do bấm sang mục khác
-            if (playingButton === button) resetAudioButton();
-            window.AppToast?.error(t('lesson.audio_error', 'Không phát được âm thanh của mục này.'));
-        });
+        if (button.dataset.src) {
+            player.src = button.dataset.src;
+            player.play().catch(error => {
+                if (error?.name === 'AbortError') return; // bị ngắt do bấm sang mục khác
+                audioError(button);
+            });
+        } else {
+            speak(button, button.dataset.speak);
+        }
     });
+
+    // Rời trang thì dừng giọng đọc (speechSynthesis không tự dừng khi chuyển trang trên một số trình duyệt)
+    window.addEventListener('pagehide', stopAll);
 
     // ---------- Bài trước / tiếp theo (theo thứ tự level -> order của GET /api/lessons) ----------
     function setPagerLink(link, lesson) {
