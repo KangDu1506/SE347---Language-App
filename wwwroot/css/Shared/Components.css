@@ -4,6 +4,7 @@
 
 /* ---------- Button ---------- */
 .btn {
+    box-sizing: border-box; /* .btn--block rộng 100% không tràn vì viền/padding */
     display: inline-flex;
     align-items: center;
     justify-content: center;
