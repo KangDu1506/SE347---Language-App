@@ -76,36 +76,50 @@
 .lesson-content h2 { margin: 0 0 20px; font-family: var(--font-display); font-size: 32px; line-height: 1; }
 .lesson-items { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
 
-/* Thẻ mục: nửa trái tô màu (từ + nút nghe, phiên âm, ảnh) | nửa phải (nghĩa, ví dụ, từ liên quan) */
-.lesson-item { display: grid; grid-template-columns: minmax(240px, 36%) minmax(0, 1fr); overflow: hidden; }
-.lesson-item__side { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-right: var(--border-sticker); background: var(--surface-orange); }
+/* Thẻ mục: dải màu trên cùng (số | từ + phiên âm | nút nghe) / thân 2 cột (nghĩa | ví dụ) / từ liên quan */
+.lesson-item { overflow: hidden; }
+.lesson-item__side {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 16px;
+    padding: 16px 22px;
+    border-bottom: var(--border-sticker);
+    background: var(--surface-orange);
+}
 .lesson-item:nth-child(4n + 2) .lesson-item__side { background: var(--surface-mint); }
 .lesson-item:nth-child(4n + 3) .lesson-item__side { background: var(--surface-pink); }
 .lesson-item:nth-child(4n + 4) .lesson-item__side { background: var(--surface-sand); }
 
-/* Câu/từ và nút nghe cùng một hàng */
-.lesson-item__head { display: flex; align-items: flex-start; gap: 12px; }
-.lesson-item__term { flex: 1; min-width: 0; margin: 0; font-family: var(--font-display); font-size: clamp(22px, 2.5vw, 30px); line-height: 1.1; letter-spacing: -.01em; overflow-wrap: anywhere; }
-.lesson-item__ipa { margin: 0; font-family: "Noto Serif", Georgia, "Times New Roman", serif; font-size: 16px; }
-.lesson-item__ipa b { margin-right: 4px; font-family: var(--font-sans); font-size: 11px; letter-spacing: .06em; }
-
-/* Số thứ tự lớn, chữ viền mờ ở góc dưới nửa màu */
-.lesson-item__side::after {
+/* Ô số thứ tự (trang trí; số cho trình đọc màn hình nằm trong span .visually-hidden) */
+.lesson-item__side::before {
     content: attr(data-no);
-    align-self: flex-end;
-    margin-top: auto;
-    padding-top: 12px;
-    color: transparent;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border: var(--border-sticker);
+    border-radius: 12px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sticker-sm);
     font-family: var(--font-display);
-    font-size: 88px;
+    font-size: 19px;
     font-weight: var(--fw-heavy);
-    line-height: .8;
-    -webkit-text-stroke: 3px var(--ink);
-    opacity: .22;
-    pointer-events: none;
+    transform: rotate(-4deg);
 }
 
+.lesson-item__head { display: contents; }
+.lesson-item__term { grid-column: 2; grid-row: 1; margin: 0; font-family: var(--font-display); font-size: clamp(22px, 2.6vw, 30px); line-height: 1.1; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.lesson-item__ipa { grid-column: 2; grid-row: 2; margin: 0; font-family: "Noto Serif", Georgia, "Times New Roman", serif; font-size: 16px; }
+.lesson-item__ipa b { margin-right: 4px; font-family: var(--font-sans); font-size: 11px; letter-spacing: .06em; }
+/* Không có phiên âm (vd. bài nghe): từ/câu canh giữa theo chiều dọc */
+.lesson-item__side:not(:has(.lesson-item__ipa:not([hidden]))) .lesson-item__term { grid-row: 1 / span 2; }
+
 .lesson-item__audio {
+    grid-column: 3;
+    grid-row: 1 / span 2;
     display: grid;
     flex: 0 0 auto;
     width: 46px;
@@ -129,9 +143,11 @@
 .lesson-item__audio[aria-pressed="true"] .lesson-item__wave { animation: lesson-wave .8s ease-in-out infinite alternate; }
 @keyframes lesson-wave { from { opacity: .25; } }
 
-.lesson-item__image { display: block; width: 100%; aspect-ratio: 4 / 3; margin-top: 6px; object-fit: cover; border: var(--border-sticker); border-radius: 12px; background: var(--bg-card); }
+.lesson-item__image { grid-column: 1 / -1; display: block; width: 100%; max-height: 280px; margin-top: 12px; object-fit: cover; border: var(--border-sticker); border-radius: 12px; background: var(--bg-card); }
 
-.lesson-item__main { display: grid; align-content: start; gap: 16px; padding: 22px 24px; }
+.lesson-item__main { display: grid; align-items: start; gap: 18px 32px; padding: 20px 24px 22px; }
+.lesson-item__main:has(> .lesson-item__examples:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.lesson-item__foot { grid-column: 1 / -1; }
 .lesson-item__defs { display: grid; gap: 10px; margin: 0; }
 .lesson-item__def { margin: 0; }
 .lesson-item__def dt { margin-bottom: 2px; color: var(--text-secondary); font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: .06em; text-transform: uppercase; }
@@ -193,10 +209,9 @@
     .lesson-hero .btn--lg { width: 100%; }
     .lesson-message { padding: 28px 22px; }
     .lesson-message__fox { width: 120px; height: 120px; }
-    .lesson-item { grid-template-columns: 1fr; }
-    .lesson-item__side { border-right: 0; border-bottom: var(--border-sticker); padding: 16px 18px; }
-    .lesson-item__side::after { display: none; } /* màn hẹp: không cần lấp khoảng trống */
-    .lesson-item__main { padding: 16px 18px; }
+    .lesson-item__side { gap: 2px 12px; padding: 14px 16px; }
+    .lesson-item__side::before { width: 40px; height: 40px; font-size: 17px; }
+    .lesson-item__main, .lesson-item__main:has(> .lesson-item__examples:not([hidden])) { grid-template-columns: 1fr; padding: 16px 18px; }
     .lesson-item__image { max-height: 220px; }
     .lesson-outro { flex-direction: column; align-items: stretch; padding: 20px; text-align: center; }
     .lesson-outro__fox { align-self: center; margin: -50px 0 0; }
@@ -229,4 +244,4 @@
     .lesson-outro,
     .lesson-pager__link--next
 ) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); }
-[data-theme="dark"] .lesson-item__side::after { -webkit-text-stroke-color: var(--paper-text); }
+[data-theme="dark"] .lesson-item__side::before { border-color: var(--paper-text); box-shadow: 3px 3px 0 var(--paper-text); }
