@@ -2,8 +2,8 @@
 @*
     Chi tiết bài học (SCRUM-57): /Lesson/{lessonId}, ví dụ /Lesson/simple-greetings-1.
     Dữ liệu lấy ở client qua GET /api/lessons/{lessonId} (js/lesson.js), trang chỉ render khung:
-    data-state="loading" | "message" (rỗng, không tìm thấy, lỗi) | "ready".
-    Bố cục: phần đầu (tên bài + số liệu) / cột nội dung + cột phụ dính (ôn tập, mục lục).
+    data-state="loading" | "message" (không tìm thấy, lỗi) | "ready".
+    Bố cục 1 cột canh giữa: phần đầu (tên bài + nút ôn tập | số liệu) / các mục / dải ôn tập / bài trước-sau.
 *@
 @{
     Layout = "_Layout";
@@ -33,22 +33,18 @@
         <section class="lesson-loading" data-state="loading" aria-busy="true" aria-live="polite">
             <p class="visually-hidden" data-i18n="lesson.loading">Đang tải bài học…</p>
             <div class="lesson-skel lesson-skel--hero"></div>
-            <div class="lesson-layout">
-                <div class="lesson-skel-list"><div class="lesson-skel"></div><div class="lesson-skel"></div></div>
-                <div class="lesson-skel lesson-skel--aside"></div>
-            </div>
+            <div class="lesson-skel"></div>
+            <div class="lesson-skel"></div>
         </section>
 
-        @* Rỗng / không tìm thấy / lỗi: lesson.js điền tiêu đề, mô tả, nút *@
+        @* Không tìm thấy / lỗi: lesson.js điền tiêu đề, mô tả, nút *@
         <section class="sticker lesson-message" data-state="message" role="status" hidden>
             <svg class="foxy lesson-message__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
-            <div>
-                <h1 class="lesson-message__title" data-message-title></h1>
-                <p class="lesson-message__text" data-message-text></p>
-                <div class="lesson-message__actions">
-                    <button class="btn btn--ink" type="button" data-action="retry" hidden data-i18n="lesson.retry">Thử lại</button>
-                    <a class="btn" href="/Study" data-i18n="lesson.back_to_study">← Về trang Học tập</a>
-                </div>
+            <h1 class="lesson-message__title" data-message-title></h1>
+            <p class="lesson-message__text" data-message-text></p>
+            <div class="lesson-message__actions">
+                <button class="btn btn--ink" type="button" data-action="retry" hidden data-i18n="lesson.retry">Thử lại</button>
+                <a class="btn" href="/Study" data-i18n="lesson.back_to_study">← Về trang Học tập</a>
             </div>
         </section>
 
@@ -63,63 +59,60 @@
                     </div>
                     <h1 id="lesson-title" lang="en" data-lesson-name></h1>
                     <p class="lesson-hero__desc" lang="en" data-lesson-description></p>
+                    <a class="btn btn--ink btn--lg" data-action="review" href="#" data-i18n="lesson.start_review">Bắt đầu ôn tập →</a>
                 </div>
-                <ul class="lesson-hero__stats">
-                    <li class="lesson-stat"><b data-lesson-minutes></b><span data-i18n="lesson.minutes">phút</span></li>
-                    <li class="lesson-stat"><b data-lesson-count></b><span data-i18n="lesson.items">mục</span></li>
-                    <li class="lesson-stat" data-lesson-quiz-wrap><b data-lesson-quiz></b><span data-i18n="lesson.questions">câu hỏi</span></li>
-                </ul>
+                <div class="lesson-hero__side">
+                    <svg class="foxy lesson-hero__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+                    <ul class="lesson-hero__stats">
+                        <li class="lesson-stat"><b data-lesson-minutes></b><span data-i18n="lesson.minutes">phút</span></li>
+                        <li class="lesson-stat"><b data-lesson-count></b><span data-i18n="lesson.items">mục</span></li>
+                        <li class="lesson-stat" data-lesson-quiz-wrap><b data-lesson-quiz></b><span data-i18n="lesson.questions">câu hỏi</span></li>
+                    </ul>
+                </div>
             </header>
 
-            <div class="lesson-layout">
-                <section class="lesson-content" aria-labelledby="lesson-content-title">
-                    <h2 id="lesson-content-title" data-i18n="lesson.content_title">Nội dung bài học</h2>
-                    <ol class="lesson-items" data-lesson-items></ol>
-                    <div class="sticker lesson-empty" data-lesson-empty hidden>
-                        <svg class="foxy lesson-empty__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
-                        <p data-i18n="lesson.empty_content">Bài học này chưa có nội dung. Quay lại sau nhé!</p>
-                    </div>
+            <section class="lesson-content" aria-labelledby="lesson-content-title">
+                <h2 id="lesson-content-title" data-i18n="lesson.content_title">Nội dung bài học</h2>
+                <ol class="lesson-items" data-lesson-items></ol>
+                <div class="sticker lesson-empty" data-lesson-empty hidden>
+                    <svg class="foxy lesson-empty__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
+                    <p data-i18n="lesson.empty_content">Bài học này chưa có nội dung. Quay lại sau nhé!</p>
+                </div>
+            </section>
 
-                    <nav class="lesson-pager" aria-label="Chuyển bài học" data-i18n-aria-label="lesson.pager">
-                        <a class="sticker press lesson-pager__link lesson-pager__link--prev" data-lesson-prev hidden>
-                            <small data-i18n="lesson.prev">← Bài trước</small>
-                            <b lang="en" data-pager-name></b>
-                        </a>
-                        <a class="sticker press lesson-pager__link lesson-pager__link--next" data-lesson-next hidden>
-                            <small data-i18n="lesson.next">Bài tiếp theo →</small>
-                            <b lang="en" data-pager-name></b>
-                        </a>
-                    </nav>
-                </section>
+            @* Dải ôn tập cuối bài: học xong nội dung là gặp nút ôn *@
+            <section class="sticker lesson-outro" data-lesson-outro aria-labelledby="lesson-outro-title">
+                <svg class="foxy lesson-outro__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-wave" /></svg>
+                <div class="lesson-outro__text">
+                    <h2 id="lesson-outro-title" data-i18n="lesson.outro_title">Học xong rồi? Ôn ngay cho nhớ lâu!</h2>
+                    <p data-i18n="lesson.review_text">Lật thẻ để nhớ từng mục trong bài, rồi làm câu hỏi kiểm tra.</p>
+                </div>
+                <a class="btn btn--ink btn--lg" data-action="review" href="#" data-i18n="lesson.start_review">Bắt đầu ôn tập →</a>
+            </section>
 
-                <aside class="lesson-aside" aria-label="Ôn tập và mục lục" data-i18n-aria-label="lesson.aside">
-                    <section class="sticker lesson-review" data-lesson-review aria-labelledby="lesson-review-title">
-                        <svg class="foxy lesson-review__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-wave" /></svg>
-                        <span class="tag" data-i18n="lesson.review_tag">Ôn tập</span>
-                        <h2 id="lesson-review-title" data-i18n="lesson.review_title">Sẵn sàng ôn tập?</h2>
-                        <p data-i18n="lesson.review_text">Lật thẻ để nhớ từng mục trong bài, rồi làm câu hỏi kiểm tra.</p>
-                        <a class="btn btn--ink btn--lg btn--block" data-action="review" href="#" data-i18n="lesson.start_review">Bắt đầu ôn tập →</a>
-                    </section>
-
-                    <nav class="sticker lesson-toc" data-lesson-toc aria-labelledby="lesson-toc-title">
-                        <h2 id="lesson-toc-title" data-i18n="lesson.toc">Mục lục</h2>
-                        <ol data-lesson-toc-list></ol>
-                    </nav>
-                </aside>
-            </div>
+            <nav class="lesson-pager" aria-label="Chuyển bài học" data-i18n-aria-label="lesson.pager">
+                <a class="sticker press lesson-pager__link lesson-pager__link--prev" data-lesson-prev hidden>
+                    <small data-i18n="lesson.prev">← Bài trước</small>
+                    <b lang="en" data-pager-name></b>
+                </a>
+                <a class="sticker press lesson-pager__link lesson-pager__link--next" data-lesson-next hidden>
+                    <small data-i18n="lesson.next">Bài tiếp theo →</small>
+                    <b lang="en" data-pager-name></b>
+                </a>
+            </nav>
         </article>
     </div>
 
     <template id="lesson-item-template">
         <li class="sticker lesson-item">
             <div class="lesson-item__side" data-field="side">
-                <div class="lesson-item__top">
-                    <span class="visually-hidden" data-field="no"></span>
+                <span class="visually-hidden" data-field="no"></span>
+                <div class="lesson-item__head">
+                    <h3 class="lesson-item__term" lang="en" data-field="content"></h3>
                     <button class="lesson-item__audio" type="button" data-field="audio" aria-pressed="false" hidden aria-label="Nghe phát âm" data-i18n-aria-label="lesson.play_audio" title="Nghe phát âm" data-i18n-title="lesson.play_audio">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" /><path class="lesson-item__wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" /></svg>
                     </button>
                 </div>
-                <h3 class="lesson-item__term" lang="en" data-field="content"></h3>
                 <p class="lesson-item__ipa" data-field="ipa" hidden></p>
                 <img class="lesson-item__image" data-field="image" alt="" loading="lazy" hidden />
             </div>

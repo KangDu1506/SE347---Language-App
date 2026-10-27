@@ -419,9 +419,6 @@
     "lesson.network_text": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
     "lesson.error_text": "Máy chủ đang gặp sự cố. Thử lại sau ít phút.",
     "lesson.audio_error": "Không phát được âm thanh của mục này.",
-    "lesson.aside": "Ôn tập và mục lục",
-    "lesson.review_tag": "Ôn tập",
-    "lesson.review_title": "Sẵn sàng ôn tập?",
     "lesson.review_text": "Lật thẻ để nhớ từng mục trong bài, rồi làm câu hỏi kiểm tra.",
-    "lesson.toc": "Mục lục"
+    "lesson.outro_title": "Học xong rồi? Ôn ngay cho nhớ lâu!"
 }
