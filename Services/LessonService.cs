@@ -26,6 +26,7 @@ namespace SE347.Services
         private readonly string _root;
         private readonly ILogger<LessonService> _logger;
         private readonly Dictionary<string, CachedLesson> _lessons = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, IReadOnlyList<string>> _prerequisites = new(StringComparer.Ordinal);
 
         public LessonService(IWebHostEnvironment environment, ILogger<LessonService> logger)
         {
@@ -33,6 +34,7 @@ namespace SE347.Services
             _root = Path.GetFullPath(Path.Combine(environment.ContentRootPath, "Storage", "LessonTemplate"));
 
             LoadAllLessons();
+            LoadPrerequisites();
         }
 
         public IReadOnlyList<LessonSummaryDto> GetAll(string? category = null, string? level = null)
@@ -96,6 +98,16 @@ namespace SE347.Services
             return _lessons.TryGetValue(lessonId, out var lesson) ? lesson.QuizQuestions : null;
         }
 
+        public IReadOnlyList<string> GetPrerequisites(string lessonId)
+        {
+            if (string.IsNullOrWhiteSpace(lessonId))
+            {
+                return [];
+            }
+
+            return _prerequisites.TryGetValue(lessonId, out var prerequisites) ? prerequisites : [];
+        }
+
         public string? GetAssetPath(string lessonId, string assetPath)
         {
             if (string.IsNullOrWhiteSpace(lessonId) || string.IsNullOrWhiteSpace(assetPath)
@@ -119,7 +131,8 @@ namespace SE347.Services
 
             foreach (var relativeFolder in LessonTemplateLayout.LessonFolders(_root))
             {
-                var folder = Path.Combine(_root, relativeFolder);
+                // GetFullPath đổi "/" trong relativeFolder sang dấu phân cách của OS (Windows) để ResolveSafePath so sánh đúng
+                var folder = Path.GetFullPath(Path.Combine(_root, relativeFolder));
                 var folderName = Path.GetFileName(relativeFolder);
 
                 if (!LessonIds.IsValid(folderName))
@@ -275,6 +288,48 @@ namespace SE347.Services
             }
 
             _logger.LogInformation("Đã khởi tạo thành công {Count} bài học từ {Root}.", _lessons.Count, _root);
+        }
+
+        /// <summary>
+        /// Đọc "prerequisites" của bài chính và bài trong nhánh ở mọi LearningPath.json.
+        /// Chỉ giữ prerequisite trỏ tới bài đã nạp được; LearningPath.json lỗi thì bỏ qua cả lộ trình (bài vẫn mở được).
+        /// </summary>
+        private void LoadPrerequisites()
+        {
+            if (!Directory.Exists(_root))
+            {
+                return;
+            }
+
+            foreach (var pathFolder in LessonTemplateLayout.LearningPathFolders(_root))
+            {
+                LearningPathDto? path;
+                try
+                {
+                    var json = File.ReadAllText(Path.Combine(_root, pathFolder, LessonTemplateLayout.LearningPathFile));
+                    path = JsonSerializer.Deserialize<LearningPathDto>(json, ReadOptions);
+                }
+                catch (Exception ex) when (ex is JsonException or IOException)
+                {
+                    _logger.LogWarning(ex, "Không đọc được {File} của lộ trình '{PathFolder}'. Bỏ qua prerequisites của lộ trình này.",
+                        LessonTemplateLayout.LearningPathFile, pathFolder);
+                    continue;
+                }
+
+                if (path is null)
+                {
+                    continue;
+                }
+
+                foreach (var lesson in path.AllLessons())
+                {
+                    var prerequisites = lesson.Prerequisites.Where(_lessons.ContainsKey).Distinct(StringComparer.Ordinal).ToList();
+                    if (_lessons.ContainsKey(lesson.LessonId) && prerequisites.Count > 0)
+                    {
+                        _prerequisites[lesson.LessonId] = prerequisites;
+                    }
+                }
+            }
         }
 
         private static string? ResolveSafePath(string folder, string relativePath)
