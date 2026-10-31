@@ -38,12 +38,19 @@ namespace SE347.Endpoints
                 return ToResult(await progress.GetLessonProgressAsync(userId, lessonId, ct));
             });
 
-            // POST /api/progress/lessons/{lessonId}/open: ghi nhận user mở bài học
-            group.MapPost("/lessons/{lessonId}/open", async (string lessonId, ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
+            // POST /api/progress/lessons/{lessonId}/open: ghi nhận user mở bài học (403 nếu bài đang khóa)
+            group.MapPost("/lessons/{lessonId}/open", async (string lessonId, ClaimsPrincipal user, IProgressService progress,
+                ILessonService lessons, ILessonAccessService access, CancellationToken ct) =>
             {
                 if (user.GetUserId() is not Guid userId)
                 {
                     return Results.Unauthorized();
+                }
+
+                if (lessons.LessonExists(lessonId)
+                    && await access.CheckLessonAsync(userId, lessonId, ct) is LessonAccess.Locked)
+                {
+                    return LessonEndpoints.Forbidden(LessonAccess.Locked);
                 }
 
                 return ToResult(await progress.MarkLessonOpenedAsync(userId, lessonId, ct));

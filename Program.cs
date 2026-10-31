@@ -40,6 +40,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ILessonService, LessonService>();
 builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
+builder.Services.AddScoped<ILessonAccessService, LessonAccessService>();
 
 // CORS chỉ dùng khi dev: frontend chạy ở origin khác (Live Server, Vite) gọi /api/*.
 // Production phục vụ trang và API cùng origin nên không bật. Danh sách origin: Cors:DevOrigins.
@@ -151,3 +152,6 @@ app.MapHealthEndpoints();
 
 // Kích hoạt Server chạy
 app.Run();
+
+// Cho tests/SE347.Tests dùng WebApplicationFactory<Program>
+public partial class Program { }

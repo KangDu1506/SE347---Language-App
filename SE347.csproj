@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>se347-3ae48838-e899-44eb-85a7-32f9db827d8b</UserSecretsId>
+    <!-- Project test nằm trong tests/, không compile/publish chung với app -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
