@@ -192,6 +192,7 @@ namespace SE347.Services
                 }
             }
 
+            CheckPrerequisiteCycles(file, lists, errors);
             CheckUniqueOrders(file, "/lessons", path.Lessons, errors);
             for (var b = 0; b < path.Branches.Count; b++)
             {
@@ -211,6 +212,50 @@ namespace SE347.Services
             }
 
             return path;
+        }
+
+        /// <summary>
+        /// Prerequisites tạo vòng (A cần B, B cần A) thì các bài trong vòng khóa vĩnh viễn: báo lỗi ở từng bài nằm trong vòng.
+        /// </summary>
+        private static void CheckPrerequisiteCycles(string file, List<(string Pointer, LearningPathLessonDto Lesson)> lists, List<LessonValidationError> errors)
+        {
+            var prerequisites = lists.GroupBy(x => x.Lesson.LessonId)
+                .ToDictionary(g => g.Key, g => g.First().Lesson.Prerequisites);
+            var done = new HashSet<string>();
+            var inCycle = new HashSet<string>();
+
+            foreach (var start in prerequisites.Keys)
+            {
+                Visit(start, []);
+            }
+
+            foreach (var (pointer, lesson) in lists.Where(x => inCycle.Contains(x.Lesson.LessonId)))
+            {
+                errors.Add(new(file, $"{pointer}/prerequisites", $"Bài \"{lesson.LessonId}\" nằm trong vòng prerequisite."));
+            }
+
+            void Visit(string lessonId, List<string> stack)
+            {
+                var index = stack.IndexOf(lessonId);
+                if (index >= 0)
+                {
+                    inCycle.UnionWith(stack.Skip(index));
+                    return;
+                }
+
+                if (done.Contains(lessonId) || !prerequisites.TryGetValue(lessonId, out var next))
+                {
+                    return;
+                }
+
+                stack.Add(lessonId);
+                foreach (var prerequisite in next)
+                {
+                    Visit(prerequisite, stack);
+                }
+                stack.RemoveAt(stack.Count - 1);
+                done.Add(lessonId);
+            }
         }
 
         private static void CheckUniqueOrders(string file, string pointer, List<LearningPathLessonDto> lessons, List<LessonValidationError> errors)

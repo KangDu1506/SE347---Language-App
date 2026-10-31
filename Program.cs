@@ -152,3 +152,6 @@ app.MapHealthEndpoints();
 
 // Kích hoạt Server chạy
 app.Run();
+
+// Cho tests/SE347.Tests dùng WebApplicationFactory<Program>
+public partial class Program { }

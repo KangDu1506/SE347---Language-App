@@ -8,7 +8,8 @@ namespace SE347.Endpoints
 {
     /// <summary>
     /// Minimal API cho dữ liệu bài học (/api/lessons/*).
-    /// Yêu cầu người dùng đã đăng nhập (Bearer token của Supabase).
+    /// Yêu cầu người dùng đã đăng nhập (Bearer token của Supabase); 403 nếu hồ sơ không active
+    /// hoặc bài đang khóa theo prerequisites của lộ trình (ILessonAccessService).
     /// Trả về DTO LessonSummaryDto / LessonDetailResponseDto, không trả đường dẫn nội bộ.
     /// </summary>
     public static class LessonEndpoints
@@ -20,9 +21,10 @@ namespace SE347.Endpoints
             var group = app.MapGroup("/api/lessons").RequireAuthorization();
 
             // GET /api/lessons?category=grammar&level=A1: Lấy danh sách bài học có thể lọc theo category và level
-            group.MapGet("/", (ClaimsPrincipal user, string? category, string? level, ILessonService lessonService) =>
+            group.MapGet("/", async (ClaimsPrincipal user, string? category, string? level, ILessonService lessonService,
+                ILessonAccessService access, CancellationToken ct) =>
             {
-                if (user.GetUserId() is not Guid)
+                if (user.GetUserId() is not Guid userId)
                 {
                     return Results.Unauthorized();
                 }
@@ -39,27 +41,29 @@ namespace SE347.Endpoints
                     return Results.BadRequest(new { error = $"level phải là một trong: {string.Join(", ", CefrLevels.All)}." });
                 }
 
+                if (await access.CheckProfileAsync(userId, ct) is not LessonAccess.Allowed and var denied)
+                {
+                    return Forbidden(denied);
+                }
+
                 var lessons = lessonService.GetAll(category, level);
                 return Results.Ok(lessons);
             });
 
             // GET /api/lessons/{lessonId}: Lấy chi tiết bài học (nội dung và quiz không có đáp án)
-            group.MapGet("/{lessonId}", (string lessonId, ClaimsPrincipal user, ILessonService lessonService) =>
+            group.MapGet("/{lessonId}", async (string lessonId, ClaimsPrincipal user, ILessonService lessonService,
+                ILessonAccessService access, CancellationToken ct) =>
             {
-                if (user.GetUserId() is not Guid)
-                {
-                    return Results.Unauthorized();
-                }
+                var (detail, error) = await GetAccessibleDetailAsync(lessonId, user, lessonService, access, ct);
+                return error ?? Results.Ok(detail);
+            });
 
-                if (!LessonIds.IsValid(lessonId))
-                {
-                    return Results.BadRequest(new { error = "Mã bài học không đúng định dạng." });
-                }
-
-                var detail = lessonService.GetDetail(lessonId);
-                return detail is null
-                    ? Results.NotFound(new { error = $"Không tìm thấy bài học '{lessonId}'." })
-                    : Results.Ok(detail);
+            // GET /api/lessons/{lessonId}/quiz: Câu hỏi quiz của bài (không có answer/explanation/translation), rỗng nếu bài không có quiz
+            group.MapGet("/{lessonId}/quiz", async (string lessonId, ClaimsPrincipal user, ILessonService lessonService,
+                ILessonAccessService access, CancellationToken ct) =>
+            {
+                var (detail, error) = await GetAccessibleDetailAsync(lessonId, user, lessonService, access, ct);
+                return error ?? Results.Ok(detail!.Quiz);
             });
 
             // GET /api/lessons/{lessonId}/assets/{path}: file audio/ảnh/txt của bài học (URL có sẵn trong response chi tiết).
@@ -79,5 +83,38 @@ namespace SE347.Endpoints
 
             return app;
         }
+
+        /// <summary>
+        /// Chi tiết bài nếu user được xem; ngược lại error là 401 / 400 / 404 / 403 (theo thứ tự kiểm tra).
+        /// </summary>
+        private static async Task<(LessonDetailResponseDto? Detail, IResult? Error)> GetAccessibleDetailAsync(
+            string lessonId, ClaimsPrincipal user, ILessonService lessonService, ILessonAccessService access, CancellationToken ct)
+        {
+            if (user.GetUserId() is not Guid userId)
+            {
+                return (null, Results.Unauthorized());
+            }
+
+            if (!LessonIds.IsValid(lessonId))
+            {
+                return (null, Results.BadRequest(new { error = "Mã bài học không đúng định dạng." }));
+            }
+
+            var detail = lessonService.GetDetail(lessonId);
+            if (detail is null)
+            {
+                return (null, Results.NotFound(new { error = $"Không tìm thấy bài học '{lessonId}'." }));
+            }
+
+            var result = await access.CheckLessonAsync(userId, lessonId, ct);
+            return result == LessonAccess.Allowed ? (detail, null) : (null, Forbidden(result));
+        }
+
+        /// <summary>403 kèm code ("lesson_locked" / "profile_inactive") để frontend hiện thông báo theo ngôn ngữ.</summary>
+        internal static IResult Forbidden(LessonAccess access) => Results.Json(
+            access == LessonAccess.Locked
+                ? new { error = "Bài học đang khóa: cần hoàn thành các bài trước.", code = "lesson_locked" }
+                : new { error = "Tài khoản không hoạt động.", code = "profile_inactive" },
+            statusCode: StatusCodes.Status403Forbidden);
     }
 }
