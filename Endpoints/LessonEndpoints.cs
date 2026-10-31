@@ -110,13 +110,11 @@ namespace SE347.Endpoints
             return result == LessonAccess.Allowed ? (detail, null) : (null, Forbidden(result));
         }
 
-        private static IResult Forbidden(LessonAccess access) => Results.Json(
-            new
-            {
-                error = access == LessonAccess.Locked
-                    ? "Bài học đang khóa: cần hoàn thành các bài trước."
-                    : "Tài khoản không hoạt động."
-            },
+        /// <summary>403 kèm code ("lesson_locked" / "profile_inactive") để frontend hiện thông báo theo ngôn ngữ.</summary>
+        internal static IResult Forbidden(LessonAccess access) => Results.Json(
+            access == LessonAccess.Locked
+                ? new { error = "Bài học đang khóa: cần hoàn thành các bài trước.", code = "lesson_locked" }
+                : new { error = "Tài khoản không hoạt động.", code = "profile_inactive" },
             statusCode: StatusCodes.Status403Forbidden);
     }
 }

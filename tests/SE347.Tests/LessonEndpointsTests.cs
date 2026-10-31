@@ -246,6 +246,30 @@ namespace SE347.Tests
         }
 
         [Fact]
+        public async Task LockedLesson_ResponseHasLockedCode_AndOpenProgressIsBlocked()
+        {
+            var (lessonId, _) = LockableLesson();
+            var client = _factory.CreateClientFor(await _factory.CreateUserAsync());
+
+            var detail = await client.GetAsync($"/api/lessons/{lessonId}");
+            var open = await client.PostAsync($"/api/progress/lessons/{lessonId}/open", null);
+
+            Assert.Equal("lesson_locked", (await detail.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
+            Assert.Equal(HttpStatusCode.Forbidden, open.StatusCode);
+            Assert.Equal("lesson_locked", (await open.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
+        }
+
+        [Fact]
+        public async Task InactiveProfile_ResponseHasInactiveCode()
+        {
+            var client = _factory.CreateClientFor(await _factory.CreateUserAsync("blocked"));
+
+            var response = await client.GetAsync("/api/lessons/present-simple-tense");
+
+            Assert.Equal("profile_inactive", (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
+        }
+
+        [Fact]
         public async Task LockedLesson_PrerequisiteInProgress_Returns403()
         {
             var (lessonId, prerequisites) = LockableLesson();

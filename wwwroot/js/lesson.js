@@ -31,6 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const MESSAGES = {
         not_found: ['lesson.not_found_title', 'Không tìm thấy bài học', 'lesson.not_found_text', 'Bài học này không tồn tại hoặc đã bị gỡ. Hãy chọn bài khác ở trang Học tập.'],
+        locked: ['lesson.locked_title', 'Bài học đang khóa', 'lesson.locked_text', 'Hoàn thành các bài trước trong lộ trình để mở bài này.'],
+        inactive: ['lesson.inactive_title', 'Tài khoản không hoạt động', 'lesson.inactive_text', 'Tài khoản của bạn đang bị khóa hoặc đã xóa nên không mở được bài học.'],
         network: ['lesson.error_title', 'Không tải được bài học', 'lesson.network_text', 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.'],
         error: ['lesson.error_title', 'Không tải được bài học', 'lesson.error_text', 'Máy chủ đang gặp sự cố. Thử lại sau ít phút.']
     };
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const [titleKey, title, textKey, text] = MESSAGES[kind];
         setI18n($('[data-message-title]'), titleKey, title);
         setI18n($('[data-message-text]'), textKey, text);
-        $('[data-action="retry"]').hidden = kind === 'not_found';
+        $('[data-action="retry"]').hidden = kind !== 'network' && kind !== 'error';
         show('message');
     }
 
@@ -273,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             if (error.status === 401) return; // AppApi đã chuyển sang trang đăng nhập
             if (error.status === 404 || error.status === 400) showMessage('not_found');
+            else if (error.status === 403) showMessage(error.body?.code === 'lesson_locked' ? 'locked' : 'inactive');
             else showMessage(error.status === 0 ? 'network' : 'error');
         }
     }
