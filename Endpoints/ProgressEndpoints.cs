@@ -7,7 +7,7 @@ namespace SE347.Endpoints
 {
     /// <summary>
     /// /api/progress/*: tiến độ học của user đang đăng nhập (cần Bearer token của Supabase).
-    /// Ghi nhận kết quả flashcard/mini-game/quiz là API của S2-BE-05, gọi IProgressService.
+    /// Ghi nhận kết quả flashcard/mini-game/quiz (SCRUM-62) chấm điểm ở server qua ILearningResultService.
     /// </summary>
     public static class ProgressEndpoints
     {
@@ -56,16 +56,53 @@ namespace SE347.Endpoints
                 return ToResult(await progress.MarkLessonOpenedAsync(userId, lessonId, ct));
             });
 
+            // POST /api/progress/lessons/{lessonId}/contents/{contentId}/complete: flashcard "Nhớ", mục đã học (+XP lần đầu)
+            group.MapPost("/lessons/{lessonId}/contents/{contentId}/complete", async (string lessonId, string contentId, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await results.CompleteContentAsync(userId, lessonId, contentId, ct));
+            });
+
+            // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }] }.
+            // Trả điểm, XP, tiến độ bài và kết quả từng câu (kèm đáp án đúng, giải thích).
+            group.MapPost("/lessons/{lessonId}/quiz", async (string lessonId, SubmitQuizRequestDto request, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await results.SubmitQuizAsync(userId, lessonId, request.Answers, ct));
+            });
+
+            // POST /api/progress/lessons/{lessonId}/complete: hoàn thành bài không có quiz (đã học hết các mục nội dung)
+            group.MapPost("/lessons/{lessonId}/complete", async (string lessonId, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await results.CompleteLessonAsync(userId, lessonId, ct));
+            });
+
             return app;
         }
 
-        private static IResult ToResult(ProgressResult<LessonProgressDto> result) => result.Error switch
+        private static IResult ToResult<T>(ProgressResult<T> result) => result.Error switch
         {
             ProgressError.None => Results.Ok(result.Value),
             ProgressError.LessonNotFound => Results.NotFound(new { error = "Không tìm thấy bài học." }),
             ProgressError.ContentNotFound => Results.NotFound(new { error = "Không tìm thấy nội dung trong bài học." }),
             ProgressError.ProfileNotActive => Results.Json(new { error = "Tài khoản không hoạt động." }, statusCode: StatusCodes.Status403Forbidden),
-            _ => Results.BadRequest(new { error = "Dữ liệu không hợp lệ." }),
+            ProgressError.QuizNotFound => Results.NotFound(new { error = "Bài học không có quiz." }),
+            ProgressError.QuizRequired => Results.Conflict(new { error = "Bài học có quiz, hãy nộp quiz để hoàn thành bài." }),
+            ProgressError.ContentsIncomplete => Results.Conflict(new { error = "Chưa học hết các mục nội dung của bài." }),
+            _ => Results.BadRequest(new { error = result.Detail ?? "Dữ liệu không hợp lệ." }),
         };
     }
 }

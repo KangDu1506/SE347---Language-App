@@ -1,0 +1,6 @@
+<Project>
+  <!-- The web project includes nested .cs files by default; keep test sources in the test assembly. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'SE347'">
+    <Compile Remove="tests/**/*.cs" />
+  </ItemGroup>
+</Project>

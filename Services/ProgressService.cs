@@ -137,7 +137,7 @@ namespace SE347.Services
                 return Task.FromResult(ProgressResult<QuizAttemptResultDto>.Fail(ProgressError.InvalidInput));
             }
 
-            var score = (short)Math.Round(100.0 * correctCount / totalCount, MidpointRounding.AwayFromZero);
+            var score = IProgressService.QuizScore(correctCount, totalCount);
 
             return WriteAsync(userId, lessonId, async (today, ct) =>
             {

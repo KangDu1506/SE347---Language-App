@@ -10,14 +10,20 @@ namespace SE347.Services
         LessonNotFound,
         ContentNotFound,
         InvalidInput,
+        /// <summary>Nộp quiz cho bài không có quiz.</summary>
+        QuizNotFound,
+        /// <summary>Bài có quiz phải hoàn thành bằng cách nộp quiz.</summary>
+        QuizRequired,
+        /// <summary>Đánh dấu hoàn thành bài khi chưa học hết các mục nội dung.</summary>
+        ContentsIncomplete,
     }
 
-    /// <summary>Kết quả ghi tiến độ: Value có khi Error = None.</summary>
-    public record ProgressResult<T>(T? Value, ProgressError Error)
+    /// <summary>Kết quả ghi tiến độ: Value có khi Error = None; Detail là mô tả lỗi cụ thể (nếu có) để trả cho client.</summary>
+    public record ProgressResult<T>(T? Value, ProgressError Error, string? Detail = null)
     {
         public static ProgressResult<T> Ok(T value) => new(value, ProgressError.None);
 
-        public static ProgressResult<T> Fail(ProgressError error) => new(default, error);
+        public static ProgressResult<T> Fail(ProgressError error, string? detail = null) => new(default, error, detail);
     }
 
     /// <summary>
@@ -30,6 +36,10 @@ namespace SE347.Services
     {
         /// <summary>% câu đúng tối thiểu để một lần nộp quiz đánh dấu bài là hoàn thành.</summary>
         const short QuizPassScore = 60;
+
+        /// <summary>Điểm quiz = % câu đúng, làm tròn 0.5 lên.</summary>
+        static short QuizScore(int correctCount, int totalCount) =>
+            (short)Math.Round(100.0 * correctCount / totalCount, MidpointRounding.AwayFromZero);
 
         /// <summary>null nếu user không có hồ sơ hoặc hồ sơ đã xóa.</summary>
         Task<ProgressOverviewDto?> GetOverviewAsync(Guid userId, CancellationToken cancellationToken = default);
