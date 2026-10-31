@@ -89,6 +89,6 @@ Lỗi trả về `{ error }`:
 | Status | Khi nào |
 |---|---|
 | 400 | Bài làm không hợp lệ: thiếu `answers`, `questionId` không có trong bài, một câu trả lời hai lần, đáp án quá dài (quá 20 phần tử hoặc quá 200 ký tự) |
-| 403 | Tài khoản bị khóa hoặc đã xóa |
+| 403 | `code: "lesson_locked"`: bài đang khóa (chưa hoàn thành bài prerequisite). `code: "profile_inactive"`: tài khoản bị khóa hoặc đã xóa |
 | 404 | Không có bài học hoặc mục nội dung, hay nộp quiz cho bài không có quiz |
 | 409 | Gọi `/complete` cho bài có quiz, hoặc khi chưa học hết các mục nội dung |

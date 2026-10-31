@@ -62,7 +62,7 @@ namespace SE347.Services
             }
 
             // XP chỉ cộng ở lần đầu đạt điểm qua bài, làm lại bài đã hoàn thành không cộng thêm.
-            // Hai lần nộp song song cùng lúc vẫn có thể cùng được cộng: chấp nhận vì chỉ xảy ra khi user tự gửi trùng.
+            // RecordQuizAttemptAsync kiểm lại dưới khóa hàng nên hai lần nộp song song không cùng được cộng.
             var correctCount = results.Count(r => r.IsCorrect);
             var passes = IProgressService.QuizScore(correctCount, questions.Count) >= IProgressService.QuizPassScore;
             var xp = passes && current.Value!.Status != UserLessonProgress.StatusCompleted
