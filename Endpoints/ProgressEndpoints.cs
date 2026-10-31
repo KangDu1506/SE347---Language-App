@@ -39,22 +39,15 @@ namespace SE347.Endpoints
             });
 
             // POST /api/progress/lessons/{lessonId}/open: ghi nhận user mở bài học (403 nếu bài đang khóa)
-            group.MapPost("/lessons/{lessonId}/open", async (string lessonId, ClaimsPrincipal user, IProgressService progress,
-                ILessonService lessons, ILessonAccessService access, CancellationToken ct) =>
+            group.MapPost("/lessons/{lessonId}/open", async (string lessonId, ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
             {
                 if (user.GetUserId() is not Guid userId)
                 {
                     return Results.Unauthorized();
                 }
 
-                if (lessons.LessonExists(lessonId)
-                    && await access.CheckLessonAsync(userId, lessonId, ct) is LessonAccess.Locked)
-                {
-                    return LessonEndpoints.Forbidden(LessonAccess.Locked);
-                }
-
                 return ToResult(await progress.MarkLessonOpenedAsync(userId, lessonId, ct));
-            });
+            }).AddEndpointFilter(RequireUnlockedLesson);
 
             // POST /api/progress/lessons/{lessonId}/contents/{contentId}/complete: flashcard "Nhớ", mục đã học (+XP lần đầu)
             group.MapPost("/lessons/{lessonId}/contents/{contentId}/complete", async (string lessonId, string contentId, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
@@ -65,7 +58,7 @@ namespace SE347.Endpoints
                 }
 
                 return ToResult(await results.CompleteContentAsync(userId, lessonId, contentId, ct));
-            });
+            }).AddEndpointFilter(RequireUnlockedLesson);
 
             // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }] }.
             // Trả điểm, XP, tiến độ bài và kết quả từng câu (kèm đáp án đúng, giải thích).
@@ -77,7 +70,7 @@ namespace SE347.Endpoints
                 }
 
                 return ToResult(await results.SubmitQuizAsync(userId, lessonId, request.Answers, ct));
-            });
+            }).AddEndpointFilter(RequireUnlockedLesson);
 
             // POST /api/progress/lessons/{lessonId}/complete: hoàn thành bài không có quiz (đã học hết các mục nội dung)
             group.MapPost("/lessons/{lessonId}/complete", async (string lessonId, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
@@ -88,9 +81,28 @@ namespace SE347.Endpoints
                 }
 
                 return ToResult(await results.CompleteLessonAsync(userId, lessonId, ct));
-            });
+            }).AddEndpointFilter(RequireUnlockedLesson);
 
             return app;
+        }
+
+        /// <summary>
+        /// Chặn ghi tiến độ cho bài đang khóa theo prerequisites (403 lesson_locked).
+        /// Bài không tồn tại / hồ sơ không active để endpoint tự trả 404 / 403.
+        /// </summary>
+        private static async ValueTask<object?> RequireUnlockedLesson(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        {
+            var http = context.HttpContext;
+            if (http.Request.RouteValues["lessonId"] is string lessonId
+                && http.User.GetUserId() is Guid userId
+                && http.RequestServices.GetRequiredService<ILessonService>().LessonExists(lessonId)
+                && await http.RequestServices.GetRequiredService<ILessonAccessService>()
+                    .CheckLessonAsync(userId, lessonId, http.RequestAborted) is LessonAccess.Locked)
+            {
+                return LessonEndpoints.Forbidden(LessonAccess.Locked);
+            }
+
+            return await next(context);
         }
 
         private static IResult ToResult<T>(ProgressResult<T> result) => result.Error switch
@@ -98,7 +110,7 @@ namespace SE347.Endpoints
             ProgressError.None => Results.Ok(result.Value),
             ProgressError.LessonNotFound => Results.NotFound(new { error = "Không tìm thấy bài học." }),
             ProgressError.ContentNotFound => Results.NotFound(new { error = "Không tìm thấy nội dung trong bài học." }),
-            ProgressError.ProfileNotActive => Results.Json(new { error = "Tài khoản không hoạt động." }, statusCode: StatusCodes.Status403Forbidden),
+            ProgressError.ProfileNotActive => LessonEndpoints.Forbidden(LessonAccess.ProfileNotActive),
             ProgressError.QuizNotFound => Results.NotFound(new { error = "Bài học không có quiz." }),
             ProgressError.QuizRequired => Results.Conflict(new { error = "Bài học có quiz, hãy nộp quiz để hoàn thành bài." }),
             ProgressError.ContentsIncomplete => Results.Conflict(new { error = "Chưa học hết các mục nội dung của bài." }),

@@ -58,7 +58,7 @@ namespace SE347.Services
 
         /// <summary>
         /// Lưu một lần nộp quiz đã chấm ở server. Score = % đúng; Score ≥ <see cref="QuizPassScore"/>
-        /// lần đầu thì bài chuyển sang completed.
+        /// lần đầu thì bài chuyển sang completed. xp chỉ được cộng ở lần nộp làm bài chuyển sang completed, các lần khác ghi 0.
         /// </summary>
         Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp, CancellationToken cancellationToken = default);
 

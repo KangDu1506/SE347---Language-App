@@ -144,11 +144,13 @@ namespace SE347.Services
                 await TouchLessonAsync(userId, lessonId, ct);
                 var wasCompleted = await LockLessonStatusAsync(userId, lessonId, ct) == UserLessonProgress.StatusCompleted;
                 var completesNow = !wasCompleted && score >= IProgressService.QuizPassScore;
+                // Đọc trạng thái dưới khóa hàng: lần nộp song song thứ hai thấy completed nên không được cộng XP lần nữa.
+                var awardedXp = completesNow ? xp : 0;
 
                 var attemptId = await _db.Database
                     .SqlQuery<long>($"""
                         insert into public.user_quiz_attempts (user_id, lesson_id, correct_count, total_count, score, xp_awarded)
-                        values ({userId}, {lessonId}, {(short)correctCount}, {(short)totalCount}, {score}, {xp})
+                        values ({userId}, {lessonId}, {(short)correctCount}, {(short)totalCount}, {score}, {awardedXp})
                         returning id as "Value"
                         """)
                     .ToListAsync(ct);
@@ -158,17 +160,17 @@ namespace SE347.Services
                     set quiz_attempts   = quiz_attempts + 1,
                         last_quiz_score = {score},
                         best_quiz_score = greatest(best_quiz_score, {score}),
-                        xp_earned       = xp_earned + {xp},
+                        xp_earned       = xp_earned + {awardedXp},
                         status          = case when {completesNow} then 'completed' else status end,
                         completed_at    = case when {completesNow} then now() else completed_at end
                     where user_id = {userId} and lesson_id = {lessonId}
                     """, ct);
 
-                await RecordActivityAsync(userId, today, xp, lessonsCompleted: completesNow ? 1 : 0, wordsLearned: 0, ct);
+                await RecordActivityAsync(userId, today, awardedXp, lessonsCompleted: completesNow ? 1 : 0, wordsLearned: 0, ct);
 
                 var progress = (await LoadLessonAsync(userId, lessonId, ct))!;
                 return ProgressResult<QuizAttemptResultDto>.Ok(new QuizAttemptResultDto(
-                    attemptId.Single(), (short)correctCount, (short)totalCount, score, xp, completesNow, progress));
+                    attemptId.Single(), (short)correctCount, (short)totalCount, score, awardedXp, completesNow, progress));
             }, cancellationToken);
         }
 

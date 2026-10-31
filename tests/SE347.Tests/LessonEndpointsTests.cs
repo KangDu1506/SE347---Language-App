@@ -260,6 +260,27 @@ namespace SE347.Tests
         }
 
         [Fact]
+        public async Task LockedLesson_LearningResultEndpoints_Return403()
+        {
+            var (lessonId, _) = LockableLesson();
+            var contentId = Lessons.GetDetail(lessonId)!.Contents[0].Id;
+            var client = _factory.CreateClientFor(await _factory.CreateUserAsync());
+
+            var responses = new[]
+            {
+                await client.PostAsync($"/api/progress/lessons/{lessonId}/contents/{contentId}/complete", null),
+                await client.PostAsJsonAsync($"/api/progress/lessons/{lessonId}/quiz", new { answers = Array.Empty<object>() }),
+                await client.PostAsync($"/api/progress/lessons/{lessonId}/complete", null),
+            };
+
+            foreach (var response in responses)
+            {
+                Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+                Assert.Equal("lesson_locked", (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
+            }
+        }
+
+        [Fact]
         public async Task InactiveProfile_ResponseHasInactiveCode()
         {
             var client = _factory.CreateClientFor(await _factory.CreateUserAsync("blocked"));
