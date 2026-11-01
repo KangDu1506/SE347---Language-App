@@ -51,11 +51,13 @@ Các tab cùng origin/scope/lesson đồng bộ qua `storage`; cùng thẻ dùng
 Xóa key/clear storage cũng cập nhật UI. Đồng bộ không đổi index/mặt thẻ và không phát
 event rate, tránh consumer gọi API lặp. Không lưu server, không tính XP/hoàn thành.
 
-Bấm card hoặc Enter/Space khi focus card để lật (không còn nút lật riêng); giữ phím
-không lật liên tục, chọn văn bản không lật. Khung cao `clamp(330px, 52vh, 480px)`
+Bấm card hoặc Enter/Space trên nhãn Mặt trước/Mặt sau (button native bên trong card)
+để lật; không có nút Flip riêng bên dưới. Vùng nội dung focus riêng để cuộn bằng
+Arrow/PageUp/PageDown/Home/End. Vuốt/chọn văn bản không lật. Khung cao `clamp(330px, 52vh, 480px)`
 thống nhất giữa các thẻ/hai mặt. Nội dung dài cuộn bên trong, thanh cuộn được ẩn;
 vị trí nút ngoài thẻ ổn định. Hover trên thiết bị có chuột nhấc thẻ nhẹ và tăng bóng
 sticker; nhấn thẻ có phản hồi ấn xuống. Reduced motion tắt chuyển động, giữ phản hồi bóng.
+Chi tiết nghiệm thu responsive/accessibility: [SCRUM-74](../test/SCRUM_74.md).
 
 Các DOM event bubbling từ `.flashcard-page`:
 
