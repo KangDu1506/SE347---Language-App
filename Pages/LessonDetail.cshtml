@@ -63,9 +63,9 @@
 <main class="lesson-detail-page">
     <div class="detail-wrap">
         <!-- BREADCRUMBS & TOP NAVIGATION -->
-        <nav class="detail-breadcrumb" aria-label="Điều hướng phân cấp">
+        <nav class="detail-breadcrumb" data-i18n-aria-label="detail.breadcrumb_aria" aria-label="Điều hướng phân cấp">
             <a class="btn btn--sm detail-back-btn" href="/Study">
-                <span aria-hidden="true">←</span> Quay lại Bàn cờ lộ trình
+                <span aria-hidden="true">←</span> <span data-i18n="detail.back_to_board">Quay lại Bàn cờ lộ trình</span>
             </a>
             <span class="detail-breadcrumb__separator">/</span>
             <span class="detail-breadcrumb__current">@lessonData.Config.Topic</span>
@@ -81,8 +81,8 @@
                     <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 </span>
                 <div>
-                    <strong>Chế độ dự phòng (Fallback):</strong>
-                    <span>Dữ liệu chi tiết của bài học "<code>@lessonId</code>" đang được cập nhật trên máy chủ. Bạn vẫn có thể xem tóm tắt và trải nghiệm cấu trúc bài học bên dưới.</span>
+                    <strong data-i18n="detail.fallback_title">Chế độ dự phòng (Fallback):</strong>
+                    <span data-i18n="detail.fallback_desc">Dữ liệu chi tiết của bài học "<code>@lessonId</code>" đang được cập nhật trên máy chủ. Bạn vẫn có thể xem tóm tắt và trải nghiệm cấu trúc bài học bên dưới.</span>
                 </div>
             </div>
         }
@@ -93,22 +93,28 @@
                 <div class="detail-hero__badges">
                     <span class="detail-badge detail-badge--level">@lessonData.Config.Level</span>
                     <span class="detail-badge detail-badge--cat">
-                        <span class="detail-badge__icon">@categoryIcon</span> @categoryLabel
+                        <span class="detail-badge__icon">@categoryIcon</span>
+                        <span data-i18n="@(lessonData.Config.Category switch {
+                            "speaking" => "detail.cat_speaking",
+                            "grammar" => "detail.cat_grammar",
+                            "listening" => "detail.cat_listening",
+                            _ => "detail.cat_vocab"
+                        })">@categoryLabel</span>
                     </span>
                     @if (lessonData.Roadmap.IsStandalone)
                     {
-                        <span class="detail-badge detail-badge--standalone">Bài học chuyên đề tự do</span>
+                        <span class="detail-badge detail-badge--standalone" data-i18n="detail.badge_standalone">Bài học chuyên đề tự do</span>
                     }
                     else if (lessonData.Roadmap.IsBranch)
                     {
-                        <span class="detail-badge detail-badge--branch">Nhánh: @lessonData.Roadmap.BranchTitle</span>
+                        <span class="detail-badge detail-badge--branch"><span data-i18n="detail.badge_branch">Nhánh:</span> @lessonData.Roadmap.BranchTitle</span>
                     }
                     else
                     {
-                        <span class="detail-badge detail-badge--main">Mạch chính · Bài @lessonData.Roadmap.Order</span>
+                        <span class="detail-badge detail-badge--main"><span data-i18n="detail.badge_main">Mạch chính · Bài</span> @lessonData.Roadmap.Order</span>
                     }
                 </div>
-                <span class="detail-hero__topic-tag">Chủ đề: @lessonData.Config.Topic</span>
+                <span class="detail-hero__topic-tag"><span data-i18n="detail.topic_prefix">Chủ đề:</span> @lessonData.Config.Topic</span>
             </div>
 
             <div class="detail-hero__main">
@@ -130,8 +136,8 @@
                         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </span>
                     <div>
-                        <b>~@lessonData.Config.EstimatedMinutes phút</b>
-                        <small>Thời gian ước tính</small>
+                        <b>~@lessonData.Config.EstimatedMinutes <span data-i18n="lesson.minutes">phút</span></b>
+                        <small data-i18n="detail.metric_time">Thời gian ước tính</small>
                     </div>
                 </div>
 
@@ -140,8 +146,8 @@
                         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                     </span>
                     <div>
-                        <b>@lessonData.Contents.Count mục</b>
-                        <small>Kiến thức trọng tâm</small>
+                        <b>@lessonData.Contents.Count <span data-i18n="lesson.items">mục</span></b>
+                        <small data-i18n="detail.metric_items">Kiến thức trọng tâm</small>
                     </div>
                 </div>
 
@@ -150,8 +156,8 @@
                         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                     </span>
                     <div>
-                        <b>@lessonData.QuizCount câu</b>
-                        <small>Trắc nghiệm củng cố</small>
+                        <b>@lessonData.QuizCount <span data-i18n="lesson.questions">câu hỏi</span></b>
+                        <small data-i18n="detail.metric_quiz">Trắc nghiệm củng cố</small>
                     </div>
                 </div>
 
@@ -161,34 +167,34 @@
                     </span>
                     <div>
                         <b>+@(Math.Max(10, lessonData.Contents.Count * 2)) XP</b>
-                        <small>Phần thưởng bài học</small>
+                        <small data-i18n="detail.metric_reward">Phần thưởng bài học</small>
                     </div>
                 </div>
             </div>
 
             <!-- HÀNG NÚT CTA HÀNH ĐỘNG CHÍNH -->
             <div class="detail-hero__actions">
-                <a class="btn btn--ink btn--lg detail-cta-btn" href="/TrialTest?lessonId=@lessonId">
+                <a class="btn btn--ink btn--lg detail-cta-btn" href="/TrialTest?lessonId=@lessonId" data-i18n="detail.btn_start_now">
                     Bắt đầu học bài này ngay →
                 </a>
-                <a class="btn btn--lg detail-flashcard-btn" href="/Flashcard/@lessonId">
+                <a class="btn btn--lg detail-flashcard-btn" href="/Flashcard/@lessonId" data-i18n="detail.btn_flashcard">
                     Luyện bằng Flashcard
                 </a>
-                <span class="detail-cta-hint">Đạt từ 60% câu đúng để mở khóa bài kế tiếp</span>
+                <span class="detail-cta-hint" data-i18n="detail.cta_hint">Đạt từ 60% câu đúng để mở khóa bài kế tiếp</span>
             </div>
         </section>
 
         <!-- BỐ CỤC 4 THẺ THÔNG TIN NỬA DƯỚI -->
-        <div class="detail-bottom-section" aria-label="Thông tin chi tiết bài học">
+        <div class="detail-bottom-section" data-i18n-aria-label="detail.bottom_section_aria" aria-label="Thông tin chi tiết bài học">
             <!-- THẺ 1: VỊ TRÍ TRONG LỘ TRÌNH (TRẢI NGANG, CHIỀU CAO NHỎ, DÀN TRẢI BƯỚC THEO CHIỀU NGANG) -->
             <section class="sticker detail-card detail-card--roadmap" aria-labelledby="roadmap-card-title">
                 <div class="roadmap-header-row">
                     <div class="detail-card__head">
-                        <span class="tag">Vị trí lộ trình</span>
-                        <h2 id="roadmap-card-title">Bản đồ học tập</h2>
+                        <span class="tag" data-i18n="detail.roadmap_tag">Vị trí lộ trình</span>
+                        <h2 id="roadmap-card-title" data-i18n="detail.roadmap_title">Bản đồ học tập</h2>
                     </div>
                     <div class="detail-card__action">
-                        <a class="btn btn--sm detail-sidecard__btn" href="/Study">
+                        <a class="btn btn--sm detail-sidecard__btn" href="/Study" data-i18n="detail.view_board_btn">
                             Xem trên Bàn cờ lộ trình →
                         </a>
                     </div>
@@ -198,7 +204,7 @@
                     @if (!string.IsNullOrEmpty(lessonData.Roadmap.PrerequisiteName))
                     {
                         <div class="flow-step flow-step--prev">
-                            <span class="step-label">Bài trước</span>
+                            <span class="step-label" data-i18n="detail.step_prev">Bài trước</span>
                             <span class="step-name" title="@lessonData.Roadmap.PrerequisiteName">@lessonData.Roadmap.PrerequisiteName</span>
                         </div>
                         <div class="flow-arrow" aria-hidden="true">
@@ -208,8 +214,8 @@
 
                     <div class="flow-step flow-step--current">
                         <div class="flow-step__meta-row">
-                            <span class="step-label">Đang xem</span>
-                            <span class="step-tag">
+                            <span class="step-label" data-i18n="detail.step_current">Đang xem</span>
+                            <span class="step-tag" data-i18n="@(lessonData.Roadmap.IsStandalone ? "detail.badge_standalone" : (lessonData.Roadmap.IsBranch ? "study.pill_branch" : "study.pill_main"))">
                                 @(lessonData.Roadmap.IsStandalone ? "Chuyên đề tự do" : (lessonData.Roadmap.IsBranch ? "Nhánh mở rộng" : "Mạch chính"))
                             </span>
                         </div>
@@ -222,7 +228,7 @@
                             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                         </div>
                         <div class="flow-step flow-step--next">
-                            <span class="step-label">Tiếp theo</span>
+                            <span class="step-label" data-i18n="detail.step_next">Tiếp theo</span>
                             <span class="step-name" title="@lessonData.Roadmap.NextLessonName">@lessonData.Roadmap.NextLessonName</span>
                         </div>
                     }
@@ -234,29 +240,29 @@
                 <!-- THẺ 2: CẤU TRÚC BÀI KIỂM TRA TRẮC NGHIỆM -->
                 <section class="sticker detail-card detail-card--quiz" aria-labelledby="quiz-section-title">
                     <div class="detail-card__head">
-                        <span class="tag">Thực hành củng cố</span>
-                        <h2 id="quiz-section-title">Cấu trúc bài trắc nghiệm</h2>
+                        <span class="tag" data-i18n="detail.quiz_tag">Thực hành củng cố</span>
+                        <h2 id="quiz-section-title" data-i18n="detail.quiz_title">Cấu trúc bài trắc nghiệm</h2>
                     </div>
-                    <p class="detail-card__desc">Bài học gồm <b>@(lessonData.QuizCount > 0 ? lessonData.QuizCount : 5) câu trắc nghiệm</b> ngẫu nhiên giúp ghi nhớ phản xạ dài hạn.</p>
+                    <p class="detail-card__desc"><span data-i18n="detail.quiz_desc_prefix">Bài học gồm</span> <b>@(lessonData.QuizCount > 0 ? lessonData.QuizCount : 5) <span data-i18n="detail.quiz_desc_count">câu trắc nghiệm</span></b> <span data-i18n="detail.quiz_desc_suffix">ngẫu nhiên giúp ghi nhớ phản xạ dài hạn.</span></p>
 
                     <div class="quiz-preview-features">
                         <div class="quiz-feature-item">
                             <span class="quiz-feature-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             </span>
-                            <span>Trộn câu hỏi & đáp án tự động</span>
+                            <span data-i18n="detail.quiz_feat1">Trộn câu hỏi & đáp án tự động</span>
                         </div>
                         <div class="quiz-feature-item">
                             <span class="quiz-feature-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .5 2.1 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>
                             </span>
-                            <span>Giải thích chi tiết ngay sau mỗi câu</span>
+                            <span data-i18n="detail.quiz_feat2">Giải thích chi tiết ngay sau mỗi câu</span>
                         </div>
                         <div class="quiz-feature-item">
                             <span class="quiz-feature-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"></path></svg>
                             </span>
-                            <span>Chấm điểm và ghi nhận chuỗi học</span>
+                            <span data-i18n="detail.quiz_feat3">Chấm điểm và ghi nhận chuỗi học</span>
                         </div>
                     </div>
                 </section>
@@ -264,28 +270,28 @@
                 <!-- THẺ 3: GÓC MẸO HỌC CÙNG CÁO FOXY -->
                 <section class="sticker detail-card detail-card--foxy" aria-labelledby="foxy-card-title">
                     <div class="detail-card__head">
-                        <span class="tag">Gợi ý từ trợ lý</span>
+                        <span class="tag" data-i18n="detail.foxy_tag">Gợi ý từ trợ lý</span>
                         <div class="foxy-head-badge">
                             <svg class="foxy foxy-avatar-mini" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
-                            <h2 id="foxy-card-title" class="foxy-card-title">Mẹo học từ Foxy</h2>
+                            <h2 id="foxy-card-title" class="foxy-card-title" data-i18n="detail.foxy_title">Mẹo học từ Foxy</h2>
                         </div>
                     </div>
                     <p class="foxy-advice">
                         @if (lessonData.Config.Category == "speaking")
                         {
-                            <span>"Với bài Giao tiếp, hãy đọc to các câu ví dụ ít nhất 3 lần để cơ miệng quen với ngữ điệu tự nhiên nhé!"</span>
+                            <span data-i18n="detail.foxy_speaking">"Với bài Giao tiếp, hãy đọc to các câu ví dụ ít nhất 3 lần để cơ miệng quen với ngữ điệu tự nhiên nhé!"</span>
                         }
                         else if (lessonData.Config.Category == "grammar")
                         {
-                            <span>"Đừng chỉ học công thức suông. Hãy chú ý các từ khóa dấu hiệu nhận biết và tự đặt 1 câu về bản thân bạn!"</span>
+                            <span data-i18n="detail.foxy_grammar">"Đừng chỉ học công thức suông. Hãy chú ý các từ khóa dấu hiệu nhận biết và tự đặt 1 câu về bản thân bạn!"</span>
                         }
                         else if (lessonData.Config.Category == "listening")
                         {
-                            <span>"Hãy nghe lượt đầu tiên không nhìn chữ, lượt thứ hai đọc theo để tai và não liên kết âm thanh chuẩn xác nhé!"</span>
+                            <span data-i18n="detail.foxy_listening">"Hãy nghe lượt đầu tiên không nhìn chữ, lượt thứ hai đọc theo để tai và não liên kết âm thanh chuẩn xác nhé!"</span>
                         }
                         else
                         {
-                            <span>"Mỗi ngày nhớ các từ cốt lõi này và ứng dụng ngay vào suy nghĩ hằng ngày sẽ giúp bạn nhớ lâu gấp 3 lần!"</span>
+                            <span data-i18n="detail.foxy_vocab">"Mỗi ngày nhớ các từ cốt lõi này và ứng dụng ngay vào suy nghĩ hằng ngày sẽ giúp bạn nhớ lâu gấp 3 lần!"</span>
                         }
                     </p>
                 </section>
@@ -293,33 +299,33 @@
                 <!-- THẺ 4: PHẦN THƯỞNG HOÀN THÀNH -->
                 <section class="sticker detail-card detail-card--rewards" aria-labelledby="rewards-card-title">
                     <div class="detail-card__head">
-                        <span class="tag">Phần thưởng</span>
-                        <h2 id="rewards-card-title">Sau khi hoàn thành</h2>
+                        <span class="tag" data-i18n="detail.rewards_tag">Phần thưởng</span>
+                        <h2 id="rewards-card-title" data-i18n="detail.rewards_title">Sau khi hoàn thành</h2>
                     </div>
                     <ul class="rewards-checklist">
                         <li>
                             <span class="reward-icon-badge reward-icon-badge--star" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                             </span>
-                            <span><b>3 Sao vàng</b> cho bảng xếp hạng tuần</span>
+                            <span><b>3 <span data-i18n="study.unit_stars">Sao vàng</span></b> <span data-i18n="detail.reward_stars">cho bảng xếp hạng tuần</span></span>
                         </li>
                         <li>
                             <span class="reward-icon-badge reward-icon-badge--xp" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                             </span>
-                            <span><b>+@(Math.Max(10, lessonData.Contents.Count * 2)) XP</b> điểm kinh nghiệm tích lũy</span>
+                            <span><b>+@(Math.Max(10, lessonData.Contents.Count * 2)) XP</b> <span data-i18n="detail.reward_xp">điểm kinh nghiệm tích lũy</span></span>
                         </li>
                         <li>
                             <span class="reward-icon-badge reward-icon-badge--streak" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
                             </span>
-                            <span><b>+1 ngày streak</b> duy trì thói quen học</span>
+                            <span><b>+1 <span data-i18n="ui.day_streak">ngày liên tục</span></b> <span data-i18n="detail.reward_streak">duy trì thói quen học</span></span>
                         </li>
                         <li>
                             <span class="reward-icon-badge reward-icon-badge--unlock" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
                             </span>
-                            <span>Mở khóa bài học kế tiếp trên bản đồ</span>
+                            <span data-i18n="detail.reward_unlock">Mở khóa bài học kế tiếp trên bản đồ</span>
                         </li>
                     </ul>
                 </section>

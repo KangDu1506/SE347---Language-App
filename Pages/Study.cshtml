@@ -39,7 +39,7 @@
             <h1 id="study-title"><span data-i18n="study.title_a">Học</span> <span class="study-head__accent" data-i18n="study.title_b">tập</span></h1>
             <div class="sticker study-level">
                 <b>A2</b>
-                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small data-i18n="study.level_meta">@CompletedCount/@TotalBoardCount bài · 1.247 từ Oxford</small></p>
+                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small>@CompletedCount/@TotalBoardCount <span data-i18n="study.lessons_unit">bài</span> · 1.247 <span data-i18n="study.oxford_words">từ Oxford</span></small></p>
             </div>
         </section>
 
@@ -48,24 +48,24 @@
             <div class="study-board__head">
                 <div>
                     <span class="tag" data-i18n="study.board_tag">Bàn cờ lộ trình</span>
-                    <h2 id="study-board-title">Lộ trình học tập phân nhánh</h2>
+                    <h2 id="study-board-title" data-i18n="study.board_branch_title">Lộ trình học tập phân nhánh</h2>
                     <div class="study-board__legend" aria-hidden="true">
-                        <span class="legend-item"><span class="legend-dot legend-dot--main"></span> Mạch chính</span>
-                        <span class="legend-item"><span class="legend-dot legend-dot--branch"></span> Nhánh mở rộng</span>
-                        <span class="legend-item"><span class="legend-dot legend-dot--current"></span> Đang học</span>
+                        <span class="legend-item"><span class="legend-dot legend-dot--main"></span> <span data-i18n="study.legend_main">Mạch chính</span></span>
+                        <span class="legend-item"><span class="legend-dot legend-dot--branch"></span> <span data-i18n="study.legend_branch">Nhánh mở rộng</span></span>
+                        <span class="legend-item"><span class="legend-dot legend-dot--current"></span> <span data-i18n="study.legend_current">Đang học</span></span>
                     </div>
                 </div>
                 <div class="study-board__controls">
-                    <span class="study-board__stars-pill">⭐ @CompletedCount/@TotalBoardCount bài đã học</span>
+                    <span class="study-board__stars-pill">⭐ @CompletedCount/@TotalBoardCount <span data-i18n="study.lessons_completed">bài đã học</span></span>
                     <div class="study-board__btn-group">
-                        <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-left" aria-label="Cuộn sang trái">◀</button>
-                        <button type="button" class="btn btn--sm btn--ink study-board__nav-btn" id="study-scroll-current" title="Di chuyển tới bài đang học">Vị trí hiện tại</button>
-                        <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-right" aria-label="Cuộn sang phải">▶</button>
+                        <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-left" data-i18n-aria-label="study.scroll_left" aria-label="Cuộn sang trái">◀</button>
+                        <button type="button" class="btn btn--sm btn--ink study-board__nav-btn" id="study-scroll-current" data-i18n-title="study.scroll_current_title" data-i18n="study.current_position" title="Di chuyển tới bài đang học">Vị trí hiện tại</button>
+                        <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-right" data-i18n-aria-label="study.scroll_right" aria-label="Cuộn sang phải">▶</button>
                     </div>
                 </div>
             </div>
 
-            <div class="study-board__viewport" id="study-board-viewport" tabindex="0" role="region" aria-label="Bản đồ lộ trình học tập">
+            <div class="study-board__viewport" id="study-board-viewport" tabindex="0" role="region" data-i18n-aria-label="study.map_aria_label" aria-label="Bản đồ lộ trình học tập">
                 <div class="study-board__canvas" id="study-board-canvas" style="--total-cols: @MaxCol;">
                     <!-- Lớp SVG vẽ các đường cong nối Bézier (đã bỏ đầu mũi tên) -->
                     <svg class="study-board__svg" id="study-board-svg" aria-hidden="true"></svg>
@@ -88,29 +88,33 @@
                             }
 
                             <div class="study-node__header">
-                                <span class="study-node__pill @(node.IsBranch ? "study-node__pill--branch" : "study-node__pill--main")">
+                                <span class="study-node__pill @(node.IsBranch ? "study-node__pill--branch" : "study-node__pill--main")" data-i18n="@(node.IsBranch ? "study.pill_branch" : "study.pill_main")">
                                     @(node.IsBranch ? "Nhánh" : "Chính")
                                 </span>
                                 <span class="study-node__level">@node.Level</span>
                                 <span class="study-node__badge">
                                     @if (node.State == "done")
                                     {
-                                        <span class="badge-done" title="Đã hoàn thành">✓</span>
+                                        <span class="badge-done" data-i18n-title="study.status_done" title="Đã hoàn thành">✓</span>
                                     }
                                     else if (node.State == "current")
                                     {
-                                        <span class="badge-current" title="Đang học">▶</span>
+                                        <span class="badge-current" data-i18n-title="study.status_current" title="Đang học">▶</span>
                                     }
                                     else
                                     {
-                                        <span class="badge-locked" title="Chưa mở khóa">🔒</span>
+                                        <span class="badge-locked" data-i18n-title="study.status_locked" title="Chưa mở khóa">🔒</span>
                                     }
                                 </span>
                             </div>
 
                             <div class="study-node__content">
                                 <h3 class="study-node__title" title="@node.Name">@node.Name</h3>
-                                <span class="study-node__cat">
+                                <span class="study-node__cat" data-i18n="@(node.Category switch {
+                                    "speaking" => "study.cat_speaking",
+                                    "grammar" => "ui.grammar",
+                                    _ => "ui.vocabulary"
+                                })">
                                     @(node.Category switch {
                                         "speaking" => "Giao tiếp",
                                         "grammar" => "Ngữ pháp",
@@ -122,15 +126,15 @@
                             <div class="study-node__footer">
                                 @if (node.State == "done")
                                 {
-                                    <span class="study-node__status-text study-node__status-text--done">Đã xong · 3★</span>
+                                    <span class="study-node__status-text study-node__status-text--done" data-i18n="study.done_stars">Đã xong · 3★</span>
                                 }
                                 else if (node.State == "current")
                                 {
-                                    <a class="btn btn--sm btn--ink study-node__btn" href="/LessonDetail?id=@node.Id">Vào học →</a>
+                                    <a class="btn btn--sm btn--ink study-node__btn" href="/LessonDetail?id=@node.Id" data-i18n="study.btn_start">Vào học →</a>
                                 }
                                 else
                                 {
-                                    <span class="study-node__status-text study-node__status-text--locked">Mở sau bài trước</span>
+                                    <span class="study-node__status-text study-node__status-text--locked" data-i18n="study.note_locked">Mở sau bài trước</span>
                                 }
                             </div>
                         </article>
@@ -141,17 +145,19 @@
 
         <!-- THƯ VIỆN CHỦ ĐỀ & DANH SÁCH BÀI HỌC (ĐÃ LỌC BỎ BÀI KIỂM TRA Ở CUỐI) -->
         <div class="study-lower">
-            <aside class="sticker study-lib" aria-label="Thư viện chủ đề bài học">
+            <aside class="sticker study-lib" data-i18n-aria-label="study.library_aria_label" aria-label="Thư viện chủ đề bài học">
                 <div class="study-lib__head">
                     <span class="tag" data-i18n="study.library_tag">Thư viện</span>
                     <button type="button"
                             class="study-lib__toggle-all"
                             id="study-lib-toggle-all"
                             data-state="expand"
+                            data-i18n-title="study.toggle_all_title"
+                            data-i18n-aria-label="study.toggle_all_label"
                             title="Mở rộng tất cả các danh mục"
                             aria-label="Mở hoặc thu gọn tất cả danh mục">
                         <span class="toggle-all__icon" aria-hidden="true">⊞</span>
-                        <span class="toggle-all__text">Mở tất cả</span>
+                        <span class="toggle-all__text" data-i18n="study.expand_all">Mở tất cả</span>
                     </button>
                 </div>
 
@@ -161,21 +167,27 @@
                     <input type="text"
                            id="study-search-input"
                            class="study-search-input"
+                           data-i18n-placeholder="study.search_placeholder"
+                           data-i18n-aria-label="study.search_aria_label"
                            placeholder="Tìm bài học (vd: present, greetings, coffee)..."
                            aria-label="Tìm kiếm chủ đề bài học"
                            autocomplete="off" />
                     <button type="button"
                             id="study-search-clear"
                             class="study-search-clear"
+                            data-i18n-title="study.search_clear_title"
+                            data-i18n-aria-label="study.search_clear_label"
                             title="Xóa nội dung tìm kiếm"
                             aria-label="Xóa nội dung tìm kiếm"
                             hidden>✕</button>
                     <button type="button"
                             id="study-search-btn"
                             class="study-search-btn"
+                            data-i18n-title="study.search_btn_title"
+                            data-i18n-aria-label="study.search_btn_label"
                             title="Tìm kiếm"
                             aria-label="Thực hiện tìm kiếm">
-                        <span>Tìm</span>
+                        <span data-i18n="study.search_btn_text">Tìm</span>
                     </button>
                 </div>
 
@@ -260,58 +272,58 @@
         <section class="study-recs" aria-labelledby="study-recs-title">
             <div class="study-recs__head">
                 <div>
-                    <span class="tag">Chuyên đề tự do</span>
-                    <h2 id="study-recs-title">Gợi ý bài học ngoài lộ trình</h2>
+                    <span class="tag" data-i18n="study.standalone_tag">Chuyên đề tự do</span>
+                    <h2 id="study-recs-title" data-i18n="study.standalone_title">Gợi ý bài học ngoài lộ trình</h2>
                 </div>
-                <p>3 bài học chuyên sâu về Nghe hiểu, Ngữ pháp và Từ vựng nâng cao sẵn sàng học ngay.</p>
+                <p data-i18n="study.standalone_desc">3 bài học chuyên sâu về Nghe hiểu, Ngữ pháp và Từ vựng nâng cao sẵn sàng học ngay.</p>
             </div>
             <div class="study-rec-grid">
                 <!-- BÀI 1: AT THE COFFEE SHOP (LISTENING) -->
                 <article class="sticker press study-rec">
-                    <span class="study-rec__hot">NGHE HIỂU</span>
+                    <span class="study-rec__hot" data-i18n="study.rec_listening">NGHE HIỂU</span>
                     <div class="study-rec__art study-rec__art--wave" aria-hidden="true">
                         <span class="study-rec__play">▶</span>
                         <span class="study-rec__bars">@foreach (var h in new[] { 30, 70, 45, 90, 55, 80, 35, 65, 95, 50, 75, 40, 60, 85, 30 }) { <i style="--h: @(h)%"></i> }</span>
                         <span class="study-rec__time">0:42</span>
                     </div>
-                    <span class="tag">Nghe hiểu · A2</span>
+                    <span class="tag" data-i18n="study.rec_listening_tag">Nghe hiểu · A2</span>
                     <h3>At the Coffee Shop</h3>
-                    <p>Luyện nghe hội thoại thực tế giữa khách hàng và barista tại quán cà phê.</p>
+                    <p data-i18n="study.rec_coffee_desc">Luyện nghe hội thoại thực tế giữa khách hàng và barista tại quán cà phê.</p>
                     <div class="study-rec__row">
-                        <span>8 phút · <b>+16 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=at-the-coffee-shop">Học ngay →</a>
+                        <span data-i18n="study.rec_coffee_time">8 phút · <b>+16 XP</b></span>
+                        <a class="btn btn--sm" href="/LessonDetail?id=at-the-coffee-shop" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
 
                 <!-- BÀI 2: PRESENT SIMPLE TENSE (GRAMMAR) -->
                 <article class="sticker press study-rec">
-                    <span class="study-rec__hot">NGỮ PHÁP</span>
+                    <span class="study-rec__hot" data-i18n="study.rec_grammar">NGỮ PHÁP</span>
                     <div class="study-rec__art study-rec__art--chat" aria-hidden="true" lang="en">
                         <span class="study-bubble">He works at a bank in Hanoi.</span>
                         <span class="study-bubble study-bubble--me">Do you play tennis every Sunday?</span>
                     </div>
-                    <span class="tag">Ngữ pháp · A1</span>
+                    <span class="tag" data-i18n="study.rec_grammar_tag">Ngữ pháp · A1</span>
                     <h3>Present Simple Tense</h3>
-                    <p>Thì hiện tại đơn diễn tả thói quen, chân lý và lịch trình thường nhật.</p>
+                    <p data-i18n="study.rec_present_desc">Thì hiện tại đơn diễn tả thói quen, chân lý và lịch trình thường nhật.</p>
                     <div class="study-rec__row">
-                        <span>15 phút · <b>+30 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=present-simple-tense">Học ngay →</a>
+                        <span data-i18n="study.rec_present_time">15 phút · <b>+30 XP</b></span>
+                        <a class="btn btn--sm" href="/LessonDetail?id=present-simple-tense" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
 
                 <!-- BÀI 3: AMBIGUOUS, VAGUE, EQUIVOCAL, OBSCURE (VOCABULARY) -->
                 <article class="sticker press study-rec">
-                    <span class="study-rec__hot">TỪ VỰNG</span>
+                    <span class="study-rec__hot" data-i18n="study.rec_vocab">TỪ VỰNG</span>
                     <div class="study-rec__art study-rec__art--chat" aria-hidden="true" lang="en">
                         <span class="study-bubble">His reply was very ambiguous.</span>
                         <span class="study-bubble study-bubble--me">The instructions remain vague.</span>
                     </div>
-                    <span class="tag">Từ vựng · B2</span>
+                    <span class="tag" data-i18n="study.rec_vocab_tag">Từ vựng · B2</span>
                     <h3>Ambiguous, Vague, Equivocal, Obscure</h3>
-                    <p>Phân biệt 4 tính từ cao cấp chỉ tính chất mơ hồ, khó hiểu và đa nghĩa.</p>
+                    <p data-i18n="study.rec_ambiguous_desc">Phân biệt 4 tính từ cao cấp chỉ tính chất mơ hồ, khó hiểu và đa nghĩa.</p>
                     <div class="study-rec__row">
-                        <span>10 phút · <b>+20 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=ambiguous-vague-equivocal-obscure">Học ngay →</a>
+                        <span data-i18n="study.rec_ambiguous_time">10 phút · <b>+20 XP</b></span>
+                        <a class="btn btn--sm" href="/LessonDetail?id=ambiguous-vague-equivocal-obscure" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
             </div>

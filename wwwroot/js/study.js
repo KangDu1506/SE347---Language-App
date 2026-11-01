@@ -19,13 +19,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (openCount > 0) {
             toggleAllBtn.setAttribute('data-state', 'collapse');
             if (iconSpan) iconSpan.textContent = '⊟';
-            if (textSpan) textSpan.textContent = 'Thu gọn tất cả';
-            toggleAllBtn.setAttribute('title', 'Thu gọn tất cả các danh mục');
+            if (textSpan) {
+                textSpan.textContent = window.AppI18n?.t('study.collapse_all', 'Thu gọn tất cả');
+                textSpan.setAttribute('data-i18n', 'study.collapse_all');
+            }
+            const tip = window.AppI18n?.t('study.toggle_all_title', 'Thu gọn tất cả các danh mục');
+            toggleAllBtn.setAttribute('title', tip);
+            toggleAllBtn.setAttribute('data-i18n-title', 'study.toggle_all_title');
         } else {
             toggleAllBtn.setAttribute('data-state', 'expand');
             if (iconSpan) iconSpan.textContent = '⊞';
-            if (textSpan) textSpan.textContent = 'Mở tất cả';
-            toggleAllBtn.setAttribute('title', 'Mở rộng tất cả các danh mục');
+            if (textSpan) {
+                textSpan.textContent = window.AppI18n?.t('study.expand_all', 'Mở tất cả');
+                textSpan.setAttribute('data-i18n', 'study.expand_all');
+            }
+            const tip = window.AppI18n?.t('study.toggle_all_title', 'Mở rộng tất cả các danh mục');
+            toggleAllBtn.setAttribute('title', tip);
+            toggleAllBtn.setAttribute('data-i18n-title', 'study.toggle_all_title');
         }
     }
 
@@ -189,17 +199,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (searchMeta) {
-            searchMeta.innerHTML = `<span class="study-search-count">Tìm thấy <b>${matches.length}</b> bài học cho "${escapeHtml(rawQuery)}"</span>`;
+            const foundPrefix = window.AppI18n?.t('study.search_found_prefix', 'Tìm thấy');
+            const foundSuffix = window.AppI18n?.t('study.search_found_suffix', 'bài học cho');
+            searchMeta.innerHTML = `<span class="study-search-count">${escapeHtml(foundPrefix)} <b>${matches.length}</b> ${escapeHtml(foundSuffix)} "${escapeHtml(rawQuery)}"</span>`;
         }
 
         if (searchList) {
             searchList.innerHTML = '';
             if (matches.length === 0) {
+                const emptyTitle = window.AppI18n?.t('study.search_empty_title', 'Không tìm thấy bài học phù hợp');
+                const emptyDesc = window.AppI18n?.t('study.search_empty_desc', 'Thử tìm từ khóa khác như "present", "greetings", "numbers", "coffee", "occupations"...');
                 searchList.innerHTML = `
                     <div class="study-search-empty">
                         <svg class="empty-icon-svg" viewBox="0 0 24 24" width="28" height="28" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <p>Không tìm thấy bài học phù hợp</p>
-                        <small>Thử tìm từ khóa khác như "present", "greetings", "numbers", "coffee", "occupations"...</small>
+                        <p data-i18n="study.search_empty_title">${escapeHtml(emptyTitle)}</p>
+                        <small data-i18n="study.search_empty_desc">${escapeHtml(emptyDesc)}</small>
                     </div>
                 `;
                 return;
@@ -215,12 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isCurrent = item.element.getAttribute('aria-current') === 'true';
                 if (isCurrent) btn.setAttribute('aria-current', 'true');
 
+                const unitText = window.AppI18n?.t('study.lessons_unit', 'bài');
                 btn.innerHTML = `
                     <div class="study-search-item__info">
                         <span class="study-search-item__title">${escapeHtml(item.title)}</span>
                         ${item.cat ? `<span class="study-search-item__cat">${escapeHtml(item.cat)}</span>` : ''}
                     </div>
-                    <span class="study-search-item__count">${escapeHtml(item.count)} bài</span>
+                    <span class="study-search-item__count">${escapeHtml(item.count)} <span data-i18n="study.lessons_unit">${escapeHtml(unitText)}</span></span>
                 `;
 
                 btn.addEventListener('click', () => {
