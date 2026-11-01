@@ -77,6 +77,11 @@
                         <article class="study-node study-node--@node.State @(node.IsBranch ? "study-node--branch" : "study-node--main")"
                                  id="node-@node.Id"
                                  data-node-id="@node.Id"
+                                 data-level="@node.Level"
+                                 data-category="@node.Category"
+                                 data-topic="@node.Topic"
+                                 data-name="@node.Name"
+                                 data-branch="@node.BranchTitle"
                                  data-prereq="@prereqsJoin"
                                  data-col="@node.Column"
                                  data-row="@node.Row"
@@ -88,10 +93,12 @@
                             }
 
                             <div class="study-node__header">
-                                <span class="study-node__pill @(node.IsBranch ? "study-node__pill--branch" : "study-node__pill--main")" data-i18n="@(node.IsBranch ? "study.pill_branch" : "study.pill_main")">
-                                    @(node.IsBranch ? "Nhánh" : "Chính")
-                                </span>
-                                <span class="study-node__level">@node.Level</span>
+                                <div class="study-node__tags">
+                                    <span class="study-node__pill @(node.IsBranch ? "study-node__pill--branch" : "study-node__pill--main")" data-i18n="@(node.IsBranch ? "study.pill_branch" : "study.pill_main")">
+                                        @(node.IsBranch ? "Nhánh" : "Chính")
+                                    </span>
+                                    <span class="study-node__level">@node.Level</span>
+                                </div>
                                 <span class="study-node__badge">
                                     @if (node.State == "done")
                                     {
@@ -169,7 +176,7 @@
                            class="study-search-input"
                            data-i18n-placeholder="study.search_placeholder"
                            data-i18n-aria-label="study.search_aria_label"
-                           placeholder="Tìm bài học (vd: present, greetings, coffee)..."
+                           placeholder="Tìm bài học (vd: A1, A2, adjectives, greetings)..."
                            aria-label="Tìm kiếm chủ đề bài học"
                            autocomplete="off" />
                     <button type="button"
@@ -217,6 +224,9 @@
                                                 data-topic="@topic.Id"
                                                 data-topic-title="@topic.Title"
                                                 data-category="@cat.Label"
+                                                data-group="@group.Name"
+                                                data-levels="@string.Join(",", topic.Levels)"
+                                                data-lessons="@string.Join(" | ", topic.Lessons.Select(l => l.Name))"
                                                 data-count="@topic.Lessons.Length"
                                                 aria-controls="study-topic"
                                                 aria-current="@(topic.Id == ActiveTopic ? "true" : null)">
@@ -342,11 +352,21 @@
         int Column,
         int Row,
         string State,
-        string[] Prerequisites
+        string[] Prerequisites,
+        string Topic = "",
+        string Description = ""
     );
 
     private sealed record Lesson(string Id, string Name, string State);
-    private sealed record Topic(string Id, string Category, string Title, string Desc, Lesson[] Lessons);
+    private sealed record Topic(
+        string Id,
+        string Category,
+        string Title,
+        string Desc,
+        Lesson[] Lessons,
+        string[] Levels,
+        string GroupName
+    );
     private sealed record Group(string Name, Topic[] Topics);
     private sealed record Category(string Id, string Icon, string LabelKey, string Label, string Meta, bool Open, Group[] Groups);
     private sealed record CategoryDefinition(string Id, string ConfigCategory, string Icon, string LabelKey, string Label, int Order);
@@ -425,7 +445,9 @@
                     Column: order,
                     Row: 1, // Hàng giữa
                     State: state,
-                    Prerequisites: prereqs
+                    Prerequisites: prereqs,
+                    Topic: config.Topic ?? string.Empty,
+                    Description: config.Description ?? string.Empty
                 ));
             }
         }
@@ -482,7 +504,9 @@
                             Column: col,
                             Row: row,
                             State: "locked",
-                            Prerequisites: prereqsList.ToArray()
+                            Prerequisites: prereqsList.ToArray(),
+                            Topic: config.Topic ?? string.Empty,
+                            Description: config.Description ?? string.Empty
                         ));
                     }
                 }
@@ -626,7 +650,13 @@
                                     .Select(entry => entry.Config.Description)
                                     .Distinct(StringComparer.Ordinal));
 
-                                return new Topic(topicId, topicGroup.Key, title, description, lessons);
+                                var levels = orderedLessons
+                                    .Select(entry => entry.Config.Level)
+                                    .Where(l => !string.IsNullOrEmpty(l))
+                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .ToArray();
+
+                                return new Topic(topicId, topicGroup.Key, title, description, lessons, levels, topicGroup.Key);
                             })
                             .Where(topic => topic != null)
                             .Select(topic => topic!)
