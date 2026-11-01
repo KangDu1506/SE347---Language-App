@@ -13,10 +13,14 @@
 .flashcard-skeleton { width: 100%; height: min(380px, 52vh); min-height: 260px; border: 3px dashed var(--border-strong); border-radius: var(--radius-sticker); background: linear-gradient(100deg, var(--bg-soft) 30%, var(--bg-card) 50%, var(--bg-soft) 70%) 0 0 / 300% 100%; animation: flashcard-shimmer 1.2s linear infinite; }
 .flashcard-skeleton--short { width: 60%; height: 18px; min-height: 18px; }
 @keyframes flashcard-shimmer { to { background-position: -150% 0; } }
-.flashcard-message, .flashcard-empty { display: grid; justify-items: center; gap: 12px; max-width: 620px; margin: 40px auto; padding: 32px; background: var(--surface-sand); text-align: center; }
-.flashcard-message .foxy, .flashcard-empty .foxy { width: 110px; height: 110px; }
-.flashcard-message h1, .flashcard-empty h1 { margin: 0; font-family: var(--font-display); font-size: clamp(26px, 4vw, 36px); }
-.flashcard-message p, .flashcard-empty p { margin: 0 0 8px; }
+.flashcard-message, .flashcard-empty, .flashcard-complete { display: grid; justify-items: center; gap: 12px; max-width: 620px; margin: 40px auto; padding: 32px; background: var(--surface-sand); text-align: center; }
+.flashcard-message .foxy, .flashcard-empty .foxy, .flashcard-complete .foxy { width: 110px; height: 110px; }
+.flashcard-message h1, .flashcard-empty h1, .flashcard-complete h1 { margin: 0; font-family: var(--font-display); font-size: clamp(26px, 4vw, 36px); }
+.flashcard-message p, .flashcard-empty p, .flashcard-complete > p:not(.flashcard-eyebrow) { margin: 0 0 8px; }
+.flashcard-complete { background: var(--surface-mint); }
+.flashcard-complete[data-phase="saving"], .flashcard-complete[data-phase="error"] { background: var(--surface-sand); }
+.flashcard-complete .flashcard-eyebrow { color: var(--paper-text); }
+.flashcard-complete:focus { outline: 3px solid var(--color-secondary); outline-offset: 5px; }
 .flashcard-message__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .flashcard-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
 .flashcard-eyebrow { margin: 0 0 6px; color: var(--color-primary); font-size: var(--fs-sm); font-weight: var(--fw-heavy); text-transform: uppercase; letter-spacing: .06em; }
@@ -62,8 +66,8 @@
 [data-theme="dark"] .flashcard-card { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
 [data-theme="dark"] .flashcard-card .flashcard-card__label { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); }
 [data-theme="dark"] .flashcard-card[data-card-side="back"] { color: var(--text-on-blue); }
-[data-theme="dark"] :is(.flashcard-message, .flashcard-empty) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); color: var(--paper-text); }
-.flashcard-message, .flashcard-empty { overflow-wrap: anywhere; }
+[data-theme="dark"] :is(.flashcard-message, .flashcard-empty, .flashcard-complete) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); color: var(--paper-text); }
+.flashcard-message, .flashcard-empty, .flashcard-complete { overflow-wrap: anywhere; }
 @media (max-width: 620px) {
     .flashcard-wrap { width: calc(100% - 32px); padding-top: 20px; }
     .flashcard-heading { align-items: flex-start; flex-direction: column; }

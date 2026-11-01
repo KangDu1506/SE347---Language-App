@@ -18,7 +18,12 @@
         <partial name="_SupabaseClient" />
         <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
     }
+    <script src="~/js/flashcard-data.js" asp-append-version="true" defer></script>
     <script src="~/js/flashcard.js" asp-append-version="true" defer></script>
+    @if (!preview)
+    {
+        <script src="~/js/flashcard-progress.js" asp-append-version="true" defer></script>
+    }
 }
 
 <main class="flashcard-page" data-lesson-id="@lessonId">
@@ -63,6 +68,19 @@
             <a class="btn btn--ink" data-empty-back href="#" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
         </section>
 
+        <section class="sticker flashcard-complete" data-view="complete" role="region" aria-labelledby="flashcard-complete-title" tabindex="-1" hidden>
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-wave" /></svg>
+            <p class="flashcard-eyebrow" data-i18n="flashcard.complete_eyebrow">Phiên ôn tập Flashcard</p>
+            <h1 id="flashcard-complete-title" data-completion-title></h1>
+            <p data-completion-message role="status" aria-live="polite" aria-atomic="true"></p>
+            <div class="flashcard-message__actions">
+                <button class="btn btn--ink" type="button" data-action="retry-completion" data-i18n="flashcard.retry_save" hidden>Thử lưu lại</button>
+                <a class="btn btn--ink" data-complete-next data-completion-navigation data-i18n="flashcard.continue" hidden>Tiếp tục →</a>
+                <a class="btn btn--ink" data-complete-back-to-lesson data-completion-navigation href="#" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
+                <a class="btn" data-complete-back-to-study data-completion-navigation href="/Study" data-i18n="flashcard.return_to_study">← Về trang Học tập</a>
+            </div>
+        </section>
+
         <section class="flashcard-study" data-view="ready" aria-labelledby="flashcard-title" hidden>
             <header class="flashcard-heading">
                 <div>
@@ -74,7 +92,7 @@
 
             <div class="flashcard-progress-row">
                 <span data-card-count aria-live="polite"></span>
-                <span data-i18n="flashcard.position_label">Vị trí trong bộ thẻ</span>
+                <span data-answered-count aria-live="polite"></span>
             </div>
             <div class="flashcard-progress" role="progressbar" aria-label="Vị trí trong bộ thẻ" data-i18n-aria-label="flashcard.position_label" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
                 <span data-progress-fill></span>
