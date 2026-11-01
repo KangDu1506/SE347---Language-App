@@ -139,7 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const flipKey = front ? 'flashcard.flip_to_back' : 'flashcard.flip_to_front';
         const flipFallback = front ? 'Lật thẻ để xem mặt sau' : 'Lật thẻ để xem mặt trước';
-        card.setAttribute('aria-label', `${item.content}. ${t(flipKey, flipFallback)}`);
+        const sideLabel = $('[data-card-label]').textContent;
+        const toggle = $('[data-card-toggle]');
+        toggle.setAttribute('aria-label', `${sideLabel}. ${t(flipKey, flipFallback)}`);
+        toggle.setAttribute('aria-controls', 'flashcard-back');
+        toggle.setAttribute('aria-expanded', String(!front));
+        const announcement = $('[data-card-announcement]');
+        const message = `${count}. ${sideLabel}`;
+        if (announcement.textContent !== message) announcement.textContent = message;
         $('[data-action="previous"]').disabled = state.index === 0;
         $('[data-action="next"]').disabled = state.index === total - 1;
 
@@ -230,14 +237,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const card = $('[data-card-side]');
+    let gesture = null;
+    // Native scrolling owns touch input. Only a tap/click should flip the card.
+    card.addEventListener('pointerdown', event => {
+        gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+    }, { passive: true });
+    card.addEventListener('pointermove', event => {
+        if (gesture?.id === event.pointerId && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 8) gesture.moved = true;
+    }, { passive: true });
+    card.addEventListener('pointercancel', () => { if (gesture) gesture.moved = true; }, { passive: true });
     card.addEventListener('click', event => {
-        if (event.target.closest('a, button, input, select, textarea') || window.getSelection()?.isCollapsed === false) return;
+        if (event.detail !== 0 && gesture?.moved) return;
+        const control = event.target.closest('a, button, input, select, textarea');
+        if ((control && !control.matches('[data-card-toggle]')) || window.getSelection()?.isCollapsed === false) return;
         flipCard();
     });
     card.addEventListener('keydown', event => {
-        if (event.target !== card || !['Enter', ' '].includes(event.key)) return;
-        event.preventDefault();
-        if (!event.repeat) flipCard();
+        if (event.target.matches('[data-card-toggle]')) {
+            if (event.repeat && event.key === 'Enter') event.preventDefault();
+            return; // Native button owns Enter/Space and emits one click.
+        }
+        const content = $('.flashcard-card__content');
+        if (event.target !== content || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        if (content.scrollHeight > content.clientHeight
+            && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End'].includes(event.key)) {
+            event.preventDefault();
+            const step = event.key.startsWith('Page') ? content.clientHeight * 0.8 : 40;
+            if (event.key === 'Home') content.scrollTop = 0;
+            else if (event.key === 'End') content.scrollTop = content.scrollHeight;
+            else content.scrollTop += event.key === 'ArrowUp' || event.key === 'PageUp' ? -step : step;
+            return;
+        }
     });
 
     page.addEventListener('click', event => {
