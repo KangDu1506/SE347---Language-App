@@ -26,7 +26,7 @@
         },
         "category": {
             "type": "string",
-            "enum": ["vocabulary", "grammar", "listening"],
+            "enum": ["vocabulary", "grammar", "listening", "speaking"],
             "description": "Lesson type, matches the filters on the Study page."
         },
         "topic": {

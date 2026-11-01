@@ -1,8 +1,8 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
-    "name": "Communication Verbs",
+    "name": "Basic Verbs 3",
     "category": "vocabulary",
-    "topic": "Verbs",
+    "topic": "Basic Verbs",
     "description": "Learn common verbs for speaking, asking, and sharing information.",
     "level": "A1",
     "order": 14,

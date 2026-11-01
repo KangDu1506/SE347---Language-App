@@ -1,0 +1,7 @@
+[
+    {"id":"1","type":"single-choice","question":"Who repairs water pipes and sinks?","options":["plumber","teacher","singer","photographer"],"answer":["plumber"],"explanation":"A plumber installs and repairs pipes and water equipment.","translation":"Ai sửa đường ống nước và bồn rửa?"},
+    {"id":"2","type":"single-choice","question":"Who constructs or repairs buildings?","options":["builder","writer","nurse","shop assistant"],"answer":["builder"],"explanation":"A builder works on constructing or repairing buildings.","translation":"Ai xây dựng hoặc sửa chữa các tòa nhà?"},
+    {"id":"3","type":"single-choice","question":"Who keeps or checks a company's financial records?","options":["accountant","actor","driver","chef"],"answer":["accountant"],"explanation":"An accountant manages or checks financial records.","translation":"Ai ghi chép hoặc kiểm tra sổ sách tài chính của công ty?"},
+    {"id":"4","type":"single-choice","question":"Who often works at a desk in an office?","options":["office worker","firefighter","farmer","pilot"],"answer":["office worker"],"explanation":"An office worker does their job in an office.","translation":"Ai thường làm việc tại bàn trong văn phòng?"},
+    {"id":"5","type":"single-choice","question":"Who welcomes visitors at a hotel desk?","options":["receptionist","mechanic","artist","police officer"],"answer":["receptionist"],"explanation":"A receptionist welcomes visitors and answers questions.","translation":"Ai đón khách tại quầy khách sạn?"}
+]

@@ -1,8 +1,8 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
-    "name": "Action Verbs",
+    "name": "Basic Verbs 2",
     "category": "vocabulary",
-    "topic": "Verbs",
+    "topic": "Basic Verbs",
     "description": "Learn common verbs for physical actions and practical activities.",
     "level": "A1",
     "order": 13,

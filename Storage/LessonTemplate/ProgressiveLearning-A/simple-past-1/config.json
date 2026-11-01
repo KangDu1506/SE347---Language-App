@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Simple Past 1: Affirmative and Negative",
+    "category": "grammar",
+    "topic": "Tenses",
+    "description": "Form affirmative and negative past sentences with be, regular verbs, and irregular verbs.",
+    "level": "A2",
+    "order": 19,
+    "estimated-minutes": 25,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

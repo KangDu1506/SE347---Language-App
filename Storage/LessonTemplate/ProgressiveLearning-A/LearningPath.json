@@ -11,7 +11,7 @@
         { "itemId": "lesson-basic-adjectives-2", "order": 5, "lessonId": "basic-adjectives-2", "folder": "basic-adjectives-2" },
         { "itemId": "lesson-basic-foods-and-drinks-1", "order": 6, "lessonId": "basic-foods-and-drinks-1", "folder": "basic-foods-and-drinks-1" },
         { "itemId": "lesson-locations-and-destinations-1", "order": 7, "lessonId": "locations-and-destinations-1", "folder": "locations-and-destinations-1" },
-        { "itemId": "lesson-occupations", "order": 8, "lessonId": "occupations", "folder": "occupations" },
+        { "itemId": "lesson-occupations-1", "order": 8, "lessonId": "occupations-1", "folder": "occupations-1" },
         { "itemId": "lesson-daily-routine-verbs", "order": 9, "lessonId": "daily-routine-verbs", "folder": "daily-routine-verbs" },
         { "itemId": "lesson-action-verbs", "order": 10, "lessonId": "action-verbs", "folder": "action-verbs" },
         { "itemId": "lesson-communication-verbs", "order": 11, "lessonId": "communication-verbs", "folder": "communication-verbs" },
@@ -72,6 +72,22 @@
                     "lessonId": "locations-and-destinations-2",
                     "folder": "locations-and-destinations-2",
                     "prerequisites": ["locations-and-destinations-1"]
+                }
+            ]
+        },
+        {
+            "id": "occupations",
+            "itemId": "branch-occupations",
+            "title": "Occupations",
+            "type": "branch",
+            "required": true,
+            "lessons": [
+                {
+                    "itemId": "lesson-occupations-2",
+                    "order": 1,
+                    "lessonId": "occupations-2",
+                    "folder": "occupations-2",
+                    "prerequisites": ["occupations-1"]
                 }
             ]
         }

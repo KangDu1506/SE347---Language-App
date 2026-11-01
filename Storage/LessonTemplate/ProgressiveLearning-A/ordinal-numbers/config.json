@@ -1,8 +1,8 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
     "name": "Ordinal Numbers",
-    "category": "grammar",
-    "topic": "Numbers",
+    "category": "vocabulary",
+    "topic": "Numbers, Time, and Dates",
     "description": "Learn how to form and spell ordinal numbers from first to numbers below ten thousand.",
     "level": "A2",
     "order": 4,

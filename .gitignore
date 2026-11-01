@@ -31,3 +31,5 @@ appsettings.*.local.json
 *.msix
 *.msm
 *.msp
+.vscode/tasks.json
+/.vscode

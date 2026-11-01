@@ -1,7 +1,7 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
     "name": "Advanced Greetings 2",
-    "category": "vocabulary",
+    "category": "speaking",
     "topic": "Greetings",
     "description": "Start thoughtful conversations and check in indirectly by noticing context, recalling updates, and inviting someone to share.",
     "level": "B2",

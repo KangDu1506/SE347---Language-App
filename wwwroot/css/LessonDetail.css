@@ -1,0 +1,694 @@
+/* Trang chi tiết bài học (Pages/LessonDetail.cshtml) - Phong cách Sticker Neubrutalism */
+
+.lesson-detail-page {
+    padding: 24px 0 64px;
+}
+
+.detail-wrap {
+    width: min(1200px, calc(100% - 40px));
+    margin: 0 auto;
+}
+
+.lesson-detail-page h1,
+.lesson-detail-page h2,
+.lesson-detail-page h3 {
+    font-family: var(--font-display);
+    font-weight: var(--fw-heavy);
+    line-height: 1.1;
+}
+
+/* ---------- Breadcrumb ---------- */
+.detail-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    font-size: 13.5px;
+    font-weight: var(--fw-bold);
+    color: var(--text-secondary);
+}
+
+.detail-back-btn {
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+}
+
+.detail-breadcrumb__separator {
+    opacity: 0.5;
+}
+
+.detail-breadcrumb__name {
+    color: var(--text-primary);
+}
+
+/* Fallback Alert */
+.detail-fallback-alert {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    background: var(--surface-sand);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    box-shadow: 4px 4px 0 var(--ink);
+    margin-bottom: 22px;
+    font-size: 14px;
+}
+.detail-fallback-alert__icon {
+    font-size: 24px;
+}
+.detail-badge--standalone {
+    background: var(--surface-pink);
+}
+
+/* ---------- Hero Banner (Sticker Header) ---------- */
+.detail-hero {
+    position: relative;
+    padding: 36px 40px 32px;
+    border-radius: 28px;
+    border: var(--border-sticker);
+    box-shadow: 8px 8px 0 var(--ink);
+    margin-bottom: 36px;
+    overflow: hidden;
+}
+
+/* Biến thể màu sắc theo Category */
+.detail-hero.theme-speaking { background: var(--surface-pink); }
+.detail-hero.theme-vocab { background: var(--surface-orange); }
+.detail-hero.theme-grammar { background: var(--surface-mint); }
+.detail-hero.theme-listening { background: var(--surface-blue); color: var(--text-on-blue); }
+
+.detail-hero__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.detail-hero__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
+    background: var(--bg-card);
+    font-size: 12px;
+    font-weight: var(--fw-heavy);
+    color: var(--text-primary);
+    box-shadow: 2px 2px 0 var(--ink);
+}
+
+.detail-badge--level {
+    background: var(--ink);
+    color: var(--bg-main);
+    border-color: var(--ink);
+}
+
+.detail-badge--branch {
+    background: var(--surface-mint);
+}
+
+.detail-badge--main {
+    background: var(--surface-sand);
+}
+
+.detail-hero__topic-tag {
+    font-size: 13px;
+    font-weight: var(--fw-bold);
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-pill);
+}
+
+.detail-hero__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 28px;
+}
+
+.detail-hero__text {
+    flex: 1;
+    max-width: 820px;
+}
+
+.detail-hero__title {
+    margin: 0 0 10px;
+    font-size: clamp(34px, 5vw, 52px);
+    letter-spacing: -0.03em;
+}
+
+.detail-hero__desc {
+    margin: 0;
+    font-size: 16.5px;
+    font-weight: var(--fw-semibold);
+    line-height: 1.45;
+    opacity: 0.95;
+}
+
+.detail-hero__mascot {
+    flex: 0 0 130px;
+    display: grid;
+    place-items: center;
+}
+
+.detail-foxy-mascot {
+    width: 120px;
+    height: 120px;
+    filter: drop-shadow(4px 4px 0 var(--ink));
+    animation: foxy-float 3s ease-in-out infinite;
+}
+
+@keyframes foxy-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Thanh thông số nhanh (Metrics Bar) */
+.detail-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 2.5px solid var(--ink);
+    border-radius: 20px;
+    box-shadow: 4px 4px 0 var(--ink);
+    margin-bottom: 26px;
+    color: var(--text-primary);
+}
+
+.metric-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+}
+
+.metric-card__icon {
+    font-size: 26px;
+}
+
+.metric-card b {
+    display: block;
+    font-size: 16px;
+    font-weight: var(--fw-heavy);
+    line-height: 1.1;
+}
+
+.metric-card small {
+    display: block;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: var(--fw-bold);
+    margin-top: 2px;
+}
+
+/* Hàng nút CTA */
+.detail-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+
+.detail-cta-btn {
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: var(--fw-heavy);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.detail-flashcard-btn {
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: var(--fw-bold);
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.detail-cta-hint {
+    font-size: 13px;
+    font-weight: var(--fw-bold);
+    opacity: 0.85;
+}
+
+/* ---------- Bố cục nửa dưới trang (Vị trí lộ trình trải ngang, 3 thẻ đều nhau bên dưới) ---------- */
+.detail-bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Thẻ cơ sở: ưu tiên căn góc trên bên trái (Top-Left) */
+.detail-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+    border: var(--border-sticker);
+    border-radius: 20px;
+    box-shadow: 5px 5px 0 var(--ink);
+    background: var(--bg-card);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.detail-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 7px 7px 0 var(--ink);
+}
+
+.detail-card__head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 6px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.detail-card__head h2 {
+    margin: 0;
+    font-size: 19px;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+/* ---------- 1. THẺ VỊ TRÍ LỘ TRÌNH (TRẢI NGANG & CHIỀU CAO NHỎ) ---------- */
+.detail-card--roadmap {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--surface-sand);
+}
+
+.roadmap-header-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.roadmap-header-row .detail-card__head {
+    margin-bottom: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+}
+
+.roadmap-header-row .detail-card__head h2 {
+    font-size: 18.5px;
+}
+
+.roadmap-header-row .detail-card__action {
+    margin-top: 0;
+    padding-top: 0;
+    flex: 0 0 auto;
+}
+
+.detail-sidecard__btn {
+    text-decoration: none;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: var(--fw-heavy);
+    box-shadow: 2px 2px 0 var(--ink);
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Dàn trải bài trước - này - sau theo chiều ngang */
+.roadmap-mini-flow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.flow-step {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    padding: 8px 14px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: var(--bg-card);
+    min-height: 48px;
+    box-sizing: border-box;
+}
+
+.flow-step--prev,
+.flow-step--next {
+    opacity: 0.92;
+}
+
+.flow-step--current {
+    flex: 1.15;
+    background: var(--surface-orange);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.flow-step__meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.step-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: var(--fw-heavy);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+}
+
+.flow-step--current .step-label {
+    color: #1a1209;
+}
+
+.step-name {
+    display: block;
+    font-size: 13.5px;
+    font-weight: var(--fw-heavy);
+    color: var(--text-primary);
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.step-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: var(--fw-heavy);
+    padding: 1px 6px;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-pill);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.flow-arrow {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink);
+    opacity: 0.8;
+}
+
+/* ---------- 2. BA THẺ CÒN LẠI (NẰM DƯỚI, CHIA ĐỀU 3 CỘT, ALIGN TOP-LEFT, TEXT CENTER-LEFT) ---------- */
+.detail-grid-3col {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* Nhỏ hơn và căn các phần tử Top-Left */
+.detail-grid-3col .detail-card {
+    padding: 20px 22px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.detail-card__desc {
+    margin: 0 0 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.detail-card__desc b {
+    color: var(--text-primary);
+}
+
+/* Thẻ 2: Cấu trúc bài trắc nghiệm */
+.detail-card--quiz {
+    background: var(--surface-mint);
+}
+
+.quiz-preview-features {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    margin-top: 0;
+}
+
+/* Hàng mục: căn giữa dọc (vertically centered) và dạt trái (center-left text) */
+.quiz-feature-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: var(--bg-card);
+    font-size: 12.5px;
+    font-weight: var(--fw-bold);
+    color: var(--text-primary);
+    box-shadow: 1.5px 1.5px 0 var(--ink);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.quiz-feature-item span {
+    text-align: left;
+    line-height: 1.35;
+}
+
+.quiz-feature-icon {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--surface-sand);
+    border: 1.5px solid var(--ink);
+    flex: 0 0 auto;
+}
+
+/* Thẻ 3: Mẹo học cùng Cáo Foxy */
+.detail-card--foxy {
+    background: var(--surface-pink);
+}
+
+.foxy-head-badge {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 10px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.foxy-avatar-mini {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 auto;
+    filter: drop-shadow(2px 2px 0 var(--ink));
+}
+
+.foxy-card-title {
+    margin: 0;
+    font-size: 18.5px;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.foxy-advice {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: var(--fw-semibold);
+    line-height: 1.55;
+    font-style: italic;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.55);
+    padding: 14px 16px;
+    border: 2px dashed var(--ink);
+    border-radius: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+/* Thẻ 4: Phần thưởng hoàn thành */
+.detail-card--rewards {
+    background: var(--bg-card);
+}
+
+.rewards-checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    margin-top: 0;
+}
+
+/* Hàng mục: căn giữa dọc (vertically centered) và dạt trái (center-left text) */
+.rewards-checklist li {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    background: var(--surface-sand);
+    font-size: 12.5px;
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rewards-checklist li span {
+    text-align: left;
+    line-height: 1.35;
+}
+
+.reward-icon-badge {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1.5px solid var(--ink);
+    flex: 0 0 auto;
+}
+
+.reward-icon-badge--star {
+    background: #ffd166;
+    color: #1a1209;
+}
+
+.reward-icon-badge--xp {
+    background: var(--surface-orange);
+    color: #1a1209;
+}
+
+.reward-icon-badge--streak {
+    background: #ff6b6b;
+    color: #fff;
+}
+
+.reward-icon-badge--unlock {
+    background: var(--surface-mint);
+    color: #1a1209;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+    .detail-grid-3col {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .detail-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .detail-hero__mascot {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .detail-wrap {
+        width: calc(100% - 24px);
+    }
+    .detail-hero {
+        padding: 24px 20px;
+    }
+    .detail-metrics {
+        grid-template-columns: 1fr;
+    }
+    .detail-hero__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .detail-cta-btn,
+    .detail-flashcard-btn {
+        width: 100%;
+        text-align: center;
+    }
+    .detail-card--roadmap {
+        padding: 16px;
+    }
+    .roadmap-mini-flow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .flow-arrow svg {
+        transform: rotate(90deg);
+    }
+    .detail-grid-3col .detail-card {
+        padding: 18px 16px;
+    }
+}
+
+/* ---------- Dark Mode Support ---------- */
+[data-theme="dark"] :is(
+    .detail-hero,
+    .detail-card,
+    .flow-step,
+    .quiz-feature-item,
+    .rewards-checklist li,
+    .metric-card
+) {
+    --text-primary: var(--paper-text);
+    --text-secondary: var(--paper-text-2);
+    --bg-card: var(--paper-card);
+    --bg-main: var(--paper-card);
+    --border-strong: var(--paper-line);
+    color: var(--paper-text);
+}
+
+[data-theme="dark"] .foxy-advice {
+    background: rgba(0, 0, 0, 0.25);
+    color: var(--paper-text);
+}
+
+[data-theme="dark"] :is(
+    .detail-hero,
+    .detail-card,
+    .metric-card
+) > * {
+    --ink: var(--paper-text);
+}

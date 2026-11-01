@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Occupations 2",
+    "category": "vocabulary",
+    "topic": "Jobs",
+    "description": "Expand your knowledge of job titles with trades, office roles, and service workers.",
+    "level": "A2",
+    "order": 12,
+    "estimated-minutes": 15,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

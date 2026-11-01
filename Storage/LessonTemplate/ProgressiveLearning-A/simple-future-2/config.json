@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Simple Future 2: Yes/No and Information Questions",
+    "category": "grammar",
+    "topic": "Tenses",
+    "description": "Ask yes/no and information questions about the future with will, ordinary verbs, and be.",
+    "level": "A1",
+    "order": 22,
+    "estimated-minutes": 20,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

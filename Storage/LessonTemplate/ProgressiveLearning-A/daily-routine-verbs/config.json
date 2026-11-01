@@ -1,8 +1,8 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
-    "name": "Daily Routine Verbs",
+    "name": "Basic Verbs 1",
     "category": "vocabulary",
-    "topic": "Verbs",
+    "topic": "Basic Verbs",
     "description": "Learn common verbs for daily routines and everyday habits.",
     "level": "A1",
     "order": 12,
