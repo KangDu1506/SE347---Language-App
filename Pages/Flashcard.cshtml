@@ -1,0 +1,110 @@
+@page "{lessonId?}"
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@inject SE347.Services.ILessonService LessonService
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Flashcard";
+    var lessonId = RouteData.Values["lessonId"]?.ToString() ?? string.Empty;
+    var preview = HostEnvironment.EnvironmentName == "Development" && Request.Query["preview"] == "1";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Flashcard.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @if (!preview)
+    {
+        <partial name="_SupabaseClient" />
+        <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
+    }
+    <script src="~/js/flashcard.js" asp-append-version="true" defer></script>
+}
+
+<main class="flashcard-page" data-lesson-id="@lessonId">
+    @if (preview)
+    {
+        @* Default JSON encoder escapes HTML, including closing script tags in lesson text. *@
+        <script type="application/json" data-preview-lesson>@Html.Raw(System.Text.Json.JsonSerializer.Serialize(LessonService.GetDetail(lessonId), new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)))</script>
+    }
+    <div class="flashcard-wrap">
+        @if (preview)
+        {
+            <p class="sticker flashcard-preview" role="status" data-i18n="flashcard.preview_notice">Preview local · Dữ liệu lesson trong repository · Không lưu tiến độ lên máy chủ</p>
+        }
+        <nav class="flashcard-crumbs" aria-label="Vị trí trang" data-i18n-aria-label="lesson.breadcrumb">
+            <a href="/Study" data-i18n="ui.study">Học tập</a>
+            <span aria-hidden="true">/</span>
+            <a data-back-to-lesson href="#" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
+            <span aria-hidden="true">/</span>
+            <span data-lesson-name aria-current="page"></span>
+        </nav>
+
+        <section class="flashcard-loading" data-view="loading" aria-busy="true" aria-live="polite">
+            <p class="visually-hidden" data-i18n="flashcard.loading">Đang tải flashcard…</p>
+            <div class="flashcard-skeleton"></div>
+            <div class="flashcard-skeleton flashcard-skeleton--short"></div>
+        </section>
+
+        <section class="sticker flashcard-message" data-view="message" role="alert" hidden>
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
+            <h1 data-message-title></h1>
+            <p data-message-text></p>
+            <div class="flashcard-message__actions">
+                <button class="btn btn--ink" type="button" data-action="retry" data-i18n="lesson.retry">Thử lại</button>
+                <a class="btn" href="/Study" data-i18n="lesson.back_to_study">← Về trang Học tập</a>
+            </div>
+        </section>
+
+        <section class="sticker flashcard-empty" data-view="empty" role="status" hidden>
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
+            <h1 data-i18n="flashcard.empty_title">Bài học chưa có nội dung ôn tập</h1>
+            <p data-i18n="flashcard.empty_text">Hãy quay lại bài học hoặc chọn một bài khác.</p>
+            <a class="btn btn--ink" data-empty-back href="#" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
+        </section>
+
+        <section class="flashcard-study" data-view="ready" aria-labelledby="flashcard-title" hidden>
+            <header class="flashcard-heading">
+                <div>
+                    <p class="flashcard-eyebrow" data-i18n="flashcard.eyebrow">Ôn tập bài học</p>
+                    <h1 id="flashcard-title" data-lesson-heading></h1>
+                </div>
+                <a class="btn btn--secondary" data-back-to-lesson href="#" data-i18n="flashcard.exit">Thoát flashcard</a>
+            </header>
+
+            <div class="flashcard-progress-row">
+                <span data-card-count aria-live="polite"></span>
+                <span data-i18n="flashcard.position_label">Vị trí trong bộ thẻ</span>
+            </div>
+            <div class="flashcard-progress" role="progressbar" aria-label="Vị trí trong bộ thẻ" data-i18n-aria-label="flashcard.position_label" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                <span data-progress-fill></span>
+            </div>
+
+            <article class="sticker flashcard-card" data-card-side="front" role="button" tabindex="0" aria-label="Lật thẻ để xem mặt sau" aria-live="polite">
+                <div class="flashcard-card__content">
+                <p class="flashcard-card__label" data-card-label data-i18n="flashcard.front_label">Mặt trước</p>
+                <h2 class="flashcard-card__term" data-card-term lang="en"></h2>
+                <div class="flashcard-card__back" data-card-back hidden>
+                    <p class="flashcard-card__definition" data-definition-vi></p>
+                    <p class="flashcard-card__definition flashcard-card__definition--en" data-definition-en lang="en"></p>
+                    <p class="flashcard-card__ipa" data-pronunciation hidden></p>
+                    <div class="flashcard-card__examples" data-examples-wrap hidden>
+                        <h3 data-i18n="lesson.examples">Ví dụ</h3>
+                        <ul data-examples></ul>
+                    </div>
+                </div>
+                </div>
+            </article>
+
+            <div class="flashcard-rating" role="group" aria-label="Đánh giá mức độ nhớ" data-i18n-aria-label="flashcard.rating_label">
+                <button class="btn flashcard-rating__know" type="button" data-rating="know" aria-pressed="false" data-i18n="flashcard.know">Nhớ</button>
+                <button class="btn flashcard-rating__again" type="button" data-rating="again" aria-pressed="false" data-i18n="flashcard.again">Chưa nhớ</button>
+            </div>
+
+            <nav class="flashcard-navigation" aria-label="Chuyển thẻ" data-i18n-aria-label="flashcard.navigation_label">
+                <button class="btn btn--secondary" type="button" data-action="previous" data-i18n="flashcard.previous">← Trước</button>
+                <button class="btn btn--ink" type="button" data-action="next" data-i18n="flashcard.next">Tiếp →</button>
+            </nav>
+        </section>
+    </div>
+</main>
