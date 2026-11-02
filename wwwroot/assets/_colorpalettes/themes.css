@@ -101,6 +101,7 @@
     --surface-pink: #ff9fd0;
     --surface-sand: #ffe873;
     --surface-blue: #6d4cf5;                 /* chữ trên nền này dùng --text-on-blue (5.3:1) */
+        --surface-purple: #e6e0ff;               /* tím nhạt nghe hiểu - giữ nguyên ở cả hai theme */
     --text-on-blue: #ffffff;
     --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px);
 

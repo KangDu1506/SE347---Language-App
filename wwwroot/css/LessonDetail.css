@@ -692,3 +692,19 @@
 ) > * {
     --ink: var(--paper-text);
 }
+
+
+/* Giữ nguyên màu nền tím của mục Nghe hiểu trong trang chi tiết bài học */
+.detail-hero.theme-listening,
+[data-theme="dark"] .detail-hero.theme-listening {
+    background: var(--surface-blue, #6d4cf5) !important;
+    color: var(--text-on-blue, #ffffff) !important;
+}
+
+[data-theme="dark"] .detail-hero.theme-listening :is(
+    .detail-hero__title,
+    .detail-hero__desc,
+    .detail-hero__topic-tag
+) {
+    color: var(--text-on-blue, #ffffff) !important;
+}

@@ -683,7 +683,7 @@
 .study-cat__icon--vocab { background: var(--surface-orange); }
 .study-cat__icon--grammar { background: var(--surface-mint); }
 .study-cat__icon--speaking { background: var(--surface-pink); }
-.study-cat__icon--listening { background: var(--color-secondary-soft); }
+.study-cat__icon--listening { background: var(--surface-purple, #e6e0ff); }
 .study-cat__meta { margin-left: auto; color: var(--text-secondary); font-size: 12px; font-weight: var(--fw-bold); }
 .study-cat__toggle[aria-expanded="true"] .study-cat__meta { color: inherit; opacity: .75; }
 
@@ -721,7 +721,7 @@
 .study-recs__head p { max-width: 360px; margin: 0; color: var(--text-secondary); font-weight: var(--fw-semibold); }
 .study-rec-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
 .study-rec { position: relative; display: flex; flex-direction: column; gap: 10px; padding: 18px 20px 20px; }
-.study-rec:nth-child(1) { background: var(--surface-pink); transform: rotate(-1.2deg); }
+.study-rec:nth-child(1) { background: var(--surface-purple, #e6e0ff); transform: rotate(-1.2deg); }
 .study-rec:nth-child(2) { background: var(--surface-mint); transform: rotate(.8deg); }
 .study-rec:nth-child(3) { background: var(--surface-orange); transform: rotate(-.6deg); }
 .study-rec .tag { align-self: flex-start; }
@@ -829,3 +829,21 @@
     .study-bubble:not(.study-bubble--me),
     .study-day--now
 ) > * { --ink: var(--paper-text); --border-sticker: var(--line) solid var(--paper-text); --border-sticker-thin: var(--line-thin) solid var(--paper-text); --shadow-sticker-sm: 3px 3px 0 var(--paper-text); --shadow-sticker: 6px 6px 0 var(--paper-text); --shadow-sticker-lg: 8px 8px 0 var(--paper-text); --surface-locked: repeating-linear-gradient(45deg, #f0e6d2 0 10px, #fff 10px 20px); }
+
+
+/* Cố định màu nền tím cho mục Nghe hiểu giữa 2 theme */
+.study-cat__icon--listening,
+[data-theme="dark"] .study-cat__icon--listening {
+    background: var(--surface-purple, #e6e0ff) !important;
+    color: #1a1209 !important;
+}
+
+.study-rec:nth-child(1),
+[data-theme="dark"] .study-rec:nth-child(1) {
+    background: var(--surface-purple, #e6e0ff) !important;
+    color: #1a1209 !important;
+}
+
+[data-theme="dark"] .study-rec:nth-child(1) :is(h3, p, span, .tag, .study-rec__time) {
+    color: #1a1209 !important;
+}
