@@ -23,13 +23,16 @@ không nhúng dữ liệu; API giữ nguyên yêu cầu đăng nhập.
 ## Dữ liệu
 
 `AppApi.get('/api/lessons/{lessonId}')` sử dụng API hiện có, không thêm DTO/endpoint.
-`lessonId` response phải khớp route; `name`, `contents` phải hợp lệ.
-Mỗi mục cần `id` duy nhất, `content`, `definition-vi`, `definition-en` không rỗng.
+`lessonId` response phải khớp route; `name`, `contents` phải hợp lệ. Mapper trong
+`wwwroot/js/flashcard-data.js` giữ các item có `id` duy nhất, `content`, `definition-vi`,
+`definition-en` không rỗng và bỏ item lỗi/thiếu nội dung; danh sách sau mapping rỗng sẽ
+hiện empty state.
 Mặt trước hiển thị `content`; mặt sau giữ từ/cụm từ làm ngữ cảnh và hiển thị hai định nghĩa.
 Phiên âm `pronunciation-bre`/`pronunciation-name` và `examples` chỉ hiển thị khi có dữ liệu.
 Không thêm media khi chưa có thiết kế yêu cầu. Không sinh nội dung thay thế cho trường thiếu.
 
-`contents: []` là empty; payload thiếu/sai trường là error, không lọc bỏ thẻ lỗi âm thầm.
+`contents: []` là empty. Payload thiếu/sai cấu trúc là error; item content thiếu chữ, sai ID
+hoặc trùng ID bị bỏ qua, và nếu không còn item hợp lệ thì hiện empty thay vì dựng thẻ giả.
 Loading ẩn thao tác; tải lại xóa bộ thẻ cũ. Chỉ request mới nhất được render.
 401 do AppApi chuyển đăng nhập; 400/404, 403 locked/inactive có thông báo riêng;
 lỗi mạng/server/dữ liệu có retry theo pattern Lesson.
@@ -71,6 +74,10 @@ document.addEventListener('flashcard:rate', ({ detail }) => {
 - `flashcard:rate`: sau khi chọn; `rating` là `know` hoặc `again`.
 - `flashcard:flip`: sau khi lật; `side` là `front` hoặc `back`.
 - `flashcard:change`: sau Previous/Next; mô tả thẻ mới, `rating` khôi phục từ lựa chọn đã lưu hoặc null.
+- SCRUM-75 dùng `flashcard:session-ready`, `flashcard:completion-state` và
+  `flashcard:completion-retry`; contract chi tiết ở [FLASHCARD_COMPLETION.md](FLASHCARD_COMPLETION.md).
+  Event nháp `flashcard:complete` chỉ có lessonId không còn được tiêu thụ, vì không đủ
+  xác định phiên và trạng thái persistence. Các event tương tác trên cũng có `sessionId`.
 
 Events là thông báo tương tác, không phải xác nhận đã lưu thành công. Không phát event
 change khi khởi tạo; không phát event do đổi ngôn ngữ/theme.
@@ -78,6 +85,8 @@ Consumer xử lý tiến độ server độc lập với lựa chọn local, the
 
 Chỉ báo **vị trí trong bộ thẻ** = `(index + 1) / contents.length`.
 100% nghĩa là đang xem thẻ cuối, không có nghĩa đã học/hoàn thành bộ thẻ.
+Nhãn `[data-answered-count]` hiển thị riêng số thẻ đã phân loại (`know`/`again`) trên tổng số;
+đủ tất cả thẻ mới phát `flashcard:session-complete`, và chỉ một lần trong phiên.
 
 ## Kiểm thử
 
@@ -99,7 +108,9 @@ retry, đổi lesson, tương tác, event, biên chỉ số, i18n/theme, nội d
 Đây là kiểm tra UI contract, không chứng minh auth/API/progress production hoạt động.
 
 SCRUM-74 nghiệm thu responsive/accessibility đầy đủ; SCRUM-75 xử lý hoàn thành/điều hướng
-kết quả; SCRUM-76 tích hợp progress; SCRUM-77 quyết định lưu/đổi lựa chọn và quy tắc học.
+kết quả; SCRUM-76 tích hợp lesson/progress API; SCRUM-77 phát completion sau khi phân loại
+đủ bộ thẻ và hiển thị số thẻ đã phân loại. Chi tiết: [SCRUM-76](../test/SCRUM_76.md),
+[SCRUM-77](../test/SCRUM_77.md).
 
 ### Kết quả kiểm tra trong phiên triển khai
 
@@ -107,8 +118,11 @@ kết quả; SCRUM-76 tích hợp progress; SCRUM-77 quyết định lưu/đổi
 - `dotnet test tests/SE347.Tests/SE347.Tests.csproj --no-restore`: 51 passed, 0 failed/skipped.
 - `node --check wwwroot/js/flashcard.js`: thành công.
 - `node --check docs/test/flashcard-browser.cjs`: thành công.
-- Browser contract script: thành công trên Chrome headless, app Development tại port 5348,
-  remote debugging port 9348 (override `APP_URL`, `CHROME_DEBUG_URL`).
+- Browser contract script: thành công trên Chrome headless, app Development tại port 5347,
+  remote debugging port 9347 (override `APP_URL`, `CHROME_DEBUG_URL`), gồm completion một lần
+  sau khi phân loại đủ bộ thẻ và xác nhận endpoint content/lesson.
+- `node docs/test/flashcard-progress.cjs`: thành công cho mapper, open/read, completion,
+  retry và thứ tự revision.
 - Kiểm tra loading trì hoãn, empty, payload sai/lesson không khớp/ID trùng,
   HTTP 400/403/404/500, mất kết nối, retry, lật/đánh giá/event, đầu-cuối bộ thẻ,
   một thẻ, đổi lesson, ngôn ngữ/theme và luồng Lesson → Flashcard đều đạt.

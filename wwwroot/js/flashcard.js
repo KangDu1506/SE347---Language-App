@@ -9,12 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const views = [...page.querySelectorAll('[data-view]')];
     // This element is only emitted by Razor in Development with ?preview=1.
     const previewData = $('[data-preview-lesson]');
-    const state = { contents: [], index: 0, flipped: false, rating: null, view: 'loading' };
+    const state = { contents: [], index: 0, flipped: false, rating: null, view: 'loading',
+        sessionId: null, completion: null, retryRequested: false, navigating: false, completionRequested: false };
     let requestId = 0;
     let ratingScope = null;
     const ratings = new Map();
     const unsavedRatings = new Set();
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
+
+    function sessionContext() {
+        return state.sessionId ? Object.freeze({ lessonId, sessionId: state.sessionId,
+            contentIds: Object.freeze(state.contents.map(item => item.id)), hasQuiz: state.hasQuiz, preview: !!previewData }) : null;
+    }
+    // A late-loading adapter can read the same context as the session-ready event.
+    Object.defineProperty(page, 'flashcardSession', { get: sessionContext });
+    const createSessionId = () => typeof crypto.randomUUID === 'function' ? crypto.randomUUID()
+        : Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
 
     const isRating = value => value === 'know' || value === 'again';
     const ratingPrefix = () => ratingScope ? `se347.flashcard.rating.v1:${encodeURIComponent(ratingScope)}:${encodeURIComponent(lessonId)}:` : null;
@@ -40,12 +50,34 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch { unsavedRatings.add(id); }
     }
 
+    function hydrateRatings() {
+        state.contents.forEach(item => readRating(item.id));
+    }
+
+    function classificationStats() {
+        let remembered = 0;
+        let notRemembered = 0;
+        for (const item of state.contents) {
+            const mark = ratings.get(item.id);
+            if (mark === 'know') remembered++;
+            else if (mark === 'again') notRemembered++;
+        }
+        return { total: state.contents.length, remembered, notRemembered, answered: remembered + notRemembered };
+    }
+
+    const isDeckClassified = () => {
+        const stats = classificationStats();
+        return stats.total > 0 && stats.answered === stats.total;
+    };
+
     const userScope = session => session?.user?.id ? `user:${session.user.id}` : null;
 
     function show(view) {
+        const previous = state.view;
         state.view = view;
         views.forEach(element => { element.hidden = element.dataset.view !== view; });
         $('[data-view="loading"]').setAttribute('aria-busy', String(view === 'loading'));
+        if (view === 'complete' && previous !== view) $('[data-view="complete"]').focus();
     }
 
     function setText(selector, value) {
@@ -64,26 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
         show('message');
     }
 
-    // Check the existing lesson contract; malformed data must not look like an empty deck.
-    const hasText = value => typeof value === 'string' && value.trim().length > 0;
-    function validLesson(lesson) {
-        if (!lesson || lesson.lessonId !== lessonId || !hasText(lesson.name) || !Array.isArray(lesson.contents)) return false;
-        const ids = new Set();
-        return lesson.contents.every(item => {
-            if (!item || !hasText(item.id) || ids.has(item.id) || !hasText(item.content)
-                || !hasText(item['definition-vi']) || !hasText(item['definition-en'])) return false;
-            ids.add(item.id);
-            return ['pronunciation-bre', 'pronunciation-name'].every(key => item[key] == null || typeof item[key] === 'string')
-                && (item.examples == null || (Array.isArray(item.examples)
-                    && item.examples.every(example => example && hasText(example.term) && hasText(example.translation))));
-        });
-    }
-
     // UI integration only: consumers own learning rules and server persistence.
     function emit(name) {
         page.dispatchEvent(new CustomEvent(`flashcard:${name}`, {
             bubbles: true,
-            detail: { lessonId, contentId: state.contents[state.index].id, index: state.index,
+            detail: { lessonId, sessionId: state.sessionId, contentId: state.contents[state.index].id, index: state.index,
                 total: state.contents.length, side: state.flipped ? 'back' : 'front', rating: state.rating }
         }));
     }
@@ -108,6 +125,11 @@ document.addEventListener('DOMContentLoaded', () => {
         progress.setAttribute('aria-valuenow', String(current));
         progress.setAttribute('aria-valuetext', count);
         $('[data-progress-fill]').style.width = `${(current / total) * 100}%`;
+
+        const stats = classificationStats();
+        const answered = t('flashcard.answered_count', 'Đã phân loại {answered}/{total}')
+            .replace('{answered}', stats.answered).replace('{total}', stats.total);
+        setText('[data-answered-count]', answered);
 
         card.dataset.cardSide = front ? 'front' : 'back';
         $('[data-card-label]').textContent = t(front ? 'flashcard.front_label' : 'flashcard.back_label', front ? 'Mặt trước' : 'Mặt sau');
@@ -156,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setLessonLinks(lesson) {
         const url = `/Lesson/${encodeURIComponent(lesson.lessonId)}`;
-        page.querySelectorAll('[data-back-to-lesson], [data-empty-back]').forEach(link => { link.href = url; });
+        page.querySelectorAll('[data-back-to-lesson], [data-empty-back], [data-complete-back-to-lesson]').forEach(link => { link.href = url; });
         setText('[data-lesson-name]', lesson.name);
         setText('[data-lesson-heading]', lesson.name);
         document.title = `${lesson.name} · Wordfox`;
@@ -164,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function load() {
         const currentRequest = ++requestId;
+        invalidateSession();
         state.contents = [];
         state.index = 0;
         state.flipped = false;
@@ -171,10 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('[data-lesson-name]', '');
         setText('[data-lesson-heading]', '');
         setText('[data-card-term]', '');
+        setText('[data-answered-count]', '');
         $('[data-card-back]').hidden = true;
         $('[data-examples]').replaceChildren();
         const lessonUrl = LESSON_ID_PATTERN.test(lessonId) ? `/Lesson/${encodeURIComponent(lessonId)}` : '/Study';
-        page.querySelectorAll('[data-back-to-lesson], [data-empty-back]').forEach(link => { link.href = lessonUrl; });
+        page.querySelectorAll('[data-back-to-lesson], [data-empty-back], [data-complete-back-to-lesson]').forEach(link => { link.href = lessonUrl; });
         document.querySelector('title')?.removeAttribute('data-i18n');
         document.title = 'Flashcard · Wordfox';
         show('loading');
@@ -196,21 +220,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 unsavedRatings.clear();
                 ratingScope = scope;
             }
-            const lesson = previewData ? JSON.parse(previewData.textContent)
+            const response = previewData ? JSON.parse(previewData.textContent)
                 : await window.AppApi.get(`/api/lessons/${encodeURIComponent(lessonId)}`);
             if (currentRequest !== requestId) return;
-            if (!validLesson(lesson)) {
+            const lesson = window.FlashcardData?.mapLesson(response, lessonId);
+            if (!lesson) {
                 setMessage('lesson.error_title', 'Không tải được bài học', 'flashcard.invalid_data', 'Dữ liệu thẻ không hợp lệ. Vui lòng thử lại.', true);
                 return;
             }
             state.contents = lesson.contents;
+            state.hasQuiz = lesson.hasQuiz;
+            hydrateRatings();
             setLessonLinks(lesson);
             if (state.contents.length === 0) {
                 show('empty');
                 return;
             }
             renderCard();
+            state.sessionId = createSessionId();
+            page.dataset.sessionId = state.sessionId;
             show('ready');
+            page.dispatchEvent(new CustomEvent('flashcard:session-ready', { bubbles: true,
+                detail: sessionContext() }));
         } catch (error) {
             if (currentRequest !== requestId) return;
             if (error.status === 401) return;
@@ -227,6 +258,90 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
+
+    // SCRUM-77 determines completion; SCRUM-76 owns persistence and retry requests.
+    // The UI accepts one ordered completion stream for the current session only.
+    function invalidateSession() {
+        state.sessionId = null;
+        state.completion = null;
+        state.retryRequested = false;
+        state.completionRequested = false;
+        delete page.dataset.sessionId;
+        resetNavigation();
+        const next = $('[data-complete-next]');
+        next.hidden = true;
+        next.removeAttribute('href');
+        $('[data-action="retry-completion"]').hidden = true;
+    }
+
+    function resetNavigation() {
+        state.navigating = false;
+        page.querySelectorAll('[data-completion-navigation]').forEach(link => {
+            link.removeAttribute('aria-disabled');
+            link.removeAttribute('aria-busy');
+        });
+    }
+
+    function setCompletionText(selector, key, fallback) {
+        const element = $(selector);
+        element.dataset.i18n = key;
+        element.textContent = t(key, fallback);
+    }
+
+    function renderCompletion() {
+        const completion = state.completion;
+        const panel = $('[data-view="complete"]');
+        const focused = document.activeElement;
+        const saving = completion.phase === 'saving';
+        const failed = completion.phase === 'error';
+        const done = completion.phase === 'completed';
+        panel.dataset.phase = completion.phase;
+        $('[data-completion-message]').setAttribute('role', failed ? 'alert' : 'status');
+        $('[data-completion-message]').setAttribute('aria-live', failed ? 'assertive' : 'polite');
+        setCompletionText('[data-completion-title]', saving ? 'flashcard.saving_title' : failed ? 'flashcard.save_error_title' : 'flashcard.complete_title',
+            saving ? 'Đang ghi nhận phiên ôn tập' : failed ? 'Chưa lưu được tiến độ' : 'Bạn đã hoàn thành phiên ôn tập');
+        const textKey = saving ? 'flashcard.saving_text' : failed ? 'flashcard.save_error_text'
+            : completion.persistence === 'saved' ? 'flashcard.saved_text' : 'flashcard.local_complete_text';
+        const text = saving ? 'Đang chờ máy chủ xác nhận. Tiến độ chưa được xác nhận lưu.'
+            : failed ? 'Tiến độ chưa được xác nhận lưu lên máy chủ. Bạn có thể quay lại bài học hoặc trang Học tập.'
+            : completion.persistence === 'saved' ? 'Tiến độ phiên ôn tập đã được máy chủ xác nhận.'
+            : 'Phiên ôn tập đã kết thúc. Tiến độ của phiên này không được lưu lên máy chủ.';
+        setCompletionText('[data-completion-message]', textKey, text);
+        const retry = $('[data-action="retry-completion"]');
+        retry.hidden = !failed || !completion.canRetry;
+        retry.disabled = state.retryRequested;
+        retry.setAttribute('aria-busy', String(state.retryRequested));
+        const next = $('[data-complete-next]');
+        next.hidden = !done || !completion.nextLessonId;
+        if (!next.hidden) next.href = `/Lesson/${encodeURIComponent(completion.nextLessonId)}`;
+        else next.removeAttribute('href');
+        $('[data-complete-back-to-lesson]').classList.toggle('btn--ink', done && next.hidden);
+        // If an async update hides the focused Retry link/button, focus the new state.
+        const refocus = panel.contains(focused) && (focused.closest('[hidden]') || focused.disabled);
+        show('complete');
+        if (refocus) panel.focus();
+    }
+
+    page.addEventListener('flashcard:completion-state', event => {
+        const update = event.detail;
+        if (!update || !state.sessionId || !state.contents.length || !['ready', 'complete'].includes(state.view)
+            || update.lessonId !== lessonId || update.sessionId !== state.sessionId
+            || !Number.isSafeInteger(update.revision) || update.revision < 1
+            || update.revision <= (state.completion?.revision ?? 0) || state.completion?.phase === 'completed') return;
+        const validPair = (update.phase === 'saving' && update.persistence === 'pending')
+            || (update.phase === 'error' && update.persistence === 'failed')
+            || (update.phase === 'completed' && ['saved', 'not-required'].includes(update.persistence));
+        if (!validPair || (previewData && update.persistence === 'saved')) return;
+        const next = update.nextStep;
+        const nextLessonId = next?.type === 'lesson' && typeof next.lessonId === 'string'
+            && LESSON_ID_PATTERN.test(next.lessonId) && next.lessonId !== lessonId ? next.lessonId : null;
+        state.completion = { revision: update.revision, phase: update.phase, persistence: update.persistence,
+            canRetry: update.phase === 'error' && update.canRetry === true, nextLessonId };
+        state.retryRequested = false;
+        renderCompletion();
+    });
+
+    window.addEventListener('pageshow', resetNavigation);
 
     function flipCard() {
         if (state.view !== 'ready') return;
@@ -271,8 +386,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     page.addEventListener('click', event => {
+        const link = event.target.closest('[data-completion-navigation]');
+        if (link && page.contains(link)) {
+            if (state.view !== 'complete' || link.hidden || !link.hasAttribute('href')) { event.preventDefault(); return; }
+            if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            if (state.navigating) { event.preventDefault(); return; }
+            state.navigating = true;
+            page.querySelectorAll('[data-completion-navigation]').forEach(action => action.setAttribute('aria-disabled', 'true'));
+            link.setAttribute('aria-busy', 'true');
+            return; // Native link preserves normal history/back behavior.
+        }
         const button = event.target.closest('button');
         if (!button || !page.contains(button) || button.disabled) return;
+        if (button.dataset.action === 'retry-completion') {
+            if (state.view !== 'complete' || state.completion?.phase !== 'error' || !state.completion.canRetry || state.retryRequested) return;
+            state.retryRequested = true;
+            const wasFocused = document.activeElement === button;
+            renderCompletion();
+            if (wasFocused) $('[data-view="complete"]').focus();
+            page.dispatchEvent(new CustomEvent('flashcard:completion-retry', { bubbles: true,
+                detail: { lessonId, sessionId: state.sessionId, revision: state.completion.revision } }));
+            return;
+        }
         if (button.dataset.action === 'retry') {
             if (state.view === 'message' && !button.hidden) load();
             return;
@@ -293,9 +428,16 @@ document.addEventListener('DOMContentLoaded', () => {
             emit('change');
         }
         if (['know', 'again'].includes(button.dataset.rating)) {
+            const wasClassified = isDeckClassified();
             saveRating(state.contents[state.index].id, button.dataset.rating);
             renderCard();
             emit('rate');
+            if (!wasClassified && !state.completionRequested && isDeckClassified()) {
+                state.completionRequested = true;
+                page.dispatchEvent(new CustomEvent('flashcard:session-complete', { bubbles: true,
+                    detail: { lessonId, sessionId: state.sessionId,
+                        contentIds: Object.freeze(state.contents.map(item => item.id)), total: state.contents.length } }));
+            }
         }
     });
 
@@ -316,6 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const subscription = window.sb?.auth.onAuthStateChange?.((event, session) => {
             if (event === 'INITIAL_SESSION' || userScope(session) === ratingScope) return;
             ++requestId;
+            invalidateSession();
             state.contents = [];
             ratings.clear();
             unsavedRatings.clear();
@@ -330,8 +473,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('app:languagechange', () => {
         if (state.view === 'ready') renderCard();
+        else if (state.view === 'complete') renderCompletion();
     });
-    window.AppI18n?.ready.then(() => { if (state.view === 'ready') renderCard(); });
+    window.AppI18n?.ready.then(() => {
+        if (state.view === 'ready') renderCard();
+        else if (state.view === 'complete') renderCompletion();
+    });
 
     load();
 });

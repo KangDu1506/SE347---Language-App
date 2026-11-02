@@ -8,7 +8,7 @@ const base = process.env.APP_URL || 'http://localhost:5347';
 const debug = process.env.CHROME_DEBUG_URL || 'http://localhost:9347';
 const root = path.resolve(__dirname, '../..');
 const source = JSON.parse(fs.readFileSync(path.join(root, 'Storage/LessonTemplate/at-the-coffee-shop/content.json'), 'utf8'));
-const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', contents: source };
+const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', contents: source, quiz: [] };
 
 (async () => {
     const target = await (await fetch(debug + '/json/new?about:blank', { method: 'PUT' })).json();
@@ -19,7 +19,9 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
     const errors = [];
     const requests = [];
     let scenario = { status: 200, body: lesson };
+    let progressState = { lessonId: lesson.lessonId, status: 'not_started', completedContentIds: [], xpEarned: 0 };
     let releaseResponse;
+    const progressResponse = () => ({ ...progressState, completedContentIds: [...progressState.completedContentIds] });
     const send = (method, params = {}, sessionId) => new Promise((resolve, reject) => {
         const id = ++nextId;
         const timer = setTimeout(() => { pending.delete(id); reject(new Error('CDP timeout: ' + method)); }, 20000);
@@ -43,7 +45,17 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
             const { requestId, request } = message.params;
             const reply = (status, body, type) => fulfill(requestId, status, body, type, message.sessionId);
             let task;
-            if (request.url.includes('/api/')) {
+            if (request.url.includes('/api/progress/')) {
+                requests.push({ method: request.method, url: request.url });
+                const pathname = new URL(request.url).pathname;
+                const contentMatch = pathname.match(/\/contents\/([^/]+)\/complete$/);
+                if (request.method === 'POST' && contentMatch) {
+                    const contentId = decodeURIComponent(contentMatch[1]);
+                    if (!progressState.completedContentIds.includes(contentId)) progressState.completedContentIds.push(contentId);
+                }
+                if (request.method === 'POST' && pathname.endsWith('/complete')) progressState.status = 'completed';
+                task = reply(200, progressResponse());
+            } else if (request.url.includes('/api/')) {
                 requests.push({ method: request.method, url: request.url });
                 const response = { ...scenario };
                 if (response.networkError) task = send('Fetch.failRequest', { requestId, errorReason: 'ConnectionFailed' }, message.sessionId);
@@ -65,29 +77,47 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
             if (await run(expression, sessionId)) return;
             await new Promise(resolve => setTimeout(resolve, 50));
         }
-        throw new Error('Timed out: ' + expression);
+        const state = await run(`({path:location.pathname,message:!!document.querySelector('[data-view="message"]:not([hidden])'),loading:!!document.querySelector('[data-view="loading"]:not([hidden])'),ready:!!document.querySelector('[data-view="ready"]:not([hidden])'),error:document.querySelector('[data-message-text]')?.textContent,complete:!!document.querySelector('[data-view="complete"]:not([hidden])'),empty:!!document.querySelector('[data-view="empty"]:not([hidden])'),views:[...document.querySelectorAll('[data-view]')].map(e=>[e.dataset.view,e.hidden]),phase:document.querySelector('[data-view="complete"]')?.dataset.phase,msg:document.querySelector('[data-completion-message]')?.dataset.i18n})`, sessionId).catch(() => null);
+        throw new Error('Timed out: ' + expression + ' :: ' + JSON.stringify(state));
     };
     const visible = view => `!!document.querySelector('[data-view="${view}"]:not([hidden])')`;
     const click = (selector, sessionId) => run(`document.querySelector(${JSON.stringify(selector)}).click()`, sessionId);
+    const completion = detail => run(`(() => {const page=document.querySelector('.flashcard-page');page.dispatchEvent(new CustomEvent('flashcard:completion-state',{bubbles:true,detail:{lessonId:page.dataset.lessonId,sessionId:page.dataset.sessionId,revision:1,...${JSON.stringify(detail)}}}))})()`);
+    const completionFits = async () => {
+        for (const [width, height] of [[1440, 900], [1280, 800], [768, 1024], [390, 844], [320, 720], [844, 390], [568, 320]]) {
+            await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: Math.min(width, height) < 600 });
+            for (const theme of ['light', 'dark']) for (const language of ['vi', 'en']) {
+                await run(`AppI18n.setTheme('${theme}',false);AppI18n.setLanguage('${language}',false)`);
+                assert(await run("[...document.querySelectorAll('[data-view=complete], [data-view=complete] .btn')].filter(e=>e.getClientRects().length).every(e=>{const r=e.getBoundingClientRect();return r.left>=5&&r.right<=innerWidth-5&&e.scrollWidth<=e.clientWidth+1})"), `Completion layout ${width}x${height} ${theme}/${language}`);
+            }
+            await run("document.querySelector('[data-view=complete]').focus()");
+            await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+            await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+            assert(await run("document.activeElement.closest('[data-view=complete]') && getComputedStyle(document.activeElement).outlineStyle==='solid'"), 'Completion actions remain keyboard accessible');
+        }
+    };
     const patterns = [
         { urlPattern: '*://*/api/*' }, { urlPattern: '*/js/supabase-client*' },
         { urlPattern: 'https://cdn.jsdelivr.net/*' }, { urlPattern: 'https://fonts.googleapis.com/*' }
     ];
     let peerId;
+    let navigationId = 0;
     const navigate = async (id = lesson.lessonId, response = { status: 200, body: lesson }, view = 'ready') => {
         scenario = response;
-        await send('Page.navigate', { url: base + '/Flashcard/' + id });
+        await send('Page.navigate', { url: base + '/Flashcard/' + id + '?test=' + (++navigationId) });
         await wait(`location.pathname === '/Flashcard/${id}' && ${visible(view)} && !!window.AppI18n`);
         await run('AppI18n.ready');
     };
     try {
         await send('Runtime.enable');
         await send('Page.enable');
+        await send('Page.addScriptToEvaluateOnNewDocument', { source: "window.initialSession=null;document.addEventListener('flashcard:session-ready',e=>{window.initialSession=e.detail})" });
         await send('Fetch.enable', { patterns });
         const beforePreview = requests.length;
         await send('Page.navigate', { url: base + '/Flashcard/' + lesson.lessonId + '?preview=1' });
         await wait(visible('ready'));
         assert(await run("!!document.querySelector('[data-preview-lesson]') && !!document.querySelector('.flashcard-preview')"));
+        assert(await run(`initialSession.preview===true && initialSession.contentIds.length===${source.length} && initialSession.sessionId===document.querySelector('.flashcard-page').flashcardSession.sessionId && Object.isFrozen(initialSession)`));
         assert.equal(await run("document.querySelector('[data-card-term]').textContent"), source[0].content);
         assert(await run("!document.querySelector('[data-action=flip]')"), 'Standalone flip button removed');
         await send('DOM.enable');
@@ -107,6 +137,11 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         await click('[data-rating="know"]');
         assert.equal(requests.length, beforePreview, 'Local preview must not request API data');
         console.log('PASS: Development preview renders real lesson without auth/API');
+        await completion({ phase: 'completed', persistence: 'saved' });
+        assert(await run("document.querySelector('[data-view=complete]').hidden"), 'Preview cannot claim a server save');
+        await completion({ phase: 'completed', persistence: 'not-required' });
+        assert(await run("document.querySelector('[data-completion-message]').dataset.i18n==='flashcard.local_complete_text'"));
+        await completionFits();
         await navigate();
         await run("Object.keys(localStorage).filter(key=>key.startsWith('se347.flashcard.rating.v1:user%3Aflashcard-ui-test-')).forEach(key=>localStorage.removeItem(key))");
         await navigate();
@@ -195,20 +230,122 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         assert(await run("document.querySelector('[data-back-to-lesson]').getAttribute('href')==='/Lesson/at-the-coffee-shop'"));
         console.log('PASS: real lesson content, flip, rating events, navigation bounds, position, language/theme, lesson link');
 
+        // Visiting the last card or restoring local ratings never implies completion.
+        assert(await run("document.querySelector('[data-view=complete]').hidden && !!document.querySelector('.flashcard-page').dataset.sessionId"));
+        const progressPostsBeforeComplete = requests.filter(request => request.method === 'POST' && request.url.includes('/api/progress')).length;
+        for (const invalid of [
+            { lessonId: 'another-lesson', phase: 'completed', persistence: 'saved' },
+            { sessionId: 'old-session', phase: 'completed', persistence: 'saved' },
+            { phase: 'completed', persistence: 'pending' },
+            { phase: 'completed' },
+            { phase: 'completed', persistence: 'saved', revision: 0 }
+        ]) {
+            await completion(invalid);
+            assert(await run("!document.querySelector('[data-view=ready]').hidden && document.querySelector('[data-view=complete]').hidden"), 'Invalid completion context/state must be ignored');
+        }
+        const firstSession = await run("document.querySelector('.flashcard-page').dataset.sessionId");
+        await run("document.querySelector('.flashcard-page').dispatchEvent(new CustomEvent('flashcard:complete',{bubbles:true,detail:{lessonId:'at-the-coffee-shop'}}))");
+        assert(await run("document.querySelector('[data-view=complete]').hidden"), 'The old ambiguous event must not complete a session');
+        await completion({ phase: 'saving', persistence: 'pending' });
+        await wait(visible('complete'));
+        assert(await run("document.querySelector('[data-view=ready]').hidden && document.activeElement.matches('[data-view=complete]') && document.querySelector('[data-complete-next]').hidden"));
+        assert(await run("document.querySelector('[data-completion-title]').dataset.i18n==='flashcard.saving_title'"), 'Pending cannot announce success');
+        await completionFits();
+        await completion({ phase: 'error', persistence: 'failed', canRetry: true, revision: 2 });
+        assert(await run("document.querySelector('[data-completion-message]').getAttribute('role')==='alert' && !document.querySelector('[data-action=retry-completion]').hidden && document.querySelector('[data-complete-next]').hidden"));
+        await completionFits();
+        await run("window.retryRequests=[];document.addEventListener('flashcard:completion-retry',e=>retryRequests.push(e.detail))");
+        await run("const retry=document.querySelector('[data-action=retry-completion]');retry.focus();retry.click();retry.click();retry.click()");
+        assert.equal(await run('retryRequests.length'), 1, 'Retry emits once until the adapter provides a new state');
+        assert.equal(await run('retryRequests[0].sessionId'), firstSession);
+        assert(await run("document.activeElement.matches('[data-view=complete]')"), 'Disabled retry cannot strand keyboard focus');
+        await completion({ phase: 'saving', persistence: 'pending', revision: 3 });
+        await completion({ phase: 'error', persistence: 'failed', canRetry: true, revision: 2 });
+        assert(await run("document.querySelector('[data-view=complete]').dataset.phase==='saving'"), 'Late callbacks from older revisions cannot undo retry');
+        await completion({ phase: 'completed', persistence: 'saved', revision: 4 });
+        assert(await run("document.querySelector('[data-completion-message]').dataset.i18n==='flashcard.saved_text' && document.querySelector('[data-complete-next]').hidden"));
+        await completionFits();
+        assert.equal(await run("document.querySelector('[data-complete-back-to-lesson]').getAttribute('href')"), '/Lesson/at-the-coffee-shop');
+        assert.equal(await run("document.querySelector('[data-complete-back-to-study]').getAttribute('href')"), '/Study');
+        await run("document.querySelector('[data-complete-back-to-lesson]').focus()");
+        await completion({ phase: 'completed', persistence: 'saved', revision: 4 });
+        await completion({ phase: 'error', persistence: 'failed', revision: 5 });
+        assert(await run("document.querySelector('[data-view=complete]').dataset.phase==='completed' && document.activeElement.matches('[data-complete-back-to-lesson]')"), 'Terminal/duplicate state must not refocus or restart completion');
+        assert.equal(requests.filter(request => request.method === 'POST' && request.url.includes('/api/progress')).length, progressPostsBeforeComplete, 'SCRUM-75 must not write progress');
+
+        // Intercept the default action after the UI handler to count accepted activations.
+        await run("window.navAllowed=[];window.blockNavigation=e=>{if(e.target.closest('[data-completion-navigation]')){navAllowed.push(!e.defaultPrevented);e.preventDefault()}};document.addEventListener('click',blockNavigation)");
+        await run("const link=document.querySelector('[data-complete-back-to-lesson]');link.click();link.click();link.click()");
+        assert.deepEqual(await run('navAllowed'), [true, false, false], 'Rapid clicks must accept only one navigation');
+        await run("document.removeEventListener('click',blockNavigation);dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))");
+        assert(await run("!document.querySelector('[data-complete-back-to-lesson]').hasAttribute('aria-disabled')"), 'Back/forward restores available navigation');
+        await click('[data-complete-back-to-lesson]');
+        await wait("location.pathname==='/Lesson/at-the-coffee-shop' && !!document.querySelector('[data-state=ready]:not([hidden])')");
+        await run('history.back()');
+        await wait("location.pathname==='/Flashcard/at-the-coffee-shop' && !!document.querySelector('.flashcard-page') && document.readyState==='complete'");
+        await wait("!!document.querySelector('[data-view=ready]:not([hidden]),[data-view=complete]:not([hidden])')");
+        assert(await run("[...document.querySelectorAll('[data-completion-navigation]')].every(a=>!a.hasAttribute('aria-disabled'))"));
+        await navigate();
+        assert.notEqual(await run("document.querySelector('.flashcard-page').dataset.sessionId"), firstSession);
+        await completion({ phase: 'completed', persistence: 'saved', sessionId: firstSession });
+        assert(await run("!document.querySelector('[data-view=ready]').hidden && document.querySelector('[data-view=complete]').hidden"), 'Reload/re-entry does not reuse a previous completion event');
+        const accountSession = await run("document.querySelector('.flashcard-page').dataset.sessionId");
+        await run("window.testUser='flashcard-ui-test-b';authChange('SIGNED_IN',{user:{id:testUser}})");
+        await wait(visible('ready'));
+        await completion({ phase: 'completed', persistence: 'saved', sessionId: accountSession });
+        assert(await run("document.querySelector('[data-view=complete]').hidden"), 'A previous account callback cannot complete the new session');
+
+        // Only an explicit typed lesson destination is supported; no arbitrary URL.
+        for (const nextStep of [{ type: 'url', url: 'https://example.com' }, { type: 'lesson', lessonId: '../Study' }, { type: 'lesson', lessonId: lesson.lessonId }]) {
+            await navigate();
+            await completion({ phase: 'completed', persistence: 'not-required', nextStep });
+            assert(await run("document.querySelector('[data-complete-next]').hidden"), 'Unsupported/invalid next destinations use fallback');
+        }
+        await navigate();
+        await completion({ phase: 'completed', persistence: 'saved', nextStep: { type: 'lesson', lessonId: 'present-simple-tense' } });
+        assert.equal(await run("document.querySelector('[data-complete-next]').getAttribute('href')"), '/Lesson/present-simple-tense');
+        scenario = { status: 200, body: { ...lesson, lessonId: 'present-simple-tense' } };
+        await click('[data-complete-next]');
+        await wait("location.pathname==='/Lesson/present-simple-tense' && !!document.querySelector('[data-state=ready]:not([hidden])')");
+        await navigate();
+        await completion({ phase: 'completed', persistence: 'not-required' });
+        assert(await run("document.querySelector('[data-completion-message]').dataset.i18n==='flashcard.local_complete_text'"));
+        await click('[data-complete-back-to-study]');
+        await wait("location.pathname==='/Study' && document.readyState==='complete'");
+        console.log('PASS: session/revision contract, pending/error/retry/saved, duplicate guards, typed next/fallback routes, reload/back and navigation lock');
+
+        const withoutUuid = await send('Page.addScriptToEvaluateOnNewDocument', { source: "Object.defineProperty(crypto,'randomUUID',{value:undefined})" });
+        await navigate();
+        assert(await run("/^[a-f0-9]{32}$/.test(document.querySelector('.flashcard-page').dataset.sessionId)"), 'Session IDs work without secure-context randomUUID');
+        await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: withoutUuid.identifier });
+        const requestsBeforeMissingContext = requests.length;
+        await send('Page.navigate', { url: base + '/Flashcard' });
+        await wait(visible('message'));
+        await completion({ phase: 'completed', persistence: 'saved' });
+        assert(await run("!document.querySelector('[data-view=message]').hidden && document.querySelector('[data-view=complete]').hidden && document.querySelector('[data-back-to-lesson]').getAttribute('href')==='/Study' && document.querySelector('.flashcard-page').flashcardSession===null"));
+        assert.equal(requests.length, requestsBeforeMissingContext, 'Missing lesson ID must not call lesson/progress APIs');
+
         await navigate(lesson.lessonId, { status: 200, body: { ...lesson, contents: [] } }, 'empty');
         assert(await run("document.querySelector('[data-view=ready]').hidden"));
+        await completion({ phase: 'completed', persistence: 'saved' });
+        assert(await run("!document.querySelector('[data-view=empty]').hidden && document.querySelector('[data-view=complete]').hidden"), 'An empty deck must not be treated as complete');
         await navigate(lesson.lessonId, { status: 200, body: lesson, delay: true }, 'loading');
         await wait('document.readyState === "complete"');
         assert(await run("document.querySelector('[data-view=ready]').hidden && document.querySelector('[data-view=loading]').getAttribute('aria-busy')==='true'"));
+        await completion({ phase: 'completed', persistence: 'saved' });
+        assert(await run("document.querySelector('[data-view=complete]').hidden"), 'Loading cannot consume a completion event');
         await releaseResponse();
         await wait(visible('ready'));
         console.log('PASS: empty and delayed loading');
 
-        for (const body of [null, { ...lesson, contents: null }, { ...lesson, lessonId: 'another-lesson' },
-            { ...lesson, contents: [{ ...source[0], content: '' }] }, { ...lesson, contents: [source[0], source[0]] }]) {
+        for (const body of [null, { ...lesson, contents: null }, { ...lesson, lessonId: 'another-lesson' }]) {
             await navigate(lesson.lessonId, { status: 200, body }, 'message');
             assert(await run("document.querySelector('[data-message-text]').dataset.i18n==='flashcard.invalid_data' && !document.querySelector('[data-action=retry]').hidden"));
         }
+        await navigate(lesson.lessonId, { status: 200, body: { ...lesson, contents: [{ ...source[0], content: '' }] } }, 'empty');
+        assert(await run("document.querySelector('[data-view=ready]').hidden"));
+        await navigate(lesson.lessonId, { status: 200, body: { ...lesson, contents: [source[0], source[0]] } }, 'ready');
+        assert.equal(await run("document.querySelector('[data-card-count]').textContent.includes('/ 1')"), true, 'Duplicate content IDs are rendered once');
         for (const status of [400, 404, 403, 500]) {
             await navigate(lesson.lessonId, { status, body: { code: status === 403 ? 'lesson_locked' : '' } }, 'message');
             assert.equal(await run("document.querySelector('[data-action=retry]').hidden"), status !== 500);
@@ -223,15 +360,18 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         console.log('PASS: invalid payload, mismatched lesson, duplicate IDs, HTTP errors, retry, inactive profile');
 
         const other = { ...lesson, lessonId: 'other-lesson', name: 'Other lesson', contents: [{ ...source[0],
-            content: 'Từ dài tiếng Việt '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
-            'definition-vi': 'Đáp án dài nhiều đoạn. '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
+            content: 'Tá»« dÃ i tiáº¿ng Viá»‡t '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
+            'definition-vi': 'ÄÃ¡p Ã¡n dÃ i nhiá»u Ä‘oáº¡n. '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
             'definition-en': 'A long answer paragraph. '.repeat(100),
-            examples: [{ term: 'A long example. '.repeat(60), translation: 'Ví dụ dài. '.repeat(60) }]
+            examples: [{ term: 'A long example. '.repeat(60), translation: 'VÃ­ dá»¥ dÃ i. '.repeat(60) }]
         }] };
+        const otherDeck = { ...other, contents: [other.contents[0], { ...source[0], id: 'second-card',
+            content: 'Second card', 'definition-vi': 'Thẻ thứ hai', 'definition-en': 'Second card' }] };
         await navigate(other.lessonId, { status: 200, body: other });
         assert.equal(await run("document.querySelector('[data-card-term]').textContent"), other.contents[0].content);
         assert(await run("document.querySelector('[data-action=previous]').disabled && document.querySelector('[data-action=next]').disabled && document.querySelector('[data-pronunciation]').hidden"));
         assert(await run("[...document.querySelectorAll('[data-rating]')].every(b=>b.getAttribute('aria-pressed')==='false')"), 'Lessons must not share choices');
+        await navigate(otherDeck.lessonId, { status: 200, body: otherDeck });
         for (const [width, height] of [[1440, 900], [1280, 800], [768, 1024], [390, 844], [320, 720], [844, 390], [568, 320]]) {
             await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: Math.min(width, height) < 600 });
             for (const theme of ['light', 'dark']) {
@@ -331,6 +471,7 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         assert(await run("document.querySelector('[data-rating=again]').getAttribute('aria-pressed')==='true'"));
         await run("Object.defineProperty(window,'localStorage',storageDescriptor);true");
         console.log('PASS: responsive viewports, focus ring, keyboard scrolling, fixed-size long content, blocked storage fallback');
+        const requestsBeforeReview = requests.length;
         scenario = { status: 200, body: { ...lesson, quiz: [] } };
         await send('Page.navigate', { url: base + '/Lesson/' + lesson.lessonId });
         await wait("!!document.querySelector('[data-state=ready]:not([hidden])')");
@@ -339,9 +480,36 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         await click('[data-action="review"]');
         await wait(visible('ready'));
         assert.equal(await run('location.pathname'), '/Flashcard/' + lesson.lessonId);
-        assert.equal(requests.filter(request => request.method === 'POST' && !request.url.endsWith('/open')).length, 0);
+        assert.equal(requests.slice(requestsBeforeReview).filter(request => request.method === 'POST'
+            && (request.url.includes('/contents/') || request.url.endsWith('/complete'))).length, 0);
+
+        await navigate();
+        await run("Object.keys(localStorage).filter(key=>key.startsWith('se347.flashcard.rating.v1:user%3Aflashcard-ui-test-b:')).forEach(key=>localStorage.removeItem(key))");
+        progressState = { lessonId: lesson.lessonId, status: 'not_started', completedContentIds: [], xpEarned: 0 };
+        await navigate();
+        const completionWrites = () => requests.filter(request => request.method === 'POST'
+            && (request.url.includes('/contents/') || request.url.endsWith('/complete')));
+        const writesBeforeClassification = completionWrites().length;
+        for (let i = 0; i < source.length; i++) {
+            await click('[data-rating="know"]');
+            if (i === 0) assert.equal(completionWrites().length, writesBeforeClassification, 'A partial classification must not persist completion');
+            if (i < source.length - 1) await click('[data-action="next"]');
+        }
+        await wait("document.querySelector('[data-completion-message]').dataset.i18n==='flashcard.saved_text'");
+        const expectedCompletion = source.map(item =>
+            ['POST', base + '/api/progress/lessons/' + lesson.lessonId + '/contents/' + item.id + '/complete']);
+        expectedCompletion.push(['POST', base + '/api/progress/lessons/' + lesson.lessonId + '/complete']);
+        assert.deepEqual(completionWrites().slice(writesBeforeClassification).map(request => [request.method, request.url]), expectedCompletion);
+        assert(await run("document.querySelector('[data-answered-count]').textContent.endsWith('4/4')"));
+        assert(await run("!document.querySelector('[data-view=complete]').hidden && document.querySelector('[data-view=ready]').hidden"));
+        const completionWriteCount = completionWrites().length;
+        await run("document.querySelector('.flashcard-page').dispatchEvent(new CustomEvent('flashcard:session-complete',{bubbles:true,detail:{lessonId:'at-the-coffee-shop',sessionId:document.querySelector('.flashcard-page').dataset.sessionId}}))");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        assert.equal(completionWrites().length, completionWriteCount, 'A completed session cannot persist twice');
+        console.log('PASS: all-card classification emits completion once and uses confirmed content/lesson endpoints');
+
         assert.deepEqual(errors, []);
-        console.log('PASS: lesson switch, single card, long content, static lesson/review entry, no progress writes, no JS errors');
+        console.log('PASS: lesson switch, single card, long content, static lesson/review entry, no JS errors');
     } finally {
         if (peerId) await send('Target.closeTarget', { targetId: peerId });
         socket.close();
