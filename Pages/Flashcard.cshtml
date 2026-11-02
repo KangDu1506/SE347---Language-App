@@ -80,19 +80,22 @@
                 <span data-progress-fill></span>
             </div>
 
-            <article class="sticker flashcard-card" data-card-side="front" role="button" tabindex="0" aria-label="Lật thẻ để xem mặt sau" aria-live="polite">
-                <div class="flashcard-card__content">
-                <p class="flashcard-card__label" data-card-label data-i18n="flashcard.front_label">Mặt trước</p>
-                <h2 class="flashcard-card__term" data-card-term lang="en"></h2>
-                <div class="flashcard-card__back" data-card-back hidden>
-                    <p class="flashcard-card__definition" data-definition-vi></p>
-                    <p class="flashcard-card__definition flashcard-card__definition--en" data-definition-en lang="en"></p>
-                    <p class="flashcard-card__ipa" data-pronunciation hidden></p>
-                    <div class="flashcard-card__examples" data-examples-wrap hidden>
-                        <h3 data-i18n="lesson.examples">Ví dụ</h3>
-                        <ul data-examples></ul>
+            <p class="visually-hidden" data-card-announcement role="status" aria-atomic="true"></p>
+            <article class="sticker flashcard-card" data-card-side="front" aria-labelledby="flashcard-term">
+                <button class="flashcard-card__label" type="button" data-card-toggle aria-label="Lật thẻ để xem mặt sau">
+                    <span data-card-label data-i18n="flashcard.front_label">Mặt trước</span>
+                </button>
+                <div class="flashcard-card__content" tabindex="0" role="region" aria-labelledby="flashcard-term">
+                    <h2 id="flashcard-term" class="flashcard-card__term" data-card-term lang="en"></h2>
+                    <div id="flashcard-back" class="flashcard-card__back" data-card-back hidden>
+                        <p class="flashcard-card__definition" data-definition-vi></p>
+                        <p class="flashcard-card__definition flashcard-card__definition--en" data-definition-en lang="en"></p>
+                        <p class="flashcard-card__ipa" data-pronunciation hidden></p>
+                        <div class="flashcard-card__examples" data-examples-wrap hidden>
+                            <h3 data-i18n="lesson.examples">Ví dụ</h3>
+                            <ul data-examples></ul>
+                        </div>
                     </div>
-                </div>
                 </div>
             </article>
 

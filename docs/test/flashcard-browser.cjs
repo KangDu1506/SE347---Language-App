@@ -131,13 +131,30 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         await click('[data-card-term]');
         assert(await run("document.querySelector('[data-card-side]').dataset.cardSide==='back'"), 'Click card to flip');
         assert.deepEqual(await run("({height:document.querySelector('[data-card-side]').getBoundingClientRect().height,controls:document.querySelector('.flashcard-navigation').getBoundingClientRect().top})"), geometry);
-        await run("document.querySelector('[data-card-side]').focus()");
-        await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
+        await run("document.querySelector('[data-card-toggle]').focus()");
+        await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r', unmodifiedText: '\r' });
         await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
         assert(await run("document.querySelector('[data-card-side]').dataset.cardSide==='front'"));
         await send('Input.dispatchKeyEvent', { type: 'keyDown', key: ' ', code: 'Space', windowsVirtualKeyCode: 32 });
         await send('Input.dispatchKeyEvent', { type: 'keyUp', key: ' ', code: 'Space', windowsVirtualKeyCode: 32 });
         assert(await run("document.querySelector('[data-card-side]').dataset.cardSide==='back'"));
+        assert(await run("document.activeElement.matches('[data-card-toggle]')"), 'Native flip button retains focus');
+        const ax = (await send('Accessibility.getFullAXTree')).nodes;
+        assert(ax.some(node => !node.ignored && node.role?.value === 'heading' && node.name?.value === source[0].content));
+        assert(ax.some(node => !node.ignored && node.role?.value === 'StaticText' && node.name?.value === source[0]['definition-vi']), 'Back content must remain exposed to assistive technology');
+        for (const selector of ['.flashcard-card__content', '[data-rating=know]', '[data-rating=again]', '[data-action=next]']) {
+            await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+            await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+            assert(await run(`document.activeElement.matches('${selector}') && getComputedStyle(document.activeElement).outlineStyle==='solid'`), 'Tab reaches the next available control: ' + selector);
+        }
+        const mousePoint = await run("(() => {const b=document.querySelector('[data-rating=know]');b.scrollIntoView({block:'center'});const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+        const rateBeforeMouse = await run("uiEvents.filter(e=>e.name==='rate').length");
+        await send('Input.dispatchMouseEvent', { type: 'mouseMoved', ...mousePoint });
+        await send('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...mousePoint });
+        await send('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...mousePoint });
+        assert.equal(await run("uiEvents.filter(e=>e.name==='rate').length"), rateBeforeMouse + 1);
+        assert(await run("document.querySelector('[data-rating=know]').getAttribute('aria-pressed')==='true' && getComputedStyle(document.querySelector('[data-rating=know]'),'::before').visibility==='visible'"), 'Selected choice has a non-color check indicator');
+        await click('[data-rating="again"]');
         await navigate();
         assert(await run("document.querySelector('[data-rating=again]').getAttribute('aria-pressed')==='true'"), 'Restore after page reload');
 
@@ -205,20 +222,105 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         assert(await run("document.querySelector('[data-message-title]').dataset.i18n==='lesson.inactive_title'"));
         console.log('PASS: invalid payload, mismatched lesson, duplicate IDs, HTTP errors, retry, inactive profile');
 
-        const other = { ...lesson, lessonId: 'other-lesson', name: 'Other lesson', contents: [{ ...source[0], content: 'Long content '.repeat(100) }] };
+        const other = { ...lesson, lessonId: 'other-lesson', name: 'Other lesson', contents: [{ ...source[0],
+            content: 'Từ dài tiếng Việt '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
+            'definition-vi': 'Đáp án dài nhiều đoạn. '.repeat(100) + 'ChuoiKhongDauCach'.repeat(60),
+            'definition-en': 'A long answer paragraph. '.repeat(100),
+            examples: [{ term: 'A long example. '.repeat(60), translation: 'Ví dụ dài. '.repeat(60) }]
+        }] };
         await navigate(other.lessonId, { status: 200, body: other });
         assert.equal(await run("document.querySelector('[data-card-term]').textContent"), other.contents[0].content);
         assert(await run("document.querySelector('[data-action=previous]').disabled && document.querySelector('[data-action=next]').disabled && document.querySelector('[data-pronunciation]').hidden"));
         assert(await run("[...document.querySelectorAll('[data-rating]')].every(b=>b.getAttribute('aria-pressed')==='false')"), 'Lessons must not share choices');
-        for (const width of [375, 1280]) {
-            await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+        for (const [width, height] of [[1440, 900], [1280, 800], [768, 1024], [390, 844], [320, 720], [844, 390], [568, 320]]) {
+            await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: Math.min(width, height) < 600 });
+            for (const theme of ['light', 'dark']) {
+                for (const language of ['vi', 'en']) {
+                    await run(`AppI18n.setTheme('${theme}',false);AppI18n.setLanguage('${language}',false)`);
+                    assert(await run("[...document.querySelectorAll('.flashcard-page button,.flashcard-page a')].filter(b=>b.getClientRects().length).every(b=>{const r=b.getBoundingClientRect();return r.left>=5&&r.right<=innerWidth-5&&b.scrollWidth<=b.clientWidth+1})"), `Controls must fit: ${width}x${height} ${theme}/${language}`);
+                }
+            }
             assert(await run('document.documentElement.scrollWidth <= innerWidth'), 'Document overflow at ' + width);
             const before = await run("document.querySelector('[data-card-side]').getBoundingClientRect().height");
+            assert(await run("document.querySelector('.flashcard-card__content').scrollHeight > document.querySelector('.flashcard-card__content').clientHeight"), 'Long content must remain scrollable');
+            assert(await run("document.querySelector('.flashcard-card__content').scrollWidth<=document.querySelector('.flashcard-card__content').clientWidth+1"), 'Long front text must wrap inside the card');
+            assert(await run("getComputedStyle(document.querySelector('.flashcard-card__content')).scrollbarWidth==='none'"), 'Scrollbar stays hidden by product request');
+            assert(await run("document.querySelector('.flashcard-card__content').scrollTop=100;document.querySelector('.flashcard-card__content').scrollTop>0"), 'Long content must remain scrollable');
+            assert.equal(await run("document.querySelector('[data-card-side]').getBoundingClientRect().height"), before);
+            assert(await run("[...document.querySelectorAll('.flashcard-page button')].filter(b=>!b.disabled && !b.closest('[hidden]')).every(b=>b.getBoundingClientRect().height>=44)"), 'Touch targets should be at least 44px high');
+            assert(await run("[...document.querySelectorAll('.flashcard-page button,.flashcard-page a')].filter(b=>b.getClientRects().length).every(b=>{const r=b.getBoundingClientRect();return r.left>=5&&r.right<=innerWidth-5})"), 'Controls and their focus rings must fit horizontally, not merely be clipped by the document');
+            await run("document.querySelector('[data-card-toggle]').focus()");
+            const tab = async shift => {
+                await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9, modifiers: shift ? 8 : 0 });
+                await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9, modifiers: shift ? 8 : 0 });
+            };
+            for (const selector of ['.flashcard-card__content', '[data-rating=know]', '[data-rating=again]']) {
+                await tab(false);
+                assert(await run(`document.activeElement.matches('${selector}') && getComputedStyle(document.activeElement).outlineStyle==='solid' && getComputedStyle(document.activeElement).outlineWidth==='3px'`), 'Real Tab navigation and visible focus: ' + selector);
+                assert(await run("(() => {const e=document.activeElement;const r=e.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return !!hit&&e.contains(hit)})()"), 'Focused control must not be covered by sticky header or mobile navigation');
+            }
+            await tab(true);
+            assert(await run("document.activeElement.matches('[data-rating=know]')"), 'Shift+Tab order');
+            await tab(true);
+            assert(await run("document.activeElement.matches('.flashcard-card__content')"));
+            await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'PageDown', code: 'PageDown', windowsVirtualKeyCode: 34 });
+            await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'PageDown', code: 'PageDown', windowsVirtualKeyCode: 34 });
+            assert(await run("document.querySelector('.flashcard-card__content').scrollTop>100"), 'Keyboard must scroll long card content');
+            await click('[data-card-side]');
+            assert(await run("document.querySelector('.flashcard-card__content').scrollTop===0"), 'Flip should reset the content scroll position');
+            assert(await run("document.querySelector('.flashcard-card__content').scrollHeight>document.querySelector('.flashcard-card__content').clientHeight && document.querySelector('.flashcard-card__content').scrollWidth<=document.querySelector('.flashcard-card__content').clientWidth+1"), 'Long answers must remain readable without horizontal overflow');
+            assert(await run("document.querySelector('[data-definition-vi]').textContent.includes('ChuoiKhongDauCach') && document.querySelector('[data-definition-en]').textContent.startsWith('A long answer')"), 'Long back-side text must not be truncated');
             await click('[data-card-side]');
             assert.equal(await run("document.querySelector('[data-card-side]').getBoundingClientRect().height"), before);
-            assert(await run("document.querySelector('.flashcard-card__content').scrollHeight > document.querySelector('.flashcard-card__content').clientHeight"), 'Long content must remain scrollable');
-            assert(await run("getComputedStyle(document.querySelector('.flashcard-card__content')).scrollbarWidth==='none'"), 'Scrollbar hidden');
-            assert(await run("document.querySelector('.flashcard-card__content').scrollTop=100;document.querySelector('.flashcard-card__content').scrollTop>0"), 'Hidden scrollbar still allows scrolling');
+        }
+        await run("window.touchRateCount=0;document.querySelector('.flashcard-page').addEventListener('flashcard:rate',()=>window.touchRateCount++)");
+        await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+        await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 });
+        const rateEventsBeforeTouch = await run('window.touchRateCount');
+        const touchTarget = await run("(() => {const b=document.querySelector('[data-rating=again]');b.scrollIntoView({block:'center'});const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()");
+        await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [touchTarget] });
+        await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        assert(await run("document.querySelector('[data-rating=again]').getAttribute('aria-pressed')==='true'"), 'Touch should activate the rating control once');
+        assert.equal(await run('window.touchRateCount'), rateEventsBeforeTouch + 1, 'A touch should not trigger the rating twice');
+        await run("window.touchFlipCount=0;document.querySelector('.flashcard-page').addEventListener('flashcard:flip',()=>window.touchFlipCount++)");
+        const cardTarget = await run("(() => {const c=document.querySelector('.flashcard-card__content');document.querySelector('[data-card-side]').scrollIntoView({block:'center'});c.scrollTop=0;const r=c.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height*.75,distance:r.height*.5}})()");
+        await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cardTarget.x, y: cardTarget.y }] });
+        for (let i = 1; i <= 6; i++) {
+            await send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: cardTarget.x, y: cardTarget.y - cardTarget.distance * i / 6 }] });
+            await new Promise(resolve => setTimeout(resolve, 30));
+        }
+        await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await wait("document.querySelector('.flashcard-card__content').scrollTop>0");
+        assert.equal(await run('window.touchFlipCount'), 0, 'Swiping long content must not flip');
+        const tapPoint = { x: cardTarget.x, y: cardTarget.y - cardTarget.distance / 2 };
+        await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [tapPoint] });
+        await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await wait('window.touchFlipCount===1');
+        assert.equal(await run('window.touchFlipCount'), 1, 'A card tap must flip once');
+        await run("(() => {const c=document.querySelector('[data-card-side]');c.dispatchEvent(new PointerEvent('pointerdown',{pointerId:99,clientX:20,clientY:20}));c.dispatchEvent(new PointerEvent('pointercancel',{pointerId:99}));c.dispatchEvent(new MouseEvent('click',{bubbles:true,detail:1}))})()");
+        assert.equal(await run('window.touchFlipCount'), 1, 'A cancelled gesture must not flip');
+        await send('Emulation.setTouchEmulationEnabled', { enabled: false });
+
+        for (const [term, definition] of [[source[0].content, other.contents[0]['definition-vi']], [other.contents[0].content, source[0]['definition-vi']], [source[0].content, source[0]['definition-vi']]]) {
+            const variant = { ...other, contents: [{ ...source[0], content: term, 'definition-vi': definition }] };
+            await navigate(other.lessonId, { status: 200, body: variant });
+            for (const width of [320, 1440]) {
+                await send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width === 320 });
+                const geometry = await run("({height:document.querySelector('[data-card-side]').offsetHeight,controls:document.querySelector('.flashcard-rating').offsetTop})");
+                await click('[data-card-side]');
+                assert.equal(await run("document.querySelector('[data-definition-vi]').textContent"), definition);
+                assert.deepEqual(await run("({height:document.querySelector('[data-card-side]').offsetHeight,controls:document.querySelector('.flashcard-rating').offsetTop})"), geometry);
+                assert(await run("document.querySelector('.flashcard-card__content').scrollWidth<=document.querySelector('.flashcard-card__content').clientWidth+1"));
+                await click('[data-card-side]');
+            }
+        }
+        for (const [view, response] of [['empty', { status: 200, body: { ...lesson, contents: [] } }], ['message', { status: 500, body: {} }], ['loading', { status: 200, body: lesson, delay: true }]]) {
+            await navigate(lesson.lessonId, response, view);
+            for (const width of [320, 768, 1440]) {
+                await send('Emulation.setDeviceMetricsOverride', { width, height: 800, deviceScaleFactor: 1, mobile: width === 320 });
+                assert(await run("[...document.querySelectorAll('.flashcard-page [data-view]:not([hidden]),.flashcard-page a,.flashcard-page button')].filter(e=>e.getClientRects().length).every(e=>{const r=e.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth})"), `${view} layout at ${width}`);
+            }
+            if (view === 'loading') { await releaseResponse(); await wait(visible('ready')); }
         }
         await navigate();
         await run("window.storageDescriptor=Object.getOwnPropertyDescriptor(window,'localStorage');Object.defineProperty(window,'localStorage',{configurable:true,get(){throw new Error('Storage unavailable')}});true");
@@ -228,7 +330,7 @@ const lesson = { lessonId: 'at-the-coffee-shop', name: 'At the coffee shop', con
         await click('[data-action="previous"]');
         assert(await run("document.querySelector('[data-rating=again]').getAttribute('aria-pressed')==='true'"));
         await run("Object.defineProperty(window,'localStorage',storageDescriptor);true");
-        console.log('PASS: preview/lesson isolation, fixed-size scrollable long content, blocked storage fallback');
+        console.log('PASS: responsive viewports, focus ring, keyboard scrolling, fixed-size long content, blocked storage fallback');
         scenario = { status: 200, body: { ...lesson, quiz: [] } };
         await send('Page.navigate', { url: base + '/Lesson/' + lesson.lessonId });
         await wait("!!document.querySelector('[data-state=ready]:not([hidden])')");
