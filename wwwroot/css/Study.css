@@ -695,6 +695,8 @@
 .study-cat__list button[aria-current="true"] { border-color: var(--ink); background: var(--surface-orange); box-shadow: var(--shadow-sticker-sm); }
 .study-cat__list small { color: var(--text-secondary); font-weight: var(--fw-semibold); white-space: nowrap; }
 .study-cat__list button[aria-current="true"] small { color: inherit; }
+.study-library-state { margin: 12px 0; color: var(--text-secondary); font-weight: var(--fw-semibold); }
+#study-library-retry { margin: 0 0 8px; }
 
 .study-topic { padding: 24px 26px; }
 .study-topic__panel.is-swapping { animation: study-swap .35s ease-out; }

@@ -7,7 +7,7 @@
 @inject IWebHostEnvironment Environment
 @*
     Học tập: Bàn cờ lộ trình học tập phân nhánh (Flowchart / Skill Tree), thư viện chủ đề và gợi ý.
-    Dữ liệu lộ trình được nạp động từ LearningPath.json và thư viện từ các bài học trong ProgressiveLearning-A.
+    Bàn cờ đọc LearningPath.json; thư viện bài học được nạp từ API.
 *@
 @{
     Layout = "_Layout";
@@ -15,10 +15,6 @@
     var TemplateRoot = System.IO.Path.Combine(Environment.ContentRootPath, "Storage", "LessonTemplate");
     var ProgressiveLearningRoot = System.IO.Path.Combine(TemplateRoot, "ProgressiveLearning-A");
     var BoardNodes = LoadBoardNodes(ProgressiveLearningRoot);
-    var Categories = LoadCategories(TemplateRoot, ProgressiveLearningRoot, BoardNodes);
-    var Topics = Categories.SelectMany(category => category.Groups).SelectMany(group => group.Topics).ToArray();
-    var ActiveTopic = Topics.FirstOrDefault(topic => topic.Lessons.Any(l => l.State == "current"))?.Id
-        ?? Topics.FirstOrDefault()?.Id ?? string.Empty;
     var CompletedCount = BoardNodes.Count(n => n.State == "done");
     var TotalBoardCount = BoardNodes.Length;
     var MaxCol = BoardNodes.Length > 0 ? BoardNodes.Max(n => n.Column) : 13;
@@ -29,6 +25,8 @@
 }
 
 @section Scripts {
+    <partial name="_SupabaseClient" />
+    <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
     <script src="~/js/auth-guard.js" defer></script>
     <script src="~/js/study.js" asp-append-version="true" defer></script>
 }
@@ -137,7 +135,7 @@
                                 }
                                 else if (node.State == "current")
                                 {
-                                    <a class="btn btn--sm btn--ink study-node__btn" href="/LessonDetail?id=@node.Id" data-i18n="study.btn_start">Vào học →</a>
+                                    <a class="btn btn--sm btn--ink study-node__btn" href="/Lesson/@node.Id" data-i18n="study.btn_start">Vào học →</a>
                                 }
                                 else
                                 {
@@ -205,77 +203,16 @@
                 </div>
 
                 <!-- CÁC THỂ LOẠI VÀ CHỦ ĐỀ MẶC ĐỊNH -->
-                <div class="study-lib__categories" id="study-lib-categories">
-                    @foreach (var cat in Categories)
-                    {
-                        <div class="study-cat">
-                            <button class="study-cat__toggle" type="button" aria-expanded="@(cat.Open ? "true" : "false")" aria-controls="study-cat-@cat.Id">
-                                <span class="study-cat__icon study-cat__icon--@cat.Id" aria-hidden="true">@cat.Icon</span>
-                                <span data-i18n="@cat.LabelKey">@cat.Label</span>
-                                <span class="study-cat__meta">@cat.Meta <span data-i18n="study.lessons_unit">bài</span></span>
-                            </button>
-                            <div class="study-cat__list" id="study-cat-@cat.Id" hidden="@(!cat.Open)">
-                                @foreach (var group in cat.Groups)
-                                {
-                                    <h3>@group.Name</h3>
-                                    foreach (var topic in group.Topics)
-                                    {
-                                        <button type="button"
-                                                data-topic="@topic.Id"
-                                                data-topic-title="@topic.Title"
-                                                data-category="@cat.Label"
-                                                data-group="@group.Name"
-                                                data-levels="@string.Join(",", topic.Levels)"
-                                                data-lessons="@string.Join(" | ", topic.Lessons.Select(l => l.Name))"
-                                                data-count="@topic.Lessons.Length"
-                                                aria-controls="study-topic"
-                                                aria-current="@(topic.Id == ActiveTopic ? "true" : null)">
-                                            <span>@topic.Title</span>
-                                            <small>@topic.Lessons.Length <span data-i18n="study.lessons_unit">bài</span></small>
-                                        </button>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    }
+                <div class="study-lib__categories" id="study-lib-categories" aria-live="polite" aria-busy="true">
+                    <p class="study-library-state" id="study-library-state" role="status">Đang tải danh sách bài học...</p>
+                    <button class="btn btn--sm" id="study-library-retry" type="button" hidden>Thử lại</button>
+                    <div id="study-library-list" hidden></div>
                 </div>
             </aside>
 
             <section class="sticker study-topic" id="study-topic" aria-live="polite">
-                @foreach (var topic in Topics)
-                {
-                    <div class="study-topic__panel" data-topic-panel="@topic.Id" hidden="@(topic.Id != ActiveTopic)">
-                        <div class="study-topic__head">
-                            <div>
-                                <span class="tag">@topic.Category</span>
-                                <h2>@topic.Title</h2>
-                                <p>@topic.Desc</p>
-                            </div>
-                            <span class="study-topic__xp">+@(topic.Lessons.Length * 10) XP</span>
-                        </div>
-                        <ol class="study-lessons">
-                            @for (var i = 0; i < topic.Lessons.Length; i++)
-                            {
-                                var lesson = topic.Lessons[i];
-                                <li class="study-lesson study-lesson--@lesson.State" data-lesson-id="@lesson.Id">
-                                    <span class="study-lesson__no" aria-hidden="true">@(lesson.State == "done" ? "✓" : (i + 1).ToString())</span>
-                                    <span>
-                                        <b>@lesson.Name</b>
-                                        <small data-i18n="@("study.note_" + lesson.State)">@NoteText[lesson.State]</small>
-                                    </span>
-                                    @if (lesson.State == "locked")
-                                    {
-                                        <button class="btn btn--sm" type="button" disabled data-i18n="study.action_locked">Đang khóa</button>
-                                    }
-                                    else
-                                    {
-                                        <a class="btn btn--sm@(lesson.State == "current" ? " btn--ink" : null)" href="/LessonDetail?id=@lesson.Id" data-i18n="@("study.action_" + lesson.State)">@(lesson.State == "current" ? "Bắt đầu →" : "Ôn lại")</a>
-                                    }
-                                </li>
-                            }
-                        </ol>
-                    </div>
-                }
+                <p class="study-library-state" data-library-empty hidden>Chưa có bài học nào.</p>
+                <div id="study-topic-panels"></div>
             </section>
         </div>
 
@@ -301,7 +238,7 @@
                     <p data-i18n="study.rec_coffee_desc">Luyện nghe hội thoại thực tế giữa khách hàng và barista tại quán cà phê.</p>
                     <div class="study-rec__row">
                         <span data-i18n="study.rec_coffee_time">8 phút · <b>+16 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=at-the-coffee-shop" data-i18n="study.learn_now">Học ngay →</a>
+                        <a class="btn btn--sm" href="/Lesson/at-the-coffee-shop" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
 
@@ -317,7 +254,7 @@
                     <p data-i18n="study.rec_present_desc">Thì hiện tại đơn diễn tả thói quen, chân lý và lịch trình thường nhật.</p>
                     <div class="study-rec__row">
                         <span data-i18n="study.rec_present_time">15 phút · <b>+30 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=present-simple-tense" data-i18n="study.learn_now">Học ngay →</a>
+                        <a class="btn btn--sm" href="/Lesson/present-simple-tense" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
 
@@ -333,7 +270,7 @@
                     <p data-i18n="study.rec_ambiguous_desc">Phân biệt 4 tính từ cao cấp chỉ tính chất mơ hồ, khó hiểu và đa nghĩa.</p>
                     <div class="study-rec__row">
                         <span data-i18n="study.rec_ambiguous_time">10 phút · <b>+20 XP</b></span>
-                        <a class="btn btn--sm" href="/LessonDetail?id=ambiguous-vague-equivocal-obscure" data-i18n="study.learn_now">Học ngay →</a>
+                        <a class="btn btn--sm" href="/Lesson/ambiguous-vague-equivocal-obscure" data-i18n="study.learn_now">Học ngay →</a>
                     </div>
                 </article>
             </div>

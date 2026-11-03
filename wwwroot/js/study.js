@@ -290,15 +290,191 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isLocked = node.classList.contains('study-node--locked');
                 const lessonId = node.dataset.nodeId;
                 if (!isLocked && lessonId) {
-                    window.location.href = `/LessonDetail?id=${encodeURIComponent(lessonId)}`;
+                    window.location.href = `/Lesson/${encodeURIComponent(lessonId)}`;
                 }
             });
         });
     }
 
+    const categoryContainer = document.getElementById('study-lib-categories');
+    const libraryState = document.getElementById('study-library-state');
+    const retryButton = document.getElementById('study-library-retry');
+    const libraryList = document.getElementById('study-library-list');
+    const topicPanels = document.getElementById('study-topic-panels');
+    const emptyState = document.querySelector('[data-library-empty]');
+    let loadingLessons = false;
+
+    const categoryInfo = {
+        vocabulary: { id: 'vocab', key: 'ui.vocabulary', label: 'Từ vựng', icon: 'Aa' },
+        grammar: { id: 'grammar', key: 'ui.grammar', label: 'Ngữ pháp', icon: 'G' },
+        speaking: { id: 'speaking', key: 'study.cat_speaking', label: 'Giao tiếp', icon: 'Hi' },
+        listening: { id: 'listening', key: 'ui.listening', label: 'Nghe hiểu', icon: '♪' }
+    };
+
+    function setLibraryState(state, message) {
+        if (!libraryState || !categoryContainer) return;
+        libraryState.hidden = !message;
+        libraryState.textContent = message || '';
+        categoryContainer.setAttribute('aria-busy', String(state === 'loading'));
+        if (retryButton) retryButton.hidden = state !== 'error';
+        if (libraryList && state !== 'ready') libraryList.hidden = true;
+    }
+
+    function createElement(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text !== undefined) element.textContent = text;
+        return element;
+    }
+
+    function topicSlug(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') || 'topic';
+    }
+
+    function renderLibrary(lessons) {
+        if (!libraryList || !topicPanels) return;
+        libraryList.replaceChildren();
+        topicPanels.replaceChildren();
+
+        const categories = new Map();
+        for (const lesson of lessons) {
+            const categoryKey = String(lesson.category || 'other').toLowerCase();
+            const topicName = lesson.topic || lesson.name || 'Other';
+            if (!categories.has(categoryKey)) categories.set(categoryKey, new Map());
+            const topics = categories.get(categoryKey);
+            if (!topics.has(topicName)) topics.set(topicName, []);
+            topics.get(topicName).push(lesson);
+        }
+
+        let topicIndex = 0;
+        for (const [categoryKey, topics] of categories) {
+            const info = categoryInfo[categoryKey] || {
+                id: topicSlug(categoryKey), key: '', label: categoryKey, icon: '•'
+            };
+            const category = createElement('section', 'study-cat');
+            const categoryToggle = createElement('button', 'study-cat__toggle');
+            categoryToggle.type = 'button';
+            categoryToggle.setAttribute('aria-expanded', 'false');
+            const categoryListId = `study-cat-${info.id}`;
+            categoryToggle.setAttribute('aria-controls', categoryListId);
+
+            const icon = createElement('span', `study-cat__icon study-cat__icon--${info.id}`, info.icon);
+            icon.setAttribute('aria-hidden', 'true');
+            const label = createElement('span', '', info.label);
+            if (info.key) label.dataset.i18n = info.key;
+            const count = Array.from(topics.values()).reduce((total, items) => total + items.length, 0);
+            const meta = createElement('span', 'study-cat__meta', String(count));
+            const unit = createElement('span', '', window.AppI18n?.t('study.lessons_unit', 'bài') || 'bài');
+            unit.dataset.i18n = 'study.lessons_unit';
+            meta.append(' ', unit);
+            categoryToggle.append(icon, label, meta);
+
+            const categoryList = createElement('div', 'study-cat__list');
+            categoryList.id = categoryListId;
+            categoryList.hidden = true;
+
+            for (const [topicName, topicLessons] of topics) {
+                const topicId = `study-topic-${topicSlug(categoryKey)}-${topicSlug(topicName)}-${topicIndex++}`;
+                const topicButton = createElement('button');
+                topicButton.type = 'button';
+                topicButton.dataset.topic = topicId;
+                topicButton.dataset.topicTitle = topicName;
+                topicButton.dataset.category = info.label;
+                topicButton.dataset.group = topicName;
+                topicButton.dataset.levels = [...new Set(topicLessons.map(item => item.level).filter(Boolean))].join(',');
+                topicButton.dataset.lessons = topicLessons.map(item => item.name).join(' | ');
+                topicButton.dataset.count = String(topicLessons.length);
+                topicButton.setAttribute('aria-controls', 'study-topic');
+                const topicTitle = createElement('span', '', topicName);
+                const topicCount = createElement('small', '', String(topicLessons.length));
+                const topicUnit = createElement('span', '', window.AppI18n?.t('study.lessons_unit', 'bài') || 'bài');
+                topicUnit.dataset.i18n = 'study.lessons_unit';
+                topicCount.append(' ', topicUnit);
+                topicButton.append(topicTitle, topicCount);
+                categoryList.appendChild(topicButton);
+
+                const panel = createElement('div', 'study-topic__panel');
+                panel.dataset.topicPanel = topicId;
+                panel.hidden = topicPanels.childElementCount > 0;
+                const panelHead = createElement('div', 'study-topic__head');
+                const panelTitleBlock = createElement('div');
+                const panelCategory = createElement('span', 'tag', info.label);
+                if (info.key) panelCategory.dataset.i18n = info.key;
+                panelTitleBlock.append(panelCategory, createElement('h2', '', topicName));
+                const description = topicLessons.find(item => item.description)?.description;
+                if (description) panelTitleBlock.appendChild(createElement('p', '', description));
+                panelHead.appendChild(panelTitleBlock);
+
+                const lessonList = createElement('ol', 'study-lessons');
+                topicLessons.forEach((lesson, index) => {
+                    const row = createElement('li', 'study-lesson', undefined);
+                    row.dataset.lessonId = lesson.lessonId;
+                    row.appendChild(createElement('span', 'study-lesson__no', String(index + 1)));
+                    const detail = createElement('span');
+                    detail.appendChild(createElement('b', '', lesson.name));
+                    if (lesson.level) detail.appendChild(createElement('small', '', lesson.level));
+                    const link = createElement('a', 'btn btn--sm btn--ink', window.AppI18n?.t('study.btn_start', 'Bắt đầu →') || 'Bắt đầu →');
+                    link.href = `/Lesson/${encodeURIComponent(lesson.lessonId)}`;
+                    link.dataset.i18n = 'study.btn_start';
+                    row.append(detail, link);
+                    lessonList.appendChild(row);
+                });
+                panel.append(panelHead, lessonList);
+                topicPanels.appendChild(panel);
+            }
+
+            category.append(categoryToggle, categoryList);
+            libraryList.appendChild(category);
+        }
+
+        if (emptyState) emptyState.hidden = lessons.length > 0;
+        libraryList.hidden = lessons.length === 0;
+        topicPanels.hidden = lessons.length === 0;
+        if (emptyState && lessons.length === 0) {
+            emptyState.textContent = window.AppI18n?.t('study.no_lessons', 'Chưa có bài học nào.') || 'Chưa có bài học nào.';
+        }
+        window.AppI18n?.translate(libraryList);
+        window.AppI18n?.translate(topicPanels);
+    }
+
+    async function loadLibrary() {
+        if (loadingLessons) return;
+        loadingLessons = true;
+        setLibraryState('loading', window.AppI18n?.t('study.loading_lessons', 'Đang tải danh sách bài học...') || 'Đang tải danh sách bài học...');
+        if (topicPanels) {
+            topicPanels.replaceChildren();
+            topicPanels.hidden = true;
+        }
+        if (emptyState) emptyState.hidden = true;
+        try {
+            const lessons = await window.AppApi.get('/api/lessons');
+            renderLibrary(Array.isArray(lessons) ? lessons : []);
+            setLibraryState('ready', '');
+            initializeLibraryInteractions();
+        } catch (error) {
+            if (topicPanels) topicPanels.hidden = true;
+            const message = error?.status === 403
+                ? (window.AppI18n?.t('study.profile_inactive', 'Tài khoản không thể tải danh sách bài học.') || 'Tài khoản không thể tải danh sách bài học.')
+                : error?.status === 0
+                    ? (window.AppI18n?.t('study.network_error', 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.') || 'Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.')
+                    : (window.AppI18n?.t('study.load_error', 'Không tải được danh sách bài học. Vui lòng thử lại.') || 'Không tải được danh sách bài học. Vui lòng thử lại.');
+            setLibraryState('error', message);
+        } finally {
+            loadingLessons = false;
+        }
+    }
+
+    if (retryButton) retryButton.addEventListener('click', loadLibrary);
+
     // ==========================================
     // 3. THƯ VIỆN: Mở/đóng nhóm chủ đề & Nút Expand/Collapse All
     // ==========================================
+    function initializeLibraryInteractions() {
     const toggleAllBtn = document.getElementById('study-lib-toggle-all');
     const catToggles = Array.from(document.querySelectorAll('.study-cat__toggle'));
 
@@ -680,4 +856,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (searchInput) searchInput.focus();
         });
     }
+    }
+
+    loadLibrary();
 });
