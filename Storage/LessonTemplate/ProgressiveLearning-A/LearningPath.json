@@ -16,7 +16,15 @@
         { "itemId": "lesson-action-verbs", "order": 10, "lessonId": "action-verbs", "folder": "action-verbs" },
         { "itemId": "lesson-communication-verbs", "order": 11, "lessonId": "communication-verbs", "folder": "communication-verbs" },
         { "itemId": "lesson-advanced-greetings-1", "order": 12, "lessonId": "advanced-greetings-1", "folder": "advanced-greetings-1" },
-        { "itemId": "lesson-advanced-greetings-2", "order": 13, "lessonId": "advanced-greetings-2", "folder": "advanced-greetings-2" }
+        { "itemId": "lesson-advanced-greetings-2", "order": 13, "lessonId": "advanced-greetings-2", "folder": "advanced-greetings-2" },
+        { "itemId": "lesson-simple-present-1", "order": 14, "lessonId": "simple-present-1", "folder": "simple-present-1" },
+        { "itemId": "lesson-simple-present-2", "order": 15, "lessonId": "simple-present-2", "folder": "simple-present-2" },
+        { "itemId": "lesson-present-progressive-1", "order": 16, "lessonId": "present-progressive-1", "folder": "present-progressive-1" },
+        { "itemId": "lesson-present-progressive-2", "order": 17, "lessonId": "present-progressive-2", "folder": "present-progressive-2" },
+        { "itemId": "lesson-simple-past-1", "order": 18, "lessonId": "simple-past-1", "folder": "simple-past-1" },
+        { "itemId": "lesson-simple-past-2", "order": 19, "lessonId": "simple-past-2", "folder": "simple-past-2" },
+        { "itemId": "lesson-simple-future-1", "order": 20, "lessonId": "simple-future-1", "folder": "simple-future-1" },
+        { "itemId": "lesson-simple-future-2", "order": 21, "lessonId": "simple-future-2", "folder": "simple-future-2" }
     ],
     "branches": [
         {
