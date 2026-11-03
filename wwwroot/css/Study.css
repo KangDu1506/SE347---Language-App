@@ -695,7 +695,11 @@
 .study-cat__list button[aria-current="true"] { border-color: var(--ink); background: var(--surface-orange); box-shadow: var(--shadow-sticker-sm); }
 .study-cat__list small { color: var(--text-secondary); font-weight: var(--fw-semibold); white-space: nowrap; }
 .study-cat__list button[aria-current="true"] small { color: inherit; }
-.study-library-state { margin: 12px 0; color: var(--text-secondary); font-weight: var(--fw-semibold); }
+.study-library-state { display: flex; align-items: center; gap: 10px; margin: 12px 0; color: var(--text-secondary); font-weight: var(--fw-semibold); }
+.study-library-state[data-state="loading"]::before { width: 14px; height: 14px; flex: 0 0 auto; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; content: ""; animation: study-library-spin .7s linear infinite; }
+.study-library-state[data-state="error"] { padding-left: 10px; border-left: 3px solid var(--surface-pink); color: var(--text-primary); }
+@keyframes study-library-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .study-library-state[data-state="loading"]::before { animation: none; border-top-color: currentColor; } }
 #study-library-retry { margin: 0 0 8px; }
 
 .study-topic { padding: 24px 26px; }

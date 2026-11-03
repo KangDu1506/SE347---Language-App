@@ -315,6 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!libraryState || !categoryContainer) return;
         libraryState.hidden = !message;
         libraryState.textContent = message || '';
+        libraryState.dataset.state = state;
+        libraryState.setAttribute('role', state === 'error' ? 'alert' : 'status');
         categoryContainer.setAttribute('aria-busy', String(state === 'loading'));
         if (retryButton) retryButton.hidden = state !== 'error';
         if (libraryList && state !== 'ready') libraryList.hidden = true;
@@ -432,14 +434,17 @@ document.addEventListener('DOMContentLoaded', () => {
             libraryList.appendChild(category);
         }
 
-        if (emptyState) emptyState.hidden = lessons.length > 0;
+        const isEmpty = lessons.length === 0;
+        const emptyMessage = window.AppI18n?.t('study.no_lessons', 'Chưa có bài học nào.') || 'Chưa có bài học nào.';
+        if (emptyState) {
+            emptyState.hidden = !isEmpty;
+            if (isEmpty) emptyState.textContent = emptyMessage;
+        }
         libraryList.hidden = lessons.length === 0;
         topicPanels.hidden = lessons.length === 0;
-        if (emptyState && lessons.length === 0) {
-            emptyState.textContent = window.AppI18n?.t('study.no_lessons', 'Chưa có bài học nào.') || 'Chưa có bài học nào.';
-        }
         window.AppI18n?.translate(libraryList);
         window.AppI18n?.translate(topicPanels);
+        return { isEmpty, emptyMessage };
     }
 
     async function loadLibrary() {
@@ -453,8 +458,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (emptyState) emptyState.hidden = true;
         try {
             const lessons = await window.AppApi.get('/api/lessons');
-            renderLibrary(Array.isArray(lessons) ? lessons : []);
-            setLibraryState('ready', '');
+            if (!Array.isArray(lessons)) throw new TypeError('Expected the lessons API to return an array.');
+            const result = renderLibrary(lessons);
+            setLibraryState(result.isEmpty ? 'empty' : 'ready', result.isEmpty ? result.emptyMessage : '');
             initializeLibraryInteractions();
         } catch (error) {
             if (topicPanels) topicPanels.hidden = true;
