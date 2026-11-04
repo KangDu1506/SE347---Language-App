@@ -8,7 +8,15 @@
     Chỉ đưa Url và PublishableKey xuống trình duyệt, KHÔNG BAO GIỜ đưa SecretKey.
 *@
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
-<meta name="supabase-url" content="@Configuration["Supabase:Url"]" />
-<meta name="supabase-publishable-key" content="@Configuration["Supabase:PublishableKey"]" />
-<script src="https://cdn.jsdelivr.net/npm/@@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-<script src="~/js/supabase-client.js" defer></script>
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
+@{
+    var localAuthBypassEnabled = Environment.IsDevelopment()
+        && Configuration.GetValue<bool>("LocalAuthBypass:Enabled");
+}
+@if (!localAuthBypassEnabled)
+{
+    <meta name="supabase-url" content="@Configuration["Supabase:Url"]" />
+    <meta name="supabase-publishable-key" content="@Configuration["Supabase:PublishableKey"]" />
+    <script src="https://cdn.jsdelivr.net/npm/@@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+    <script src="~/js/supabase-client.js" defer></script>
+}

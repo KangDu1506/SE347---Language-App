@@ -1,9 +1,12 @@
 const protectedPage = document.querySelector('.home-page');
+const localAuthBypassEnabled = document.querySelector('meta[name="local-auth-bypass"]')?.content === 'true';
 
 if (protectedPage) {
     protectedPage.hidden = true;
 
-    if (!window.sb) {
+    if (localAuthBypassEnabled) {
+        protectedPage.hidden = false;
+    } else if (!window.sb) {
         console.error('Không thể xác thực phiên: Supabase client chưa được khởi tạo.');
         window.location.replace('/Account/Login');
     } else {

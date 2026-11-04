@@ -1,4 +1,11 @@
 @* Phần <head> dùng chung cho mọi trang: font (Be Vietnam Pro + Bricolage Grotesque), favicon và style logo Wordfox. *@
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
+@{
+	var localAuthBypassEnabled = Environment.IsDevelopment()
+		&& Configuration.GetValue<bool>("LocalAuthBypass:Enabled");
+}
+<meta name="local-auth-bypass" content="@(localAuthBypassEnabled ? "true" : "false")" />
 <link rel="icon" href="/images/mascot/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

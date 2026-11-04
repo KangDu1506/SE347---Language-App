@@ -30,8 +30,32 @@ var connectionString = builder.Configuration.GetConnectionString("Supabase");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Xác thực JWT của Supabase cho /api/* (Auth/)
-builder.Services.AddSupabaseJwtAuth(builder.Configuration);
+// Bypass chỉ dùng được khi app chạy Development và được bật tường minh trong local secrets.
+var localAuthBypassEnabled = builder.Environment.IsDevelopment()
+    && builder.Configuration.GetValue<bool>("LocalAuthBypass:Enabled");
+if (localAuthBypassEnabled)
+{
+    if (!Guid.TryParse(builder.Configuration["LocalAuthBypass:UserId"], out var localUserId))
+    {
+        throw new InvalidOperationException("LocalAuthBypass:UserId phải là GUID của một profile local.");
+    }
+
+    builder.Services
+        .AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = LocalDevelopmentAuthHandler.SchemeName;
+            options.DefaultChallengeScheme = LocalDevelopmentAuthHandler.SchemeName;
+        })
+        .AddScheme<LocalDevelopmentAuthOptions, LocalDevelopmentAuthHandler>(
+            LocalDevelopmentAuthHandler.SchemeName,
+            options => options.UserId = localUserId);
+    builder.Services.AddAuthorization();
+}
+else
+{
+    // Xác thực JWT của Supabase cho /api/* (Auth/)
+    builder.Services.AddSupabaseJwtAuth(builder.Configuration);
+}
 
 // Services nghiệp vụ (Services/)
 builder.Services.AddScoped<IUserService, UserService>();
