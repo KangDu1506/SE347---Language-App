@@ -1,0 +1,629 @@
+@page "{id?}"
+@using Microsoft.AspNetCore.Hosting
+@using System.Text.Json
+@using System.Text.RegularExpressions
+@using SE347.DTOs.Lesson
+@using SE347.Services
+@inject IWebHostEnvironment Environment
+@*
+    Trang thông tin chi tiết bài học (Lesson Detail) khi người dùng bấm vào tham gia từ Study Board hoặc Thư viện.
+    Hỗ trợ nạp động từ config.json, content.json, quiz.json và cơ chế Fallback an toàn tối thiểu nếu nạp thất bại.
+*@
+@{
+    Layout = "_Layout";
+    var lessonId = RouteData.Values["id"]?.ToString();
+    if (string.IsNullOrWhiteSpace(lessonId))
+    {
+        lessonId = Request.Query["id"].ToString();
+    }
+    if (string.IsNullOrWhiteSpace(lessonId))
+    {
+        lessonId = "simple-greetings-1"; // Mặc định mở bài đầu tiên
+    }
+
+    var templateRoot = System.IO.Path.Combine(Environment.ContentRootPath, "Storage", "LessonTemplate");
+    var lessonData = LoadLessonDetailSafe(templateRoot, lessonId);
+
+    ViewData["Title"] = lessonData.Config.Name;
+
+    var categoryLabel = lessonData.Config.Category switch
+    {
+        "speaking" => "Giao tiếp phản xạ",
+        "grammar" => "Ngữ pháp ứng dụng",
+        "listening" => "Luyện nghe hiểu",
+        _ => "Từ vựng cốt lõi"
+    };
+
+    var categoryIcon = lessonData.Config.Category switch
+    {
+        "speaking" => "Hi",
+        "grammar" => "G",
+        "listening" => "L",
+        _ => "Aa"
+    };
+
+    var categoryColorClass = lessonData.Config.Category switch
+    {
+        "speaking" => "theme-speaking",
+        "grammar" => "theme-grammar",
+        "listening" => "theme-listening",
+        _ => "theme-vocab"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/LessonDetail.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/auth-guard.js" defer></script>
+    <script src="~/js/lesson-detail.js" asp-append-version="true" defer></script>
+}
+
+<main class="lesson-detail-page">
+    <div class="detail-wrap">
+        <!-- BREADCRUMBS & TOP NAVIGATION -->
+        <nav class="detail-breadcrumb" data-i18n-aria-label="detail.breadcrumb_aria" aria-label="Điều hướng phân cấp">
+            <a class="btn btn--sm detail-back-btn" href="/Study">
+                <span aria-hidden="true">←</span> <span data-i18n="detail.back_to_board">Quay lại Bàn cờ lộ trình</span>
+            </a>
+            <span class="detail-breadcrumb__separator">/</span>
+            <span class="detail-breadcrumb__current">@lessonData.Config.Topic</span>
+            <span class="detail-breadcrumb__separator">/</span>
+            <span class="detail-breadcrumb__name">@lessonData.Config.Name</span>
+        </nav>
+
+        @if (lessonData.IsFallback)
+        {
+            <!-- THÔNG BÁO CHẾ ĐỘ DỰ PHÒNG (FALLBACK BANNER) -->
+            <div class="sticker detail-fallback-alert" role="status">
+                <span class="detail-fallback-alert__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </span>
+                <div>
+                    <strong data-i18n="detail.fallback_title">Chế độ dự phòng (Fallback):</strong>
+                    <span data-i18n="detail.fallback_desc">Dữ liệu chi tiết của bài học "<code>@lessonId</code>" đang được cập nhật trên máy chủ. Bạn vẫn có thể xem tóm tắt và trải nghiệm cấu trúc bài học bên dưới.</span>
+                </div>
+            </div>
+        }
+
+        <!-- HERO BANNER TỔNG QUAN BÀI HỌC (PHONG CÁCH STICKER NEUBRUTALISM) -->
+        <section class="sticker detail-hero @categoryColorClass" aria-labelledby="lesson-hero-title">
+            <div class="detail-hero__header">
+                <div class="detail-hero__badges">
+                    <span class="detail-badge detail-badge--level">@lessonData.Config.Level</span>
+                    <span class="detail-badge detail-badge--cat">
+                        <span class="detail-badge__icon">@categoryIcon</span>
+                        <span data-i18n="@(lessonData.Config.Category switch {
+                            "speaking" => "detail.cat_speaking",
+                            "grammar" => "detail.cat_grammar",
+                            "listening" => "detail.cat_listening",
+                            _ => "detail.cat_vocab"
+                        })">@categoryLabel</span>
+                    </span>
+                    @if (lessonData.Roadmap.IsStandalone)
+                    {
+                        <span class="detail-badge detail-badge--standalone" data-i18n="detail.badge_standalone">Bài học chuyên đề tự do</span>
+                    }
+                    else if (lessonData.Roadmap.IsBranch)
+                    {
+                        <span class="detail-badge detail-badge--branch"><span data-i18n="detail.badge_branch">Nhánh:</span> @lessonData.Roadmap.BranchTitle</span>
+                    }
+                    else
+                    {
+                        <span class="detail-badge detail-badge--main"><span data-i18n="detail.badge_main">Mạch chính · Bài</span> @lessonData.Roadmap.Order</span>
+                    }
+                </div>
+                <span class="detail-hero__topic-tag"><span data-i18n="detail.topic_prefix">Chủ đề:</span> @lessonData.Config.Topic</span>
+            </div>
+
+            <div class="detail-hero__main">
+                <div class="detail-hero__text">
+                    <h1 id="lesson-hero-title" class="detail-hero__title">@lessonData.Config.Name</h1>
+                    <p class="detail-hero__desc">@lessonData.Config.Description</p>
+                </div>
+
+                <!-- LINH VẬT FOXY TRANG TRÍ -->
+                <div class="detail-hero__mascot" aria-hidden="true">
+                    <svg class="foxy detail-foxy-mascot"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+                </div>
+            </div>
+
+            <!-- THANH CHỈ SỐ NHANH (QUICK METRICS BAR - SVG THAY CHO EMOJI) -->
+            <div class="detail-metrics">
+                <div class="metric-card">
+                    <span class="metric-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </span>
+                    <div>
+                        <b>~@lessonData.Config.EstimatedMinutes <span data-i18n="lesson.minutes">phút</span></b>
+                        <small data-i18n="detail.metric_time">Thời gian ước tính</small>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <span class="metric-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                    </span>
+                    <div>
+                        <b>@lessonData.Contents.Count <span data-i18n="lesson.items">mục</span></b>
+                        <small data-i18n="detail.metric_items">Kiến thức trọng tâm</small>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <span class="metric-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                    </span>
+                    <div>
+                        <b>@lessonData.QuizCount <span data-i18n="lesson.questions">câu hỏi</span></b>
+                        <small data-i18n="detail.metric_quiz">Trắc nghiệm củng cố</small>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <span class="metric-card__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </span>
+                    <div>
+                        <b>+@(Math.Max(10, lessonData.Contents.Count * 2)) XP</b>
+                        <small data-i18n="detail.metric_reward">Phần thưởng bài học</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HÀNG NÚT CTA HÀNH ĐỘNG CHÍNH -->
+            <div class="detail-hero__actions">
+                <a class="btn btn--ink btn--lg detail-cta-btn" href="/TrialTest?lessonId=@lessonId" data-i18n="detail.btn_start_now">
+                    Bắt đầu học bài này ngay →
+                </a>
+                <a class="btn btn--lg detail-flashcard-btn" href="/Flashcard/@lessonId" data-i18n="detail.btn_flashcard">
+                    Luyện bằng Flashcard
+                </a>
+                <span class="detail-cta-hint" data-i18n="detail.cta_hint">Đạt từ 60% câu đúng để mở khóa bài kế tiếp</span>
+            </div>
+        </section>
+
+        <!-- BỐ CỤC 4 THẺ THÔNG TIN NỬA DƯỚI -->
+        <div class="detail-bottom-section" data-i18n-aria-label="detail.bottom_section_aria" aria-label="Thông tin chi tiết bài học">
+            <!-- THẺ 1: VỊ TRÍ TRONG LỘ TRÌNH (TRẢI NGANG, CHIỀU CAO NHỎ, DÀN TRẢI BƯỚC THEO CHIỀU NGANG) -->
+            <section class="sticker detail-card detail-card--roadmap" aria-labelledby="roadmap-card-title">
+                <div class="roadmap-header-row">
+                    <div class="detail-card__head">
+                        <span class="tag" data-i18n="detail.roadmap_tag">Vị trí lộ trình</span>
+                        <h2 id="roadmap-card-title" data-i18n="detail.roadmap_title">Bản đồ học tập</h2>
+                    </div>
+                    <div class="detail-card__action">
+                        <a class="btn btn--sm detail-sidecard__btn" href="/Study" data-i18n="detail.view_board_btn">
+                            Xem trên Bàn cờ lộ trình →
+                        </a>
+                    </div>
+                </div>
+
+                <div class="roadmap-mini-flow">
+                    @if (!string.IsNullOrEmpty(lessonData.Roadmap.PrerequisiteName))
+                    {
+                        <div class="flow-step flow-step--prev">
+                            <span class="step-label" data-i18n="detail.step_prev">Bài trước</span>
+                            <span class="step-name" title="@lessonData.Roadmap.PrerequisiteName">@lessonData.Roadmap.PrerequisiteName</span>
+                        </div>
+                        <div class="flow-arrow" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </div>
+                    }
+
+                    <div class="flow-step flow-step--current">
+                        <div class="flow-step__meta-row">
+                            <span class="step-label" data-i18n="detail.step_current">Đang xem</span>
+                            <span class="step-tag" data-i18n="@(lessonData.Roadmap.IsStandalone ? "detail.badge_standalone" : (lessonData.Roadmap.IsBranch ? "study.pill_branch" : "study.pill_main"))">
+                                @(lessonData.Roadmap.IsStandalone ? "Chuyên đề tự do" : (lessonData.Roadmap.IsBranch ? "Nhánh mở rộng" : "Mạch chính"))
+                            </span>
+                        </div>
+                        <span class="step-name" title="@lessonData.Config.Name">@lessonData.Config.Name</span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(lessonData.Roadmap.NextLessonName))
+                    {
+                        <div class="flow-arrow" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </div>
+                        <div class="flow-step flow-step--next">
+                            <span class="step-label" data-i18n="detail.step_next">Tiếp theo</span>
+                            <span class="step-name" title="@lessonData.Roadmap.NextLessonName">@lessonData.Roadmap.NextLessonName</span>
+                        </div>
+                    }
+                </div>
+            </section>
+
+            <!-- 3 THẺ CÒN LẠI: NẰM DƯỚI, CHIA ĐỀU CHIỀU NGANG, CĂN CHỈNH TOP-LEFT, TEXT CENTER-LEFT -->
+            <div class="detail-grid-3col">
+                <!-- THẺ 2: CẤU TRÚC BÀI KIỂM TRA TRẮC NGHIỆM -->
+                <section class="sticker detail-card detail-card--quiz" aria-labelledby="quiz-section-title">
+                    <div class="detail-card__head">
+                        <span class="tag" data-i18n="detail.quiz_tag">Thực hành củng cố</span>
+                        <h2 id="quiz-section-title" data-i18n="detail.quiz_title">Cấu trúc bài trắc nghiệm</h2>
+                    </div>
+                    <p class="detail-card__desc"><span data-i18n="detail.quiz_desc_prefix">Bài học gồm</span> <b>@(lessonData.QuizCount > 0 ? lessonData.QuizCount : 5) <span data-i18n="detail.quiz_desc_count">câu trắc nghiệm</span></b> <span data-i18n="detail.quiz_desc_suffix">ngẫu nhiên giúp ghi nhớ phản xạ dài hạn.</span></p>
+
+                    <div class="quiz-preview-features">
+                        <div class="quiz-feature-item">
+                            <span class="quiz-feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </span>
+                            <span data-i18n="detail.quiz_feat1">Trộn câu hỏi & đáp án tự động</span>
+                        </div>
+                        <div class="quiz-feature-item">
+                            <span class="quiz-feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .5 2.1 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>
+                            </span>
+                            <span data-i18n="detail.quiz_feat2">Giải thích chi tiết ngay sau mỗi câu</span>
+                        </div>
+                        <div class="quiz-feature-item">
+                            <span class="quiz-feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"></path></svg>
+                            </span>
+                            <span data-i18n="detail.quiz_feat3">Chấm điểm và ghi nhận chuỗi học</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- THẺ 3: GÓC MẸO HỌC CÙNG CÁO FOXY -->
+                <section class="sticker detail-card detail-card--foxy" aria-labelledby="foxy-card-title">
+                    <div class="detail-card__head">
+                        <span class="tag" data-i18n="detail.foxy_tag">Gợi ý từ trợ lý</span>
+                        <div class="foxy-head-badge">
+                            <svg class="foxy foxy-avatar-mini" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+                            <h2 id="foxy-card-title" class="foxy-card-title" data-i18n="detail.foxy_title">Mẹo học từ Foxy</h2>
+                        </div>
+                    </div>
+                    <p class="foxy-advice">
+                        @if (lessonData.Config.Category == "speaking")
+                        {
+                            <span data-i18n="detail.foxy_speaking">"Với bài Giao tiếp, hãy đọc to các câu ví dụ ít nhất 3 lần để cơ miệng quen với ngữ điệu tự nhiên nhé!"</span>
+                        }
+                        else if (lessonData.Config.Category == "grammar")
+                        {
+                            <span data-i18n="detail.foxy_grammar">"Đừng chỉ học công thức suông. Hãy chú ý các từ khóa dấu hiệu nhận biết và tự đặt 1 câu về bản thân bạn!"</span>
+                        }
+                        else if (lessonData.Config.Category == "listening")
+                        {
+                            <span data-i18n="detail.foxy_listening">"Hãy nghe lượt đầu tiên không nhìn chữ, lượt thứ hai đọc theo để tai và não liên kết âm thanh chuẩn xác nhé!"</span>
+                        }
+                        else
+                        {
+                            <span data-i18n="detail.foxy_vocab">"Mỗi ngày nhớ các từ cốt lõi này và ứng dụng ngay vào suy nghĩ hằng ngày sẽ giúp bạn nhớ lâu gấp 3 lần!"</span>
+                        }
+                    </p>
+                </section>
+
+                <!-- THẺ 4: PHẦN THƯỞNG HOÀN THÀNH -->
+                <section class="sticker detail-card detail-card--rewards" aria-labelledby="rewards-card-title">
+                    <div class="detail-card__head">
+                        <span class="tag" data-i18n="detail.rewards_tag">Phần thưởng</span>
+                        <h2 id="rewards-card-title" data-i18n="detail.rewards_title">Sau khi hoàn thành</h2>
+                    </div>
+                    <ul class="rewards-checklist">
+                        <li>
+                            <span class="reward-icon-badge reward-icon-badge--star" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </span>
+                            <span><b>3 <span data-i18n="study.unit_stars">Sao vàng</span></b> <span data-i18n="detail.reward_stars">cho bảng xếp hạng tuần</span></span>
+                        </li>
+                        <li>
+                            <span class="reward-icon-badge reward-icon-badge--xp" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            </span>
+                            <span><b>+@(Math.Max(10, lessonData.Contents.Count * 2)) XP</b> <span data-i18n="detail.reward_xp">điểm kinh nghiệm tích lũy</span></span>
+                        </li>
+                        <li>
+                            <span class="reward-icon-badge reward-icon-badge--streak" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+                            </span>
+                            <span><b>+1 <span data-i18n="ui.day_streak">ngày liên tục</span></b> <span data-i18n="detail.reward_streak">duy trì thói quen học</span></span>
+                        </li>
+                        <li>
+                            <span class="reward-icon-badge reward-icon-badge--unlock" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                            </span>
+                            <span data-i18n="detail.reward_unlock">Mở khóa bài học kế tiếp trên bản đồ</span>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+</main>
+
+@functions {
+    public sealed record DetailExample(string Term, string Translation);
+
+    public sealed record DetailContentItem(
+        string Id,
+        string Content,
+        string? PronunciationBre,
+        string DefinitionVi,
+        string DefinitionEn,
+        List<DetailExample> Examples,
+        List<string> Synonyms,
+        List<string> Antonyms
+    );
+
+    public sealed record DetailConfig(
+        string Name,
+        string Description,
+        string Category,
+        string Topic,
+        string Level,
+        int EstimatedMinutes
+    );
+
+    public sealed record DetailRoadmap(
+        bool IsBranch,
+        bool IsStandalone,
+        string BranchTitle,
+        int Order,
+        string? PrerequisiteName,
+        string? NextLessonName
+    );
+
+    public sealed record LessonDetailResult(
+        DetailConfig Config,
+        List<DetailContentItem> Contents,
+        int QuizCount,
+        DetailRoadmap Roadmap,
+        bool IsFallback
+    );
+
+    private static LessonDetailResult LoadLessonDetailSafe(string templateRoot, string lessonId)
+    {
+        // 1. Tìm thư mục chứa bài học
+        string? targetFolder = null;
+        var pPath = System.IO.Path.Combine(templateRoot, "ProgressiveLearning-A", lessonId);
+        if (System.IO.Directory.Exists(pPath))
+        {
+            targetFolder = pPath;
+        }
+        else
+        {
+            var directPath = System.IO.Path.Combine(templateRoot, lessonId);
+            if (System.IO.Directory.Exists(directPath))
+            {
+                targetFolder = directPath;
+            }
+        }
+
+        // 2. Nếu tìm thấy thư mục và config.json -> nạp an toàn
+        if (targetFolder != null)
+        {
+            var configFile = System.IO.Path.Combine(targetFolder, LessonTemplateValidator.ConfigFile);
+            if (System.IO.File.Exists(configFile))
+            {
+                try
+                {
+                    using var configDoc = JsonDocument.Parse(System.IO.File.ReadAllText(configFile));
+                    var cRoot = configDoc.RootElement;
+
+                    var name = cRoot.TryGetProperty("name", out var np) ? np.GetString() ?? lessonId : lessonId;
+                    var desc = cRoot.TryGetProperty("description", out var dp) ? dp.GetString() ?? "" : "";
+                    var category = cRoot.TryGetProperty("category", out var cp) ? cp.GetString() ?? "vocabulary" : "vocabulary";
+                    var topic = cRoot.TryGetProperty("topic", out var tp) ? tp.GetString() ?? "Chủ đề chung" : "Chủ đề chung";
+                    var level = cRoot.TryGetProperty("level", out var lp) ? lp.GetString() ?? "A1" : "A1";
+                    var minutes = cRoot.TryGetProperty("estimated-minutes", out var mp) && mp.TryGetInt32(out var minVal) ? minVal : 15;
+
+                    var contentRelative = cRoot.TryGetProperty("content", out var conProp) ? conProp.GetString() ?? "content.json" : "content.json";
+                    contentRelative = contentRelative.TrimStart('.', '/', '\\');
+                    var contentFile = System.IO.Path.Combine(targetFolder, contentRelative);
+
+                    var items = new List<DetailContentItem>();
+                    if (System.IO.File.Exists(contentFile))
+                    {
+                        using var contentDoc = JsonDocument.Parse(System.IO.File.ReadAllText(contentFile));
+                        if (contentDoc.RootElement.ValueKind == JsonValueKind.Array)
+                        {
+                            foreach (var elem in contentDoc.RootElement.EnumerateArray())
+                            {
+                                var id = elem.TryGetProperty("id", out var idp) ? idp.GetString() ?? "" : "";
+                                var content = elem.TryGetProperty("content", out var cntp) ? cntp.GetString() ?? "" : "";
+                                var bre = elem.TryGetProperty("pronunciation-bre", out var prep) ? prep.GetString() : null;
+                                var vi = elem.TryGetProperty("definition-vi", out var vip) ? vip.GetString() ?? "" : "";
+                                var en = elem.TryGetProperty("definition-en", out var enp) ? enp.GetString() ?? "" : "";
+
+                                var examples = new List<DetailExample>();
+                                if (elem.TryGetProperty("examples", out var exArr) && exArr.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var exItem in exArr.EnumerateArray())
+                                    {
+                                        var term = exItem.TryGetProperty("term", out var tmp) ? tmp.GetString() ?? "" : "";
+                                        var trans = exItem.TryGetProperty("translation", out var trnp) ? trnp.GetString() ?? "" : "";
+                                        if (!string.IsNullOrEmpty(term))
+                                        {
+                                            examples.Add(new DetailExample(term, trans));
+                                        }
+                                    }
+                                }
+
+                                var syns = new List<string>();
+                                if (elem.TryGetProperty("synonyms", out var synArr) && synArr.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var s in synArr.EnumerateArray()) if (s.GetString() is string str) syns.Add(str);
+                                }
+
+                                var ants = new List<string>();
+                                if (elem.TryGetProperty("antonyms", out var antArr) && antArr.ValueKind == JsonValueKind.Array)
+                                {
+                                    foreach (var a in antArr.EnumerateArray()) if (a.GetString() is string str) ants.Add(str);
+                                }
+
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    items.Add(new DetailContentItem(id, content, bre, vi, en, examples, syns, ants));
+                                }
+                            }
+                        }
+                    }
+
+                    // Đếm câu hỏi quiz an toàn
+                    int quizCount = 0;
+                    var quizRelative = cRoot.TryGetProperty("quiz", out var qp) ? qp.GetString() : null;
+                    if (!string.IsNullOrEmpty(quizRelative))
+                    {
+                        quizRelative = quizRelative.TrimStart('.', '/', '\\');
+                        var quizFile = System.IO.Path.Combine(targetFolder, quizRelative);
+                        if (System.IO.File.Exists(quizFile))
+                        {
+                            try
+                            {
+                                using var qDoc = JsonDocument.Parse(System.IO.File.ReadAllText(quizFile));
+                                if (qDoc.RootElement.ValueKind == JsonValueKind.Array)
+                                {
+                                    quizCount = qDoc.RootElement.GetArrayLength();
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+
+                    var roadmap = LoadRoadmapMeta(templateRoot, lessonId);
+                    var cfg = new DetailConfig(name, desc, category, topic, level, minutes);
+
+                    // Nếu nội dung items rỗng -> nạp fallback items để hiển thị
+                    if (items.Count == 0)
+                    {
+                        items.Add(new DetailContentItem("1", name, null, "Khái niệm và kiến thức trọng tâm của bài học.", "Core lesson concepts.", new List<DetailExample>(), new(), new()));
+                    }
+
+                    return new LessonDetailResult(cfg, items, quizCount, roadmap, IsFallback: false);
+                }
+                catch
+                {
+                    // Lỗi phân tích JSON -> nhảy sang fallback
+                }
+            }
+        }
+
+        // ========================================================
+        // 3. FALLBACK TỐI THIỂU NẾU NẠP THẤT BẠI (YÊU CẦU 1)
+        // ========================================================
+        var formattedName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(lessonId.Replace("-", " "));
+        var fallbackCategory = lessonId.Contains("greeting") ? "speaking"
+            : (lessonId.Contains("tense") || lessonId.Contains("gramm")) ? "grammar"
+            : lessonId.Contains("coffee") ? "listening"
+            : "vocabulary";
+
+        var fallbackConfig = new DetailConfig(
+            Name: formattedName,
+            Description: "Bài học " + formattedName + " giúp người học nắm vững các mẫu câu và từ vựng cốt lõi theo tiêu chuẩn CEFR.",
+            Category: fallbackCategory,
+            Topic: "Chuyên đề mở rộng",
+            Level: "A1",
+            EstimatedMinutes: 15
+        );
+
+        var fallbackItems = new List<DetailContentItem>
+        {
+            new DetailContentItem(
+                Id: "1",
+                Content: formattedName + " (Mục kiến thức chính)",
+                PronunciationBre: "sample",
+                DefinitionVi: "Nội dung kiến thức cốt lõi và mẫu câu thực hành trong chủ đề này.",
+                DefinitionEn: "Primary knowledge item and practice structures for this lesson topic.",
+                Examples: new List<DetailExample>
+                {
+                    new DetailExample("I practice " + formattedName + " every day.", "Tôi luyện tập bài học này mỗi ngày.")
+                },
+                Synonyms: new List<string> { "Practice", "Study" },
+                Antonyms: new List<string>()
+            ),
+            new DetailContentItem(
+                Id: "2",
+                Content: "Thực hành ứng dụng phản xạ",
+                PronunciationBre: null,
+                DefinitionVi: "Vận dụng mẫu câu vào giao tiếp thực tế và làm bài trắc nghiệm.",
+                DefinitionEn: "Apply newly learned vocabulary into practical conversations.",
+                Examples: new List<DetailExample>
+                {
+                    new DetailExample("Let's review together!", "Hãy cùng nhau ôn tập nhé!")
+                },
+                Synonyms: new List<string>(),
+                Antonyms: new List<string>()
+            )
+        };
+
+        var fallbackRoadmap = LoadRoadmapMeta(templateRoot, lessonId);
+        return new LessonDetailResult(fallbackConfig, fallbackItems, 5, fallbackRoadmap, IsFallback: true);
+    }
+
+    private static DetailRoadmap LoadRoadmapMeta(string templateRoot, string lessonId)
+    {
+        var pathFile = System.IO.Path.Combine(templateRoot, "ProgressiveLearning-A", "LearningPath.json");
+        if (!System.IO.File.Exists(pathFile))
+        {
+            return new DetailRoadmap(false, true, "", 1, null, null);
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(System.IO.File.ReadAllText(pathFile));
+            var root = doc.RootElement;
+
+            string? GetName(string lid)
+            {
+                var cfg = System.IO.Path.Combine(templateRoot, "ProgressiveLearning-A", lid, LessonTemplateValidator.ConfigFile);
+                if (!System.IO.File.Exists(cfg)) cfg = System.IO.Path.Combine(templateRoot, lid, LessonTemplateValidator.ConfigFile);
+                if (!System.IO.File.Exists(cfg)) return lid;
+                try
+                {
+                    using var cDoc = JsonDocument.Parse(System.IO.File.ReadAllText(cfg));
+                    return cDoc.RootElement.GetProperty("name").GetString() ?? lid;
+                }
+                catch { return lid; }
+            }
+
+            if (root.TryGetProperty("lessons", out var lessonsElem))
+            {
+                var mainLessons = lessonsElem.EnumerateArray().ToArray();
+                for (int i = 0; i < mainLessons.Length; i++)
+                {
+                    var lid = mainLessons[i].GetProperty("lessonId").GetString();
+                    if (string.Equals(lid, lessonId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var order = mainLessons[i].GetProperty("order").GetInt32();
+                        string? prevId = i > 0 ? mainLessons[i - 1].GetProperty("lessonId").GetString() : null;
+                        string? nextId = i < mainLessons.Length - 1 ? mainLessons[i + 1].GetProperty("lessonId").GetString() : null;
+                        return new DetailRoadmap(false, false, "", order, prevId != null ? GetName(prevId) : null, nextId != null ? GetName(nextId) : null);
+                    }
+                }
+            }
+
+            if (root.TryGetProperty("branches", out var branchesElem))
+            {
+                foreach (var branch in branchesElem.EnumerateArray())
+                {
+                    var title = branch.TryGetProperty("title", out var t) ? t.GetString() ?? "" : "";
+                    if (branch.TryGetProperty("lessons", out var bLessons))
+                    {
+                        var bArray = bLessons.EnumerateArray().ToArray();
+                        for (int i = 0; i < bArray.Length; i++)
+                        {
+                            var lid = bArray[i].GetProperty("lessonId").GetString();
+                            if (string.Equals(lid, lessonId, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string? prereqId = null;
+                                if (bArray[i].TryGetProperty("prerequisites", out var pre) && pre.GetArrayLength() > 0)
+                                {
+                                    prereqId = pre[0].GetString();
+                                }
+                                string? nextId = i < bArray.Length - 1 ? bArray[i + 1].GetProperty("lessonId").GetString() : null;
+                                return new DetailRoadmap(true, false, title, i + 1, prereqId != null ? GetName(prereqId) : null, nextId != null ? GetName(nextId) : null);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
+
+        // Bài học ngoài lộ trình
+        return new DetailRoadmap(false, true, "Chuyên đề tự do", 1, null, null);
+    }
+}

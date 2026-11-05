@@ -1,11 +1,11 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
-    "name": "Occupations",
-    "category": "vocabulary",
-    "topic": "Jobs",
-    "description": "Learn common job titles and what people do at work.",
+    "name": "Present Progressive 2: Yes/No and Information Questions",
+    "category": "grammar",
+    "topic": "Tenses",
+    "description": "Ask yes/no and information questions about actions in progress using to be and -ing verbs.",
     "level": "A1",
-    "order": 11,
+    "order": 18,
     "estimated-minutes": 20,
     "content-settings": {},
     "quiz-settings": {

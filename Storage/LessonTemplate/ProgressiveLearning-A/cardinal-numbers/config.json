@@ -2,7 +2,7 @@
     "$schema": "../../schemas/LessonConfig.schema.json",
     "name": "Numbers",
     "category": "vocabulary",
-    "topic": "Numbers",
+    "topic": "Numbers, Time, and Dates",
     "description": "Learn cardinal numbers, number groups, and how to combine tens, hundreds, and thousands in English.",
     "level": "A1",
     "order": 3,

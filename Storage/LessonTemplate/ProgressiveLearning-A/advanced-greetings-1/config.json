@@ -1,7 +1,7 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
     "name": "Advanced Greetings 1",
-    "category": "vocabulary",
+    "category": "speaking",
     "topic": "Greetings",
     "description": "Use natural, indirect expressions to open conversations when you unexpectedly meet someone or reconnect after a long time.",
     "level": "B2",

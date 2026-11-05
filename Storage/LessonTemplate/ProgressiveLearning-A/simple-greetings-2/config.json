@@ -1,7 +1,7 @@
 {
     "$schema": "../../schemas/LessonConfig.schema.json",
     "name": "Simple Greetings 2",
-    "category": "vocabulary",
+    "category": "speaking",
     "topic": "Greetings",
     "description": "Practice introducing yourself, asking where someone is from, and saying goodbye.",
     "level": "A1",

@@ -1,0 +1,19 @@
+{
+    "$schema": "../../schemas/LessonConfig.schema.json",
+    "name": "Simple Present 1: Affirmative and Negative",
+    "category": "grammar",
+    "topic": "Tenses",
+    "description": "Build affirmative and negative simple present sentences with to be and ordinary verbs.",
+    "level": "A1",
+    "order": 15,
+    "estimated-minutes": 20,
+    "content-settings": {},
+    "quiz-settings": {
+        "mix-with-lesson": false,
+        "randomize-questions": false,
+        "shuffle-questions": true,
+        "shuffle-answers": true
+    },
+    "content": "./content.json",
+    "quiz": "./quiz.json"
+}

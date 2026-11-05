@@ -398,13 +398,14 @@ namespace SE347.Services
         private string? ResolveInside(string folder, string relativePath, string field, string path, List<LessonValidationError> errors)
         {
             var full = Path.GetFullPath(Path.Combine(folder, path));
-            if (!full.StartsWith(folder + Path.DirectorySeparatorChar, StringComparison.Ordinal))
+            var relative = Path.GetRelativePath(folder, full);
+            if (Path.IsPathRooted(relative) || relative == ".." || relative.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal))
             {
                 errors.Add(new(Rel(Label(folder), relativePath), field, $"\"{path}\" nằm ngoài folder bài học."));
                 return null;
             }
 
-            return Path.GetRelativePath(folder, full);
+            return relative;
         }
 
         /// <summary>Folder tương đối với LessonTemplate, dùng "/" (vd "ProgressiveLearning-A/time").</summary>
