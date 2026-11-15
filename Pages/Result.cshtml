@@ -1,0 +1,170 @@
+@page "{lessonId?}"
+@using SE347.DTOs.Lesson
+@using SE347.DTOs.Progress
+@using SE347.Services
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
+@inject ILessonService LessonService
+@*
+    Kết quả và ôn lại mini-game (SCRUM-60): /Result/{lessonId}.
+    Mini-game nộp bài qua POST /api/progress/lessons/{lessonId}/quiz (server chấm điểm, cập nhật progress),
+    lưu response bằng QuizResult.save (js/Shared/quiz-result.js) rồi chuyển sang đây. js/result.js render:
+    data-view="loading" | "message" (lỗi) | "empty" (chưa có kết quả) | "ready".
+    Development + ?preview=1: chấm sẵn quiz thật của bài với một bộ đáp án mẫu, không gọi API.
+*@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Kết quả";
+    var lessonId = RouteData.Values["lessonId"]?.ToString() ?? string.Empty;
+    var preview = HostEnvironment.EnvironmentName == "Development" && Request.Query["preview"] == "1";
+    object? previewData = null;
+
+    if (preview && LessonService.GetDetail(lessonId) is { } previewLesson
+        && LessonService.GetQuizQuestions(lessonId) is { Count: > 0 } previewQuestions)
+    {
+        // Đáp án mẫu: cứ 4 câu sai 1 câu, câu cuối bỏ trống, để thấy đủ các trạng thái.
+        var answers = previewQuestions.Select((question, index) =>
+        {
+            IReadOnlyList<string?> answer = question.Answers;
+            if (index == previewQuestions.Count - 1 && previewQuestions.Count > 3)
+            {
+                answer = [];
+            }
+            else if (index % 4 == 1)
+            {
+                answer = question.Type switch
+                {
+                    LessonQuizQuestionType.TrueFalse => [question.Answers.FirstOrDefault() == "true" ? "false" : "true"],
+                    LessonQuizQuestionType.FillInTheBlank => question.Answers.Select(_ => (string?)"go").ToList(),
+                    _ => [question.Options.FirstOrDefault(o => !question.Answers.Contains(o)) ?? "?"],
+                };
+            }
+            return new QuizAnswerDto(question.Id, answer);
+        }).ToList();
+
+        LearningResultService.Grade(previewQuestions, answers, out var results);
+        var correct = results.Count(r => r.IsCorrect);
+        var score = IProgressService.QuizScore(correct, results.Count);
+        var passed = score >= IProgressService.QuizPassScore;
+        var progress = new LessonProgressDto(lessonId, passed ? "completed" : "in_progress", DateTimeOffset.Now, DateTimeOffset.Now,
+            passed ? DateTimeOffset.Now : null, [], 1, score, score, passed ? correct * ILearningResultService.XpPerCorrectAnswer : 0);
+        var attempt = new QuizAttemptResultDto(0, (short)correct, (short)results.Count, score,
+            passed ? correct * ILearningResultService.XpPerCorrectAnswer : 0, passed, progress);
+        previewData = new { lesson = previewLesson, durationMs = 154_000, submission = new QuizSubmissionResultDto(attempt, results) };
+    }
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Result.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @if (!preview)
+    {
+        <partial name="_SupabaseClient" />
+        <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
+        <script src="~/js/Shared/quiz-result.js" asp-append-version="true" defer></script>
+    }
+    <script src="~/js/result.js" asp-append-version="true" defer></script>
+}
+
+<main class="result-page" data-lesson-id="@lessonId" data-pass-score="@IProgressService.QuizPassScore">
+    @if (preview)
+    {
+        @* Default JSON encoder escapes HTML, including closing script tags in lesson text. *@
+        <script type="application/json" data-preview-result>@Html.Raw(System.Text.Json.JsonSerializer.Serialize(previewData, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)))</script>
+    }
+    <div class="result-wrap">
+        @if (preview)
+        {
+            <p class="sticker result-preview" role="status" data-i18n="result.preview_notice">Preview local · Bài làm mẫu chấm trên quiz thật · Không lưu tiến độ lên máy chủ</p>
+        }
+        <nav class="result-crumbs" aria-label="Vị trí trang" data-i18n-aria-label="lesson.breadcrumb">
+            <a href="/Study" data-i18n="ui.study">Học tập</a>
+            <span aria-hidden="true">/</span>
+            <a data-back-to-lesson data-lesson-name href="/Study"></a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page" data-i18n="result.crumb">Kết quả</span>
+        </nav>
+
+        <section class="result-loading" data-view="loading" aria-busy="true" aria-live="polite">
+            <p class="visually-hidden" data-i18n="result.loading">Đang tải kết quả…</p>
+            <div class="result-skeleton result-skeleton--hero"></div>
+            <div class="result-skeleton"></div>
+            <div class="result-skeleton"></div>
+        </section>
+
+        <section class="sticker result-message" data-view="message" role="alert" hidden>
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
+            <h1 data-message-title></h1>
+            <p data-message-text></p>
+            <div class="result-message__actions">
+                <button class="btn btn--ink" type="button" data-action="reload" data-i18n="lesson.retry">Thử lại</button>
+                <a class="btn" data-back-to-lesson href="/Study" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
+            </div>
+        </section>
+
+        <section class="sticker result-message" data-view="empty" role="status" hidden>
+            <svg class="foxy" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-wave" /></svg>
+            <h1 data-i18n="result.empty_title">Chưa có kết quả</h1>
+            <p data-empty-text></p>
+            <div class="result-message__actions">
+                <a class="btn btn--ink" data-play href="#" data-empty-play></a>
+                <a class="btn" data-back-to-lesson href="/Study" data-i18n="flashcard.back_to_lesson">Quay lại bài học</a>
+            </div>
+        </section>
+
+        <div class="result-ready" data-view="ready" hidden>
+            <section class="sticker result-hero" aria-labelledby="result-title">
+                <div class="result-score" role="img" data-score-ring>
+                    <span class="result-score__value" data-score aria-hidden="true"></span>
+                    <span class="result-score__unit" aria-hidden="true" data-i18n="result.points">điểm</span>
+                </div>
+                <div class="result-hero__text">
+                    <p class="result-eyebrow" data-lesson-heading></p>
+                    <h1 id="result-title" data-result-title></h1>
+                    <p class="result-summary" data-result-summary></p>
+                    <ul class="result-badges" data-badges></ul>
+                </div>
+                <svg class="foxy result-foxy" aria-hidden="true"><use data-foxy href="/images/mascot/foxy.svg#foxy-wave" /></svg>
+            </section>
+
+            <dl class="result-stats">
+                <div class="sticker result-stat result-stat--correct">
+                    <dt data-i18n="result.stat_correct">Câu đúng</dt>
+                    <dd data-stat="correct"></dd>
+                </div>
+                <div class="sticker result-stat result-stat--wrong">
+                    <dt data-i18n="result.stat_wrong">Câu sai</dt>
+                    <dd data-stat="wrong"></dd>
+                </div>
+                <div class="sticker result-stat result-stat--time">
+                    <dt data-i18n="result.stat_time">Thời gian</dt>
+                    <dd data-stat="time"></dd>
+                </div>
+                <div class="sticker result-stat result-stat--xp">
+                    <dt data-i18n="result.stat_xp">XP nhận được</dt>
+                    <dd data-stat="xp"></dd>
+                </div>
+            </dl>
+
+            <div class="result-actions">
+                <a class="btn btn--ink btn--lg" data-play href="#" data-i18n="result.retry">Làm lại</a>
+                <a class="btn btn--secondary btn--lg" data-flashcard href="#" data-i18n="result.review_flashcard" hidden>Ôn từ bằng Flashcard</a>
+                <a class="btn btn--lg" data-back-to-lesson href="/Study" data-i18n="result.back_to_lesson">Về bài học</a>
+            </div>
+
+            <section class="result-review" aria-labelledby="result-review-title">
+                <header class="result-review__head">
+                    <h2 id="result-review-title" data-i18n="result.review_title">Ôn lại đáp án</h2>
+                    <div class="result-filter" role="group" aria-label="Lọc câu hỏi" data-i18n-aria-label="result.filter_label">
+                        <button class="result-filter__btn" type="button" data-filter="wrong" aria-pressed="false"></button>
+                        <button class="result-filter__btn" type="button" data-filter="all" aria-pressed="false"></button>
+                        <button class="result-filter__btn" type="button" data-filter="correct" aria-pressed="false"></button>
+                    </div>
+                </header>
+                <p class="sticker result-review__empty" data-review-empty hidden></p>
+                <ol class="result-list" data-review-list></ol>
+            </section>
+        </div>
+    </div>
+</main>
