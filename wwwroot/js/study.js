@@ -226,11 +226,100 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => scrollToCurrent(false), 300);
 
     // ==========================================
-    // 2. ĐIỀU KHIỂN CUỘN BÀN CỜ (BUTTONS & DRAG-TO-SCROLL)
+    // 2. ĐIỀU KHIỂN CUỘN BÀN CỜ (BUTTONS, DRAG-TO-SCROLL & CUSTOM SCROLLBAR)
     // ==========================================
     const btnLeft = document.getElementById('study-scroll-left');
     const btnRight = document.getElementById('study-scroll-right');
     const btnCurrent = document.getElementById('study-scroll-current');
+    const scrollbarWrap = document.getElementById('study-board-scrollbar');
+    const scrollbarTrack = document.getElementById('study-board-scrollbar-track');
+    const scrollbarThumb = document.getElementById('study-board-scrollbar-thumb');
+
+    function getScrollbarMetrics() {
+        if (!viewport || !scrollbarTrack) return null;
+        const maxScroll = Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+        const usableWidth = Math.max(0, scrollbarTrack.clientWidth - 4);
+        if (maxScroll <= 1 || usableWidth <= 0) {
+            return { scrollable: false, maxScroll: 0, usableWidth, thumbWidth: usableWidth, maxThumbOffset: 0 };
+        }
+        const rawThumbWidth = (viewport.clientWidth / viewport.scrollWidth) * usableWidth;
+        const thumbWidth = Math.min(usableWidth, Math.max(36, Math.round(rawThumbWidth)));
+        const maxThumbOffset = Math.max(0, usableWidth - thumbWidth);
+        return { scrollable: true, maxScroll, usableWidth, thumbWidth, maxThumbOffset };
+    }
+
+    function syncCustomScrollbar() {
+        if (!scrollbarWrap || !scrollbarThumb || !viewport) return;
+        const metrics = getScrollbarMetrics();
+        if (!metrics || !metrics.scrollable) {
+            scrollbarWrap.hidden = true;
+            return;
+        }
+        scrollbarWrap.hidden = false;
+        const ratio = metrics.maxScroll > 0
+            ? Math.min(1, Math.max(0, viewport.scrollLeft / metrics.maxScroll))
+            : 0;
+        const offset = ratio * metrics.maxThumbOffset;
+        scrollbarThumb.style.width = `${metrics.thumbWidth}px`;
+        scrollbarThumb.style.transform = `translateX(${offset}px)`;
+    }
+
+    if (viewport && scrollbarTrack && scrollbarThumb) {
+        let thumbDragging = false;
+        let thumbDragStartX = 0;
+        let thumbDragStartScroll = 0;
+
+        viewport.addEventListener('scroll', syncCustomScrollbar, { passive: true });
+        window.addEventListener('resize', syncCustomScrollbar);
+
+        if (typeof ResizeObserver === 'function') {
+            const ro = new ResizeObserver(syncCustomScrollbar);
+            ro.observe(viewport);
+            if (canvas) ro.observe(canvas);
+        }
+
+        scrollbarThumb.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            e.preventDefault();
+            e.stopPropagation();
+            thumbDragging = true;
+            thumbDragStartX = e.clientX;
+            thumbDragStartScroll = viewport.scrollLeft;
+            scrollbarTrack.classList.add('is-dragging');
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!thumbDragging) return;
+            const metrics = getScrollbarMetrics();
+            if (!metrics || !metrics.scrollable || metrics.maxThumbOffset <= 0) return;
+            const deltaX = e.clientX - thumbDragStartX;
+            viewport.scrollLeft = thumbDragStartScroll + (deltaX / metrics.maxThumbOffset) * metrics.maxScroll;
+        });
+
+        const stopThumbDrag = () => {
+            if (!thumbDragging) return;
+            thumbDragging = false;
+            scrollbarTrack.classList.remove('is-dragging');
+        };
+        window.addEventListener('pointerup', stopThumbDrag);
+        window.addEventListener('pointercancel', stopThumbDrag);
+
+        scrollbarTrack.addEventListener('pointerdown', (e) => {
+            if (e.target === scrollbarThumb) return;
+            if (e.button !== 0 && e.pointerType === 'mouse') return;
+            const metrics = getScrollbarMetrics();
+            if (!metrics || !metrics.scrollable || metrics.maxThumbOffset <= 0) return;
+            e.preventDefault();
+            const rect = scrollbarTrack.getBoundingClientRect();
+            const clickX = e.clientX - (rect.left + scrollbarTrack.clientLeft + 2);
+            const targetThumbLeft = Math.min(metrics.maxThumbOffset, Math.max(0, clickX - (metrics.thumbWidth / 2)));
+            const targetScroll = (targetThumbLeft / metrics.maxThumbOffset) * metrics.maxScroll;
+            viewport.scrollTo({ left: targetScroll, behavior: 'smooth' });
+        });
+
+        syncCustomScrollbar();
+        setTimeout(syncCustomScrollbar, 250);
+    }
 
     if (btnLeft && viewport) {
         btnLeft.addEventListener('click', () => {

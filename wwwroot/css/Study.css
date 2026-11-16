@@ -65,23 +65,57 @@
     box-shadow: 5px 5px 0 var(--ink);
     cursor: grab;
     user-select: none;
-    scrollbar-width: thin;
-    scrollbar-color: var(--surface-orange) #14151a;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 .study-board__viewport:active {
     cursor: grabbing;
 }
 .study-board__viewport::-webkit-scrollbar {
-    height: 10px;
+    display: none;
 }
-.study-board__viewport::-webkit-scrollbar-track {
+
+/* Thanh cuộn ngang rút gọn, căn giữa phía dưới viewport để không chạm góc bo */
+.study-board__scrollbar {
+    display: flex;
+    justify-content: center;
+    margin-top: 14px;
+}
+.study-board__scrollbar[hidden] {
+    display: none;
+}
+.study-board__scrollbar-track {
+    box-sizing: border-box;
+    position: relative;
+    width: min(360px, 65%);
+    height: 14px;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
     background: #14151a;
-    border-radius: 10px;
+    box-shadow: 2px 2px 0 var(--ink);
+    cursor: pointer;
+    overflow: hidden;
+    touch-action: none;
 }
-.study-board__viewport::-webkit-scrollbar-thumb {
+.study-board__scrollbar-thumb {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    width: 48px;
+    border-radius: var(--radius-pill);
     background: var(--surface-orange);
-    border-radius: 10px;
-    border: 2px solid #14151a;
+    cursor: grab;
+    will-change: transform;
+    transition: background-color 0.15s ease;
+}
+.study-board__scrollbar-thumb:hover,
+.study-board__scrollbar-track.is-dragging .study-board__scrollbar-thumb {
+    background: var(--surface-orange-deep);
+}
+.study-board__scrollbar-track.is-dragging,
+.study-board__scrollbar-track.is-dragging .study-board__scrollbar-thumb {
+    cursor: grabbing;
 }
 
 /* Canvas lưới caro như ảnh flowchart người dùng cung cấp */

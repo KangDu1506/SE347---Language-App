@@ -37,7 +37,7 @@
         <partial name="_SharedHead" />
         <link rel="stylesheet" href="~/assets/_colorpalettes/themes.css" />
         <link rel="stylesheet" href="~/css/Shared/Components.css" />
-        <link rel="stylesheet" href="~/css/Shared/Layout.css" />
+        <link rel="stylesheet" href="~/css/Shared/Layout.css" asp-append-version="true" />
         @await RenderSectionAsync("Styles", required: false)
         <link rel="stylesheet" href="~/css/Shared/Preferences.css" asp-append-version="true" />
     </head>
