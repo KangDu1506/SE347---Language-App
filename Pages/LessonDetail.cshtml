@@ -56,7 +56,8 @@
 }
 
 @section Scripts {
-    <script src="~/js/auth-guard.js" defer></script>
+    <partial name="_SupabaseClient" />
+    <script src="~/js/auth-guard.js" asp-append-version="true" defer></script>
     <script src="~/js/lesson-detail.js" asp-append-version="true" defer></script>
 }
 
@@ -174,7 +175,7 @@
 
             <!-- HÀNG NÚT CTA HÀNH ĐỘNG CHÍNH -->
             <div class="detail-hero__actions">
-                <a class="btn btn--ink btn--lg detail-cta-btn" href="/TrialTest?lessonId=@lessonId" data-i18n="detail.btn_start_now">
+                <a class="btn btn--ink btn--lg detail-cta-btn" href="/Lesson/@lessonId" data-i18n="detail.btn_start_now">
                     Bắt đầu học bài này ngay →
                 </a>
                 <a class="btn btn--lg detail-flashcard-btn" href="/Flashcard/@lessonId" data-i18n="detail.btn_flashcard">

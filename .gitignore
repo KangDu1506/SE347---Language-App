@@ -33,3 +33,4 @@ appsettings.*.local.json
 *.msp
 .vscode/tasks.json
 /.vscode
+*.cmd

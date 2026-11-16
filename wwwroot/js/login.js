@@ -1,6 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
-    if (new URLSearchParams(window.location.search).get('logout') === '1') {
-        window.sb?.auth.signOut();
+document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('logout') === '1') {
+        try {
+            await window.sb?.auth.signOut();
+        } catch {
+            // Tiếp tục xóa query logout ngay cả khi mạng lỗi
+        }
+        window.history.replaceState({}, '', window.location.pathname);
     }
 
     const form = document.querySelector('.login-card form');
@@ -13,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form) return;
     const completion = window.FormCompletion.attach(form);
 
-    const verified = new URLSearchParams(window.location.search).get('verified') === '1';
+    const verified = params.get('verified') === '1';
     if (verified) {
         const banner = document.createElement('p');
         banner.className = 'auth-banner';
@@ -66,15 +72,23 @@ document.addEventListener('DOMContentLoaded', () => {
         completion.setBusy(true);
         submitButton.textContent = window.authUi.localize('Đang đăng nhập...');
 
-        const { error } = identifier.includes('@')
-            ? await window.sb.auth.signInWithPassword({ email: identifier, password: password.value })
-            : await signInWithUsername(identifier, password.value);
+        let result;
+        try {
+            result = identifier.includes('@')
+                ? await window.sb.auth.signInWithPassword({ email: identifier, password: password.value })
+                : await signInWithUsername(identifier, password.value);
+        } catch (err) {
+            result = { error: { status: 0, message: err?.message } };
+        }
 
+        const { error } = result || {};
         if (error) {
             if (error.code === 'email_not_confirmed') {
                 message.textContent = window.authUi.localize('Email chưa được xác thực. Vui lòng kiểm tra hộp thư.');
             } else if (error.status === 429) {
                 message.textContent = window.authUi.localize('Bạn yêu cầu quá nhiều lần. Vui lòng đợi ít phút rồi thử lại.');
+            } else if (error.status === 0 || error.status >= 500 || error.name === 'AuthRetryableFetchError') {
+                message.textContent = window.authUi.localize('Không kết nối được máy chủ xác thực. Vui lòng thử lại sau.');
             } else {
                 AppI18n.setText(message, 'ui.incorrect_email_username_or_password');
             }
@@ -107,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 refresh_token: body.refreshToken
             });
         } catch (error) {
-            return { error };
+            return { error: { status: 0, message: error?.message } };
         }
     }
 

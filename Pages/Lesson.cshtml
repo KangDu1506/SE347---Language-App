@@ -90,6 +90,44 @@
                 <a class="btn btn--ink btn--lg" data-action="review" href="#" data-i18n="lesson.start_review">Bắt đầu ôn tập →</a>
             </section>
 
+            @* Bài kiểm tra củng cố / Hoàn thành bài học *@
+            <section id="lesson-quiz" class="sticker lesson-quiz" data-lesson-quiz-section hidden aria-labelledby="lesson-quiz-title">
+                <div class="lesson-quiz__head">
+                    <div>
+                        <span class="tag" data-i18n="lesson.quiz_tag">Kiểm tra củng cố</span>
+                        <h2 id="lesson-quiz-title" data-i18n="lesson.quiz_title">Bài kiểm tra cuối bài</h2>
+                        <p class="lesson-quiz__desc" data-quiz-subtitle data-i18n="lesson.quiz_subtitle">Hoàn thành từ 60% số câu trở lên để mở khóa bài tiếp theo.</p>
+                    </div>
+                    <span class="tag lesson-quiz__status" data-lesson-progress-badge hidden></span>
+                </div>
+
+                <form class="lesson-quiz__form" data-quiz-form hidden>
+                    <ol class="lesson-quiz__list" data-quiz-questions></ol>
+                    <div class="lesson-quiz__actions">
+                        <button class="btn btn--ink btn--lg" type="submit" data-action="submit-quiz" data-i18n="lesson.quiz_submit">Nộp bài kiểm tra</button>
+                    </div>
+                </form>
+
+                <div class="lesson-quiz__result" data-quiz-result hidden aria-live="polite">
+                    <div class="lesson-quiz__score-card">
+                        <strong data-quiz-score></strong>
+                        <div>
+                            <h3 data-quiz-result-title></h3>
+                            <p data-quiz-result-meta></p>
+                        </div>
+                    </div>
+                    <ol class="lesson-quiz__feedback" data-quiz-feedback></ol>
+                    <div class="lesson-quiz__actions">
+                        <button class="btn btn--ink" type="button" data-action="retry-quiz" data-i18n="lesson.quiz_retry">Làm lại bài kiểm tra</button>
+                    </div>
+                </div>
+
+                <div class="lesson-quiz__complete" data-lesson-complete-wrap hidden>
+                    <p data-lesson-complete-hint data-i18n="lesson.complete_hint">Đánh dấu đã học hết các mục nội dung để hoàn thành bài học này.</p>
+                    <button class="btn btn--ink btn--lg" type="button" data-action="complete-lesson" data-i18n="lesson.complete_btn">Hoàn thành bài học (+20 XP)</button>
+                </div>
+            </section>
+
             <nav class="lesson-pager" aria-label="Chuyển bài học" data-i18n-aria-label="lesson.pager">
                 <a class="sticker press lesson-pager__link lesson-pager__link--prev" data-lesson-prev hidden>
                     <small data-i18n="lesson.prev">← Bài trước</small>
@@ -135,6 +173,9 @@
                     <p data-field="synonyms-wrap" hidden><span data-i18n="lesson.synonyms">Đồng nghĩa</span> <span class="lesson-item__chips" lang="en" data-field="synonyms"></span></p>
                     <p data-field="antonyms-wrap" hidden><span data-i18n="lesson.antonyms">Trái nghĩa</span> <span class="lesson-item__chips" lang="en" data-field="antonyms"></span></p>
                     <a class="lesson-item__oxford" data-field="oxford" target="_blank" rel="noopener noreferrer" hidden><span data-i18n="lesson.oxford">Xem trên Oxford</span> ↗</a>
+                </div>
+                <div class="lesson-item__progress" data-field="progress-wrap">
+                    <button class="btn btn--sm lesson-item__complete" type="button" data-field="complete-btn" aria-pressed="false" data-i18n="lesson.mark_learned">Đánh dấu đã học</button>
                 </div>
             </div>
         </li>

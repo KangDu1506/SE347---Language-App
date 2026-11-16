@@ -5,6 +5,8 @@ namespace SE347.Services
     public enum ProgressError
     {
         None,
+        /// <summary>Không tìm thấy hồ sơ người dùng (hoặc hồ sơ đã xóa).</summary>
+        ProfileNotFound,
         /// <summary>Không có hồ sơ, hoặc hồ sơ bị khóa / đã xóa (chỉ user active mới được ghi).</summary>
         ProfileNotActive,
         LessonNotFound,
@@ -43,6 +45,12 @@ namespace SE347.Services
 
         /// <summary>null nếu user không có hồ sơ hoặc hồ sơ đã xóa.</summary>
         Task<ProgressOverviewDto?> GetOverviewAsync(Guid userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Đảm bảo hồ sơ và các bảng thống kê mặc định của user đã được khởi tạo nếu thiếu rồi trả về overview.
+        /// Trả về <see cref="ProgressError.ProfileNotFound"/> nếu không có hồ sơ/đã xóa, hoặc <see cref="ProgressError.ProfileNotActive"/> nếu bị khóa.
+        /// </summary>
+        Task<ProgressResult<ProgressOverviewDto>> EnsureOverviewInitializedAsync(Guid userId, CancellationToken cancellationToken = default);
 
         /// <summary>Bài chưa mở trả <see cref="LessonProgressDto.NotStarted"/>.</summary>
         Task<ProgressResult<LessonProgressDto>> GetLessonProgressAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default);

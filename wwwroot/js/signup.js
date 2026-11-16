@@ -46,11 +46,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.PasswordStrength.attach(password, strength);
 
+    const usernameInput = form.querySelector('#username');
+    let lastCheckedUsername = '';
+    let lastUsernameAvailable = null;
+
+    const showFieldCustomError = (input, key, fallbackText) => {
+        const label = input.closest('label');
+        if (!label) return;
+        const errorId = `${input.id}-error`;
+        let error = document.getElementById(errorId);
+        label.classList.add('has-error');
+        input.setAttribute('aria-invalid', 'true');
+        input.setAttribute('aria-describedby', errorId);
+        if (!error) {
+            error = document.createElement('small');
+            error.className = 'field-error';
+            error.id = errorId;
+            label.append(error);
+        }
+        error.textContent = fallbackText;
+        AppI18n.setText(error, key);
+    };
+
+    const checkUsernameAvailability = async (rawValue) => {
+        const normalized = String(rawValue || '').trim().toLowerCase();
+        if (normalized.length < 3) return null;
+        if (normalized === lastCheckedUsername && lastUsernameAvailable !== null) {
+            return lastUsernameAvailable;
+        }
+        try {
+            const response = await fetch(`/api/users/username-available?username=${encodeURIComponent(normalized)}`);
+            if (!response.ok) return null;
+            const body = await response.json();
+            if (typeof body?.available !== 'boolean') return null;
+            lastCheckedUsername = normalized;
+            lastUsernameAvailable = body.available;
+            return body.available;
+        } catch {
+            return null;
+        }
+    };
+
     form.querySelectorAll('input').forEach((input) => {
-        input.addEventListener('blur', () => {
+        input.addEventListener('blur', async () => {
             setFieldError(input);
+            if (input === usernameInput && input.checkValidity()) {
+                const available = await checkUsernameAvailability(input.value);
+                if (available === false && input === usernameInput) {
+                    input.setCustomValidity('unavailable');
+                    showFieldCustomError(input, 'validation.username_unavailable', 'Tên đăng nhập đã được sử dụng hoặc không hợp lệ.');
+                }
+            }
         });
         input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
+            if (input === usernameInput) {
+                input.setCustomValidity('');
+                lastCheckedUsername = '';
+                lastUsernameAvailable = null;
+            }
             if (input.getAttribute('aria-invalid') === 'true') setFieldError(input);
         });
     });
@@ -67,16 +120,24 @@ document.addEventListener('DOMContentLoaded', () => {
         input.setAttribute('aria-invalid', isInvalid ? 'true' : 'false');
         input.setAttribute('aria-describedby', isInvalid ? errorId : '');
 
+        const key = input.validity.customError
+            ? 'validation.username_unavailable'
+            : input.validity.valueMissing
+                ? 'validation.required'
+                : input.validity.typeMismatch
+                    ? 'validation.email'
+                    : 'validation.short';
+
         if (isInvalid && !existingError) {
             const error = document.createElement('small');
             error.className = 'field-error';
             error.id = errorId;
-            AppI18n.setText(error, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
+            AppI18n.setText(error, key);
             label.append(error);
         } else if (!isInvalid && existingError) {
             existingError.remove();
         } else if (isInvalid && existingError) {
-            AppI18n.setText(existingError, input.validity.valueMissing ? 'validation.required' : input.validity.typeMismatch ? 'validation.email' : 'validation.short');
+            AppI18n.setText(existingError, key);
         }
     }
 
@@ -101,6 +162,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const formData = new FormData(form);
+        const usernameValue = String(formData.get('username')).trim().toLowerCase();
+        const available = await checkUsernameAvailability(usernameValue);
+        if (available === false) {
+            usernameInput.setCustomValidity('unavailable');
+            showFieldCustomError(usernameInput, 'validation.username_unavailable', 'Tên đăng nhập đã được sử dụng hoặc không hợp lệ.');
+            usernameInput.focus();
+            return;
+        }
+
+        if (!window.sb) {
+            message.textContent = window.authUi.localize('Không kết nối được dịch vụ đăng ký. Vui lòng thử lại sau.');
+            form.before(message);
+            return;
+        }
+
         const email = String(formData.get('email')).trim().toLowerCase();
         saveFormDraft();
         sessionStorage.setItem('pendingSignupEmail', email);
@@ -112,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             password: String(formData.get('password')),
             options: {
                 data: {
-                    username: String(formData.get('username')).trim().toLowerCase(),
+                    username: usernameValue,
                     display_name: String(formData.get('fullName')).trim()
                 }
             }

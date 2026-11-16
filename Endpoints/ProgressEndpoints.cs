@@ -27,6 +27,17 @@ namespace SE347.Endpoints
                 return overview is null ? Results.NotFound() : Results.Ok(overview);
             });
 
+            // POST /api/progress/init: tự khởi tạo hồ sơ / bảng thống kê mặc định nếu tài khoản thiếu rồi trả về overview
+            group.MapPost("/init", async (ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await progress.EnsureOverviewInitializedAsync(userId, ct));
+            });
+
             // GET /api/progress/lessons/{lessonId}: tiến độ 1 bài ("not_started" nếu chưa mở)
             group.MapGet("/lessons/{lessonId}", async (string lessonId, ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
             {
@@ -108,6 +119,7 @@ namespace SE347.Endpoints
         private static IResult ToResult<T>(ProgressResult<T> result) => result.Error switch
         {
             ProgressError.None => Results.Ok(result.Value),
+            ProgressError.ProfileNotFound => Results.NotFound(new { error = "Không tìm thấy hồ sơ người dùng." }),
             ProgressError.LessonNotFound => Results.NotFound(new { error = "Không tìm thấy bài học." }),
             ProgressError.ContentNotFound => Results.NotFound(new { error = "Không tìm thấy nội dung trong bài học." }),
             ProgressError.ProfileNotActive => LessonEndpoints.Forbidden(LessonAccess.ProfileNotActive),

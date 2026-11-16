@@ -18,12 +18,14 @@ namespace SE347.Services
         private readonly ApplicationDbContext _db;
         private readonly ILessonLookup _lessons;
         private readonly TimeProvider _clock;
+        private readonly IUserProfileInitializer _initializer;
 
-        public ProgressService(ApplicationDbContext db, ILessonLookup lessons, TimeProvider clock)
+        public ProgressService(ApplicationDbContext db, ILessonLookup lessons, TimeProvider clock, IUserProfileInitializer initializer)
         {
             _db = db;
             _lessons = lessons;
             _clock = clock;
+            _initializer = initializer;
         }
 
         // ── Đọc ──────────────────────────────────────────────────────
@@ -36,16 +38,37 @@ namespace SE347.Services
                 .Select(p => new { p.Timezone })
                 .SingleOrDefaultAsync(cancellationToken);
 
+            var stat = profile is null
+                ? null
+                : await _db.UserStats
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+
+            if (profile is null || stat is null)
+            {
+                if (await _initializer.EnsureInitializedAsync(userId, cancellationToken))
+                {
+                    profile ??= await _db.Profiles
+                        .AsNoTracking()
+                        .Where(p => p.Id == userId && p.Status != "deleted")
+                        .Select(p => new { p.Timezone })
+                        .SingleOrDefaultAsync(cancellationToken);
+
+                    if (profile is not null && stat is null)
+                    {
+                        stat = await _db.UserStats
+                            .AsNoTracking()
+                            .SingleOrDefaultAsync(s => s.UserId == userId, cancellationToken);
+                    }
+                }
+            }
+
             if (profile is null)
             {
                 return null;
             }
 
             var today = Today(profile.Timezone);
-
-            var stat = await _db.UserStats
-                .AsNoTracking()
-                .SingleOrDefaultAsync(s => s.UserId == userId, cancellationToken);
 
             var todayXp = await _db.UserDailyActivities
                 .AsNoTracking()
@@ -75,6 +98,36 @@ namespace SE347.Services
                 lessons.Count(l => l.Status == UserLessonProgress.StatusInProgress));
 
             return new ProgressOverviewDto(stats, lessons.Select(ToDto).ToList());
+        }
+
+        public async Task<ProgressResult<ProgressOverviewDto>> EnsureOverviewInitializedAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            var exists = await _initializer.EnsureInitializedAsync(userId, cancellationToken);
+            if (!exists)
+            {
+                return ProgressResult<ProgressOverviewDto>.Fail(ProgressError.ProfileNotFound);
+            }
+
+            var status = await _db.Profiles
+                .AsNoTracking()
+                .Where(p => p.Id == userId && p.Status != "deleted")
+                .Select(p => p.Status)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (status is null)
+            {
+                return ProgressResult<ProgressOverviewDto>.Fail(ProgressError.ProfileNotFound);
+            }
+
+            if (status != "active")
+            {
+                return ProgressResult<ProgressOverviewDto>.Fail(ProgressError.ProfileNotActive);
+            }
+
+            var overview = await GetOverviewAsync(userId, cancellationToken);
+            return overview is null
+                ? ProgressResult<ProgressOverviewDto>.Fail(ProgressError.ProfileNotFound)
+                : ProgressResult<ProgressOverviewDto>.Ok(overview);
         }
 
         public async Task<ProgressResult<LessonProgressDto>> GetLessonProgressAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default)
@@ -222,6 +275,15 @@ namespace SE347.Services
                 .Where(p => p.Id == userId && p.Status == "active")
                 .Select(p => p.Timezone)
                 .SingleOrDefaultAsync(cancellationToken);
+
+            if (timezone is null && await _initializer.EnsureInitializedAsync(userId, cancellationToken))
+            {
+                timezone = await _db.Profiles
+                    .AsNoTracking()
+                    .Where(p => p.Id == userId && p.Status == "active")
+                    .Select(p => p.Timezone)
+                    .SingleOrDefaultAsync(cancellationToken);
+            }
 
             if (timezone is null)
             {

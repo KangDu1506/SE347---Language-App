@@ -45,9 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let currentUser = null;
+    let profileDisplayName = '';
     let requestVersion = 0;
     let lastData = null;
     let lastError = 'error';
+    const localAuthBypassEnabled = document.querySelector('meta[name="local-auth-bypass"]')?.content === 'true';
 
     function setView(name) {
         page.dataset.dashboardState = name;
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nameSlot) return;
         nameSlot.removeAttribute('data-i18n');
         const meta = currentUser?.user_metadata || {};
-        const fullName = String(meta.display_name || meta.full_name || '').trim();
+        const fullName = String(profileDisplayName || meta.display_name || meta.full_name || '').trim();
         nameSlot.textContent = fullName
             ? fullName.split(/\s+/).slice(-2).join(' ')
             : t('dash.friend', 'bạn');
@@ -325,13 +327,41 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (page.dataset.dashboardState === 'error') showError(lastError);
     });
 
+    async function loadProfileFallbackName() {
+        try {
+            const headers = { Accept: 'application/json' };
+            if (window.sb) {
+                const token = (await window.sb.auth.getSession())?.data?.session?.access_token;
+                if (token) headers.Authorization = `Bearer ${token}`;
+            }
+            const response = await fetch('/api/users/me', { headers });
+            if (!response.ok) return;
+            const profile = await response.json();
+            if (profile?.displayName) {
+                profileDisplayName = profile.displayName;
+                renderName();
+            }
+        } catch {
+            // Bỏ qua nếu không tải được tên từ /api/users/me
+        }
+    }
+
     async function start() {
-        if (!window.sb) return;
+        if (!window.sb) {
+            if (localAuthBypassEnabled) {
+                loadProfileFallbackName();
+                await load();
+            }
+            return;
+        }
         try {
             const { data, error } = await window.sb.auth.getUser();
             if (error || !data?.user) return;
             currentUser = data.user;
             renderName();
+            if (!currentUser.user_metadata?.display_name && !currentUser.user_metadata?.full_name) {
+                loadProfileFallbackName();
+            }
         } catch {
             return;
         }
@@ -341,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 requestVersion++;
                 lastData = null;
                 currentUser = null;
+                profileDisplayName = '';
                 views.ready.replaceChildren();
                 streakCard.hidden = true;
                 page.hidden = true;
@@ -353,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!user) return;
             const changed = currentUser?.id !== user.id;
             currentUser = user;
+            if (changed) profileDisplayName = '';
             renderName();
             if (changed) load();
         });

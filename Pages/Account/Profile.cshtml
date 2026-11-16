@@ -9,37 +9,57 @@
 }
 
 @section Scripts {
-    <script src="~/js/auth-guard.js" defer></script>
-    <script src="~/js/profile.js" defer></script>
+    <partial name="_SupabaseClient" />
+    <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
+    <script src="~/js/auth-guard.js" asp-append-version="true" defer></script>
+    <script src="~/js/profile.js" asp-append-version="true" defer></script>
 }
 
 		<main class="profile-page">
 
 			<section class="profile-hero" aria-labelledby="profile-title">
-				<div class="profile-avatar" aria-hidden="true">NA</div>
+				<div class="profile-avatar" aria-hidden="true">--</div>
 				<div class="profile-identity">
-					<p class="profile-eyebrow" data-i18n="ui.personal_account">Tài khoản cá nhân</p>
-					<h1 id="profile-title">Nguyễn Văn C</h1>
-					<p class="profile-email">nguyen.van.c@example.com</p>
+					<div class="profile-badges">
+						<span class="profile-eyebrow" id="profile-role-badge" data-i18n="ui.personal_account">Tài khoản cá nhân</span>
+						<span class="profile-badge" id="profile-visibility-badge" hidden></span>
+						<span class="profile-badge profile-badge--accent" id="profile-level-badge" hidden></span>
+						<span class="profile-badge profile-badge--warning" id="profile-status-badge" hidden></span>
+					</div>
+					<h1 id="profile-title" data-i18n="profile.loading_name">Hồ sơ của bạn</h1>
+					<p class="profile-email" data-i18n="profile.loading_identity">Đang tải thông tin tài khoản...</p>
+					<p class="profile-bio" id="profile-bio" hidden></p>
+					<div class="profile-meta" id="profile-meta" hidden>
+						<span id="profile-joined"></span>
+						<span id="profile-last-active"></span>
+					</div>
 				</div>
 				<button class="profile-edit-button" type="button" data-i18n="ui.edit_profile">Chỉnh sửa hồ sơ</button>
 			</section>
 
+			<div class="profile-status-banner" id="profile-status-banner" role="alert" hidden>
+				<p class="profile-status-banner__text" id="profile-status-text"></p>
+				<button class="profile-status-banner__retry" id="profile-retry-btn" type="button" data-i18n="profile.retry">Thử lại</button>
+			</div>
+
 			<section class="profile-stats" aria-label="Thống kê học tập" data-i18n-aria-label="ui.learning_statistics">
 				<article class="profile-stat">
 					<span class="profile-stat__label" data-i18n="ui.learning_streak">Ngày học liên tục</span>
-					<strong>12</strong>
+					<strong>0</strong>
 					<span class="profile-stat__note" data-i18n="ui.days">ngày</span>
+					<small class="profile-stat__sub" id="profile-streak-sub"></small>
 				</article>
 				<article class="profile-stat">
 					<span class="profile-stat__label" data-i18n="ui.completed_lessons">Bài đã hoàn thành</span>
-					<strong>48</strong>
+					<strong>0</strong>
 					<span class="profile-stat__note" data-i18n="ui.lessons">bài học</span>
+					<small class="profile-stat__sub" id="profile-lessons-sub"></small>
 				</article>
 				<article class="profile-stat">
 					<span class="profile-stat__label" data-i18n="ui.total_points">Điểm tích lũy</span>
-					<strong>2,840</strong>
+					<strong>0</strong>
 					<span class="profile-stat__note">XP</span>
+					<small class="profile-stat__sub" id="profile-xp-sub"></small>
 				</article>
 			</section>
 
@@ -47,15 +67,26 @@
 				<section class="profile-panel profile-progress-panel" aria-labelledby="progress-title">
 					<div class="profile-panel__heading">
 						<div>
-							<p class="profile-eyebrow" data-i18n="ui.this_week_s_goal">Mục tiêu tuần này</p>
+							<p class="profile-eyebrow" data-i18n="profile.progress_eyebrow">Tổng quan học tập</p>
 							<h2 id="progress-title" data-i18n="ui.learning_progress">Tiến độ học tập</h2>
 						</div>
-						<span class="profile-progress-value">72%</span>
+						<span class="profile-progress-value">0%</span>
 					</div>
-					<div class="profile-progress-track" role="progressbar" aria-label="Tiến độ học tập tuần này" data-i18n-aria-label="ui.this_week_s_learning_progress" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
-						<span style="width: 72%"></span>
+					<div class="profile-progress-track" role="progressbar" aria-label="Tiến độ học tập" data-i18n-aria-label="ui.learning_progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+						<span style="width: 0%"></span>
 					</div>
-					<p class="profile-panel__description" data-i18n="ui.you_have_completed_18_of_25_activities_this_week">Bạn đã hoàn thành 18 trên 25 hoạt động trong tuần này.</p>
+					<p class="profile-panel__description" data-i18n="profile.progress_empty">Chưa có dữ liệu tiến độ học tập.</p>
+
+					<div class="profile-goal-block" id="profile-goal-block" hidden>
+						<div class="profile-goal-block__head">
+							<span data-i18n="profile.daily_goal_label">Mục tiêu XP hôm nay</span>
+							<strong id="profile-goal-value">0 / 20 XP</strong>
+						</div>
+						<div class="profile-progress-track profile-progress-track--goal" role="progressbar" aria-label="Mục tiêu XP hôm nay" data-i18n-aria-label="profile.daily_goal_label" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+							<span id="profile-goal-bar" style="width: 0%"></span>
+						</div>
+					</div>
+
 					<a class="profile-panel__link" href="/Study"><span data-i18n="ui.continue_learning">Tiếp tục học</span> <span aria-hidden="true">&#8594;</span></a>
 				</section>
 
@@ -69,20 +100,70 @@
 					</div>
 					<ul class="profile-activity-list">
 						<li>
-							<span class="profile-activity-icon profile-activity-icon--blue" aria-hidden="true">V</span>
-							<span><strong data-i18n="ui.basic_vocabulary">Từ vựng cơ bản</strong><small data-i18n="ui.completed_today">Hoàn thành hôm nay</small></span>
-							<b>+120 XP</b>
+							<span><strong data-i18n="profile.no_activity">Chưa có hoạt động học tập nào.</strong></span>
 						</li>
-						<li>
-							<span class="profile-activity-icon profile-activity-icon--green" aria-hidden="true">N</span>
-							<span><strong data-i18n="ui.present_simple_grammar">Ngữ pháp hiện tại đơn</strong><small data-i18n="ui.completed_yesterday">Hoàn thành hôm qua</small></span>
-							<b>+90 XP</b>
-						</li>
-						<li>
-							<span class="profile-activity-icon profile-activity-icon--orange" aria-hidden="true">T</span>
-							<span><strong data-i18n="ui.practice_test_04">Bài kiểm tra thử số 04</strong><small data-i18n="ui.completed_2_days_ago">Hoàn thành 2 ngày trước</small></span>
-							<b>+180 XP</b>
-						</li>
+					</ul>
+				</section>
+			</div>
+
+			<div class="profile-details-grid">
+				<section class="profile-panel" aria-labelledby="account-details-title">
+					<div class="profile-panel__heading">
+						<div>
+							<p class="profile-eyebrow" data-i18n="profile.account_eyebrow">Dữ liệu tài khoản</p>
+							<h2 id="account-details-title" data-i18n="profile.account_details_title">Thông tin hồ sơ &amp; Cài đặt</h2>
+						</div>
+					</div>
+					<dl class="profile-detail-list" id="profile-detail-list">
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_username">Tên đăng nhập</dt>
+							<dd data-profile-field="username">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_email">Email</dt>
+							<dd data-profile-field="email">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_level">Trình độ CEFR</dt>
+							<dd data-profile-field="cefr">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_reason">Mục tiêu học tập</dt>
+							<dd data-profile-field="reason">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_daily_goal">Mục tiêu mỗi ngày</dt>
+							<dd data-profile-field="dailyGoal">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_locale_tz">Ngôn ngữ &amp; Múi giờ</dt>
+							<dd data-profile-field="localeTimezone">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_visibility">Hiển thị hồ sơ</dt>
+							<dd data-profile-field="visibility">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_theme_sound">Giao diện &amp; Âm thanh</dt>
+							<dd data-profile-field="themeSound">—</dd>
+						</div>
+						<div class="profile-detail-item">
+							<dt data-i18n="profile.field_reminder">Nhắc nhở học tập</dt>
+							<dd data-profile-field="reminder">—</dd>
+						</div>
+					</dl>
+				</section>
+
+				<section class="profile-panel" aria-labelledby="achievements-title">
+					<div class="profile-panel__heading">
+						<div>
+							<p class="profile-eyebrow" data-i18n="profile.achievements_eyebrow">Thành tích</p>
+							<h2 id="achievements-title" data-i18n="profile.achievements_title">Huy hiệu đạt được</h2>
+						</div>
+						<span class="profile-badge" id="profile-achievements-count">0</span>
+					</div>
+					<ul class="profile-achievements-list" id="profile-achievements-list">
+						<li class="profile-achievement-empty" data-i18n="profile.no_achievements">Chưa đạt huy hiệu nào.</li>
 					</ul>
 				</section>
 			</div>

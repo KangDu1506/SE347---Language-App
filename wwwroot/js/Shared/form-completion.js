@@ -25,6 +25,8 @@
 
         form.addEventListener('input', refresh);
         form.addEventListener('change', refresh);
+        refresh();
+        setTimeout(refresh, 100);
 
         return {
             refresh,

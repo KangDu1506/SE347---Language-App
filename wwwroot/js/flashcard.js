@@ -12,8 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const state = { contents: [], index: 0, flipped: false, rating: null, view: 'loading' };
     let requestId = 0;
     let ratingScope = null;
+    let canSyncProgress = false;
+    const syncedKnowIds = new Set();
     const ratings = new Map();
     const unsavedRatings = new Set();
+    const localAuthBypassEnabled = document.querySelector('meta[name="local-auth-bypass"]')?.content === 'true';
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
 
     const isRating = value => value === 'know' || value === 'again';
@@ -150,9 +153,25 @@ document.addEventListener('DOMContentLoaded', () => {
     function setLessonLinks(lesson) {
         const url = `/Lesson/${encodeURIComponent(lesson.lessonId)}`;
         page.querySelectorAll('[data-back-to-lesson], [data-empty-back]').forEach(link => { link.href = url; });
+        const quizLink = $('[data-go-quiz]');
+        if (quizLink) {
+            const hasQuiz = Array.isArray(lesson.quiz) && lesson.quiz.length > 0;
+            quizLink.href = `${url}#lesson-quiz`;
+            quizLink.hidden = !hasQuiz;
+        }
         setText('[data-lesson-name]', lesson.name);
         setText('[data-lesson-heading]', lesson.name);
         document.title = `${lesson.name} · Wordfox`;
+    }
+
+    function syncKnowProgress(contentId) {
+        if (!canSyncProgress || !window.AppApi || !contentId || syncedKnowIds.has(contentId)) return;
+        syncedKnowIds.add(contentId);
+        window.AppApi.post(
+            `/api/progress/lessons/${encodeURIComponent(lessonId)}/contents/${encodeURIComponent(contentId)}/complete`
+        ).catch(() => {
+            syncedKnowIds.delete(contentId);
+        });
     }
 
     async function load() {
@@ -164,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('[data-lesson-name]', '');
         setText('[data-lesson-heading]', '');
         setText('[data-card-term]', '');
+        const quizLink = $('[data-go-quiz]');
+        if (quizLink) quizLink.hidden = true;
         $('[data-card-back]').hidden = true;
         $('[data-examples]').replaceChildren();
         const lessonUrl = LESSON_ID_PATTERN.test(lessonId) ? `/Lesson/${encodeURIComponent(lessonId)}` : '/Study';
@@ -182,11 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Preview and authenticated accounts never share local choices.
-            const scope = previewData ? 'preview' : userScope((await window.sb?.auth.getSession())?.data?.session);
+            const session = previewData ? null : (await window.sb?.auth.getSession())?.data?.session;
+            const scope = previewData ? 'preview' : userScope(session);
+            canSyncProgress = !previewData && Boolean(window.AppApi) && (localAuthBypassEnabled || Boolean(session?.access_token));
             if (currentRequest !== requestId) return;
             if (scope !== ratingScope) {
                 ratings.clear();
                 unsavedRatings.clear();
+                syncedKnowIds.clear();
                 ratingScope = scope;
             }
             const lesson = previewData ? JSON.parse(previewData.textContent)
@@ -263,7 +287,11 @@ document.addEventListener('DOMContentLoaded', () => {
             emit('change');
         }
         if (['know', 'again'].includes(button.dataset.rating)) {
-            saveRating(state.contents[state.index].id, button.dataset.rating);
+            const contentId = state.contents[state.index].id;
+            saveRating(contentId, button.dataset.rating);
+            if (button.dataset.rating === 'know') {
+                syncKnowProgress(contentId);
+            }
             renderCard();
             emit('rate');
         }

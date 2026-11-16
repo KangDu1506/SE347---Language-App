@@ -58,5 +58,32 @@ const error = (status, code) => Object.assign(new Error('API failure'), { status
         return response;
     };
     assert.equal(await loadDashboard(staleApi, () => active), null);
+
+    // Tự request POST /api/progress/init khi /api/progress trả 404 (tài khoản cũ chưa khởi tạo).
+    let initCalls = 0;
+    let progressAttempt = 0;
+    const autoInitApi = {
+        get: async url => {
+            if (url === '/api/progress') {
+                progressAttempt++;
+                if (progressAttempt === 1) throw error(404);
+                return overview;
+            }
+            if (url === '/api/lessons') return catalog;
+            if (url === '/api/lessons/current' || url === '/api/lessons/locked') throw error(403, 'lesson_locked');
+            if (url === '/api/lessons/missing') throw error(404);
+            return { lessonId: url.split('/').at(-1) };
+        },
+        post: async url => {
+            assert.equal(url, '/api/progress/init');
+            initCalls++;
+            return overview;
+        }
+    };
+    const recovered = await loadDashboard(autoInitApi);
+    assert.equal(initCalls, 1);
+    assert.equal(progressAttempt, 2);
+    assert.equal(recovered.recommendations.map(item => item.lessonId).join(','), 'available');
+
     console.log('PASS: authenticated read-only loading, access filtering, removed lessons, failure propagation, invalid payloads and stale requests.');
 })().catch(error => { console.error(error); process.exitCode = 1; });

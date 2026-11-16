@@ -155,11 +155,32 @@
         };
     }
 
-    async function loadDashboard(api, isCurrent = () => true) {
-        const [overview, lessons] = await Promise.all([
+    async function fetchOverviewAndLessons(api) {
+        const [progressResult, lessonsResult] = await Promise.allSettled([
             api.get('/api/progress'),
             api.get('/api/lessons')
         ]);
+
+        if (progressResult.status === 'fulfilled' && lessonsResult.status === 'fulfilled') {
+            return [progressResult.value, lessonsResult.value];
+        }
+
+        if (progressResult.status === 'rejected'
+            && progressResult.reason?.status === 404
+            && typeof api.post === 'function') {
+            await api.post('/api/progress/init');
+            return await Promise.all([
+                api.get('/api/progress'),
+                api.get('/api/lessons')
+            ]);
+        }
+
+        if (progressResult.status === 'rejected') throw progressResult.reason;
+        throw lessonsResult.reason;
+    }
+
+    async function loadDashboard(api, isCurrent = () => true) {
+        const [overview, lessons] = await fetchOverviewAndLessons(api);
         if (!isCurrent()) return null;
         const data = mapDashboard(overview, lessons);
         if (!data) throw new Error('Invalid dashboard response');

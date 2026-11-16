@@ -11,7 +11,8 @@
 }
 
 @section Scripts {
-    <script src="~/js/auth-guard.js" defer></script>
+    <partial name="_SupabaseClient" />
+    <script src="~/js/auth-guard.js" asp-append-version="true" defer></script>
     <script src="~/js/trialtest.js" defer></script>
 }
 

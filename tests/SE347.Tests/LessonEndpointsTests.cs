@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SE347.DTOs.Lesson;
+using SE347.DTOs.Progress;
+using SE347.DTOs.Users;
 using SE347.Models;
 using SE347.Services;
 
@@ -423,6 +425,53 @@ namespace SE347.Tests
             {
                 Assert.False(question.TryGetProperty(name, out _), $"Câu hỏi quiz không được có trường '{name}'.");
             }
+        }
+
+        // ── Khởi tạo tiến độ / hồ sơ mặc định khi còn thiếu ─────────
+
+        [Fact]
+        public async Task ProgressOverview_And_MyProfile_MissingStatsOrProgress_Return200AndInitializeDefaults()
+        {
+            var client = _factory.CreateClientFor(await _factory.CreateUserAsync());
+
+            var overviewResponse = await client.GetAsync("/api/progress");
+            Assert.Equal(HttpStatusCode.OK, overviewResponse.StatusCode);
+
+            var overview = await overviewResponse.Content.ReadFromJsonAsync<ProgressOverviewDto>(Json);
+            Assert.NotNull(overview);
+            Assert.Equal(0, overview.Stats.TotalXp);
+            Assert.Equal(0, overview.Stats.CurrentStreak);
+            Assert.Empty(overview.Lessons);
+
+            var meResponse = await client.GetAsync("/api/users/me");
+            Assert.Equal(HttpStatusCode.OK, meResponse.StatusCode);
+
+            var me = await meResponse.Content.ReadFromJsonAsync<MyProfileDto>(Json);
+            Assert.NotNull(me);
+            Assert.NotNull(me.Setting);
+            Assert.NotNull(me.Stat);
+            Assert.NotNull(me.LearningProfile);
+        }
+
+        [Fact]
+        public async Task ProgressInit_ActiveUser_Returns200_And_InactiveOrMissing_IsRejected()
+        {
+            var activeClient = _factory.CreateClientFor(await _factory.CreateUserAsync());
+            var initOk = await activeClient.PostAsync("/api/progress/init", null);
+            Assert.Equal(HttpStatusCode.OK, initOk.StatusCode);
+
+            var blockedClient = _factory.CreateClientFor(await _factory.CreateUserAsync("blocked"));
+            var initBlocked = await blockedClient.PostAsync("/api/progress/init", null);
+            Assert.Equal(HttpStatusCode.Forbidden, initBlocked.StatusCode);
+            Assert.Equal("profile_inactive", (await initBlocked.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
+
+            var deletedClient = _factory.CreateClientFor(await _factory.CreateUserAsync("deleted"));
+            var initDeleted = await deletedClient.PostAsync("/api/progress/init", null);
+            Assert.Equal(HttpStatusCode.NotFound, initDeleted.StatusCode);
+
+            var missingClient = _factory.CreateClientFor(Guid.NewGuid());
+            var initMissing = await missingClient.PostAsync("/api/progress/init", null);
+            Assert.Equal(HttpStatusCode.NotFound, initMissing.StatusCode);
         }
     }
 }

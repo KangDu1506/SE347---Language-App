@@ -58,6 +58,7 @@ else
 }
 
 // Services nghiệp vụ (Services/)
+builder.Services.AddScoped<IUserProfileInitializer, UserProfileInitializer>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
 builder.Services.AddSingleton(TimeProvider.System);

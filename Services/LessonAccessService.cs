@@ -8,11 +8,13 @@ namespace SE347.Services
     {
         private readonly ApplicationDbContext _db;
         private readonly ILessonService _lessons;
+        private readonly IUserProfileInitializer _initializer;
 
-        public LessonAccessService(ApplicationDbContext db, ILessonService lessons)
+        public LessonAccessService(ApplicationDbContext db, ILessonService lessons, IUserProfileInitializer initializer)
         {
             _db = db;
             _lessons = lessons;
+            _initializer = initializer;
         }
 
         public async Task<LessonAccess> CheckProfileAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -20,6 +22,13 @@ namespace SE347.Services
             var active = await _db.Profiles
                 .AsNoTracking()
                 .AnyAsync(p => p.Id == userId && p.Status == "active", cancellationToken);
+
+            if (!active && await _initializer.EnsureInitializedAsync(userId, cancellationToken))
+            {
+                active = await _db.Profiles
+                    .AsNoTracking()
+                    .AnyAsync(p => p.Id == userId && p.Status == "active", cancellationToken);
+            }
 
             return active ? LessonAccess.Allowed : LessonAccess.ProfileNotActive;
         }
