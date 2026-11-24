@@ -179,40 +179,43 @@
         throw lessonsResult.reason;
     }
 
+    // GET /api/lessons/recommendations: in-progress -> next unlocked lesson in the
+    // learning path -> standalone lessons. The server already drops locked and
+    // completed lessons, so no per-lesson access probes are needed.
+    function mapRecommendations(rawItems, data, progressById) {
+        if (!Array.isArray(rawItems)) return null;
+        const items = [];
+        for (const raw of rawItems) {
+            const lesson = mapLesson(raw?.lesson);
+            if (!lesson || !STATUSES.has(raw.progressStatus)) return null;
+            if (lesson.lessonId === data.current?.lessonId || items.some(item => item.lessonId === lesson.lessonId)) continue;
+            const progress = progressById.get(lesson.lessonId);
+            items.push({
+                ...lesson,
+                progressStatus: raw.progressStatus,
+                completedContents: progress?.completedContentIds.length || 0,
+                lastStudiedAt: progress?.lastStudiedAt || null
+            });
+        }
+        return items.slice(0, 3);
+    }
+
     async function loadDashboard(api, isCurrent = () => true) {
-        const [overview, lessons] = await fetchOverviewAndLessons(api);
+        // One extra slot: the first suggestion is usually the current lesson, shown separately.
+        const [[overview, lessons], rawRecommendations] = await Promise.all([
+            fetchOverviewAndLessons(api),
+            api.get('/api/lessons/recommendations?limit=4')
+        ]);
         if (!isCurrent()) return null;
         const data = mapDashboard(overview, lessons);
         if (!data) throw new Error('Invalid dashboard response');
 
-        // List summaries do not expose prerequisites/access. Verify only the
-        // current lesson and the first three unfinished suggestions, without
-        // recording an open event or introducing recommendation scoring.
-        const candidates = [...(data.current ? [data.current] : []), ...data.recommendations];
-        const allowed = await Promise.all(candidates.map(async lesson => {
-            try {
-                const detail = await api.get(`/api/lessons/${encodeURIComponent(lesson.lessonId)}`);
-                if (!isObject(detail) || detail.lessonId !== lesson.lessonId) {
-                    throw new Error('Invalid lesson response');
-                }
-                return true;
-            } catch (error) {
-                if (error.status === 404 || (error.status === 403 && error.body?.code === 'lesson_locked')) {
-                    return false;
-                }
-                throw error;
-            }
-        }));
-        if (!isCurrent()) return null;
-        const accessibleIds = new Set(candidates.filter((_, index) => allowed[index]).map(lesson => lesson.lessonId));
-        if (data.current && !accessibleIds.has(data.current.lessonId)) {
-            data.current = null;
-            data.currentUnavailable = true;
-            data.mode = 'current-unavailable';
-        }
-        data.recommendations = data.recommendations.filter(lesson => accessibleIds.has(lesson.lessonId));
+        const progressById = new Map(overview.lessons.map(item => [item.lessonId, mapProgress(item)]));
+        const recommendations = mapRecommendations(rawRecommendations, data, progressById);
+        if (!recommendations) throw new Error('Invalid recommendations response');
+        data.recommendations = recommendations;
         return data;
     }
 
-    window.DashboardData = Object.freeze({ mapDashboard, loadDashboard });
+    window.DashboardData = Object.freeze({ mapDashboard, mapRecommendations, loadDashboard });
 })();

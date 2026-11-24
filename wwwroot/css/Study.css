@@ -17,6 +17,12 @@
 .study-board { padding: 24px 26px 28px; background: var(--surface-sand); }
 .study-board__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 20px; margin-bottom: 20px; }
 .study-board__head h2 { margin: 6px 0 0; font-size: 32px; }
+/* display: flex của .study-library-state / .btn đè thuộc tính hidden: buộc ẩn trong trang Study */
+.study-page [hidden] { display: none !important; }
+.study-board__status { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; }
+.study-board__status .study-library-state { margin: 0 0 12px; }
+.study-board__status .btn { margin-bottom: 12px; }
+.study-board__canvas[aria-busy="true"] .study-node { opacity: .55; }
 
 .study-board__legend {
     display: flex;
