@@ -69,7 +69,7 @@ namespace SE347.Services
                 ? correctCount * ILearningResultService.XpPerCorrectAnswer
                 : 0;
 
-            var attempt = await _progress.RecordQuizAttemptAsync(userId, lessonId, correctCount, questions.Count, xp, cancellationToken);
+            var attempt = await _progress.RecordQuizAttemptAsync(userId, lessonId, correctCount, questions.Count, xp, results, cancellationToken);
             return attempt.Error == ProgressError.None
                 ? ProgressResult<QuizSubmissionResultDto>.Ok(new QuizSubmissionResultDto(attempt.Value!, results))
                 : ProgressResult<QuizSubmissionResultDto>.Fail(attempt.Error, attempt.Detail);

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.StaticFiles;
 using SE347.Auth;
 using SE347.DTOs.Lesson;
+using SE347.Models;
 using SE347.Services;
 
 namespace SE347.Endpoints
@@ -20,7 +21,7 @@ namespace SE347.Endpoints
         {
             var group = app.MapGroup("/api/lessons").RequireAuthorization();
 
-            // GET /api/lessons?category=grammar&level=A1: Lấy danh sách bài học có thể lọc theo category và level
+            // GET /api/lessons?category=grammar&level=A1: danh sách bài học (lọc theo category và level), kèm isLocked / progressStatus theo user
             group.MapGet("/", async (ClaimsPrincipal user, string? category, string? level, ILessonService lessonService,
                 ILessonAccessService access, CancellationToken ct) =>
             {
@@ -46,7 +47,14 @@ namespace SE347.Endpoints
                     return Forbidden(denied);
                 }
 
-                var lessons = lessonService.GetAll(category, level);
+                var lockState = await access.GetLockStateAsync(userId, ct);
+                var lessons = lessonService.GetAll(category, level)
+                    .Select(l => LessonListItemDto.From(l,
+                        lockState.LockedLessonIds.Contains(l.LessonId),
+                        lockState.StatusByLesson.TryGetValue(l.LessonId, out var status)
+                            ? status == UserLessonProgress.StatusCompleted ? LessonProgressStatuses.Completed : LessonProgressStatuses.InProgress
+                            : LessonProgressStatuses.NotStarted))
+                    .ToList();
                 return Results.Ok(lessons);
             });
 
