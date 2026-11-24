@@ -117,6 +117,32 @@ public sealed class QuizGradingTests
 /// <summary>Luật XP và điều kiện hoàn thành bài của LearningResultService (IProgressService được mock).</summary>
 public sealed class LearningResultServiceTests
 {
+    [Fact]
+    public async Task CheckQuizAnswer_ReturnsPerQuestionFeedbackWithoutRecordingAnAttempt()
+    {
+        var progress = new Mock<IProgressService>(MockBehavior.Strict);
+        var service = new LearningResultService(Lessons(quizCount: 1).Object, progress.Object);
+
+        var correct = await service.CheckQuizAnswerAsync("l", new QuizAnswerDto("1", ["TRUE"]));
+        var wrong = await service.CheckQuizAnswerAsync("l", new QuizAnswerDto("1", ["false"]));
+
+        Assert.Equal(ProgressError.None, correct.Error);
+        Assert.True(correct.Value!.IsCorrect);
+        Assert.Equal(ProgressError.None, wrong.Error);
+        Assert.False(wrong.Value!.IsCorrect);
+        progress.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task CheckQuizAnswer_RejectsUnknownQuestion()
+    {
+        var service = new LearningResultService(Lessons(quizCount: 1).Object, Mock.Of<IProgressService>());
+
+        var result = await service.CheckQuizAnswerAsync("l", new QuizAnswerDto("404", ["true"]));
+
+        Assert.Equal(ProgressError.InvalidInput, result.Error);
+    }
+
     [Theory]
     [InlineData("in_progress", 4, 40)] // 80%: đạt lần đầu, 10 XP mỗi câu đúng
     [InlineData("in_progress", 3, 30)] // 60%: đúng ngưỡng đạt
