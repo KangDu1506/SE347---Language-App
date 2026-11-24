@@ -5,17 +5,18 @@
 @using SE347.DTOs.Lesson
 @using SE347.Services
 @inject IWebHostEnvironment Environment
+@inject ILessonService LessonService
 @*
     Học tập: Bàn cờ lộ trình học tập phân nhánh (Flowchart / Skill Tree), thư viện chủ đề và gợi ý.
-    Bàn cờ đọc LearningPath.json; thư viện bài học được nạp từ API.
+    Server chỉ dựng khung bàn cờ (vị trí, tên bài) từ ILessonService.GetLearningPaths() — cùng bố cục với
+    GET /api/learning-paths/{id}/board; trạng thái done/current/locked theo user do study.js nạp từ API đó.
+    Thư viện bài học và gợi ý ngoài lộ trình cũng nạp từ API.
 *@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Học tập";
-    var TemplateRoot = System.IO.Path.Combine(Environment.ContentRootPath, "Storage", "LessonTemplate");
-    var ProgressiveLearningRoot = System.IO.Path.Combine(TemplateRoot, "ProgressiveLearning-A");
-    var BoardNodes = LoadBoardNodes(ProgressiveLearningRoot);
-    var CompletedCount = BoardNodes.Count(n => n.State == "done");
+    var LearningPath = LessonService.GetLearningPaths().FirstOrDefault();
+    var BoardNodes = LoadBoardNodes(LearningPath, LessonService);
     var TotalBoardCount = BoardNodes.Length;
     var MaxCol = BoardNodes.Length > 0 ? BoardNodes.Max(n => n.Column) : 13;
 }
@@ -37,7 +38,7 @@
             <h1 id="study-title"><span data-i18n="study.title_a">Học</span> <span class="study-head__accent" data-i18n="study.title_b">tập</span></h1>
             <div class="sticker study-level">
                 <b>A2</b>
-                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small>@CompletedCount/@TotalBoardCount <span data-i18n="study.lessons_unit">bài</span> · 1.247 <span data-i18n="study.oxford_words">từ Oxford</span></small></p>
+                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small><span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_unit">bài</span> · 1.247 <span data-i18n="study.oxford_words">từ Oxford</span></small></p>
             </div>
         </section>
 
@@ -54,7 +55,7 @@
                     </div>
                 </div>
                 <div class="study-board__controls">
-                    <span class="study-board__stars-pill">⭐ @CompletedCount/@TotalBoardCount <span data-i18n="study.lessons_completed">bài đã học</span></span>
+                    <span class="study-board__stars-pill">⭐ <span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_completed">bài đã học</span></span>
                     <div class="study-board__btn-group">
                         <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-left" data-i18n-aria-label="study.scroll_left" aria-label="Cuộn sang trái">◀</button>
                         <button type="button" class="btn btn--sm btn--ink study-board__nav-btn" id="study-scroll-current" data-i18n-title="study.scroll_current_title" data-i18n="study.current_position" title="Di chuyển tới bài đang học">Vị trí hiện tại</button>
@@ -63,8 +64,13 @@
                 </div>
             </div>
 
+            <div class="study-board__status">
+                <p class="study-library-state" id="study-board-state" role="status" data-state="loading" data-i18n="study.board_loading">Đang tải tiến độ lộ trình...</p>
+                <button class="btn btn--sm" id="study-board-retry" type="button" data-i18n="dash.retry" hidden>Thử lại</button>
+            </div>
+
             <div class="study-board__viewport" id="study-board-viewport" tabindex="0" role="region" data-i18n-aria-label="study.map_aria_label" aria-label="Bản đồ lộ trình học tập">
-                <div class="study-board__canvas" id="study-board-canvas" style="--total-cols: @MaxCol;">
+                <div class="study-board__canvas" id="study-board-canvas" data-path-id="@LearningPath?.Id" aria-busy="true" style="--total-cols: @MaxCol;">
                     <!-- Lớp SVG vẽ các đường cong nối Bézier (đã bỏ đầu mũi tên) -->
                     <svg class="study-board__svg" id="study-board-svg" aria-hidden="true"></svg>
 
@@ -84,11 +90,6 @@
                                  data-col="@node.Column"
                                  data-row="@node.Row"
                                  style="grid-column: @node.Column; grid-row: @(node.Row + 1);">
-
-                            @if (node.State == "current")
-                            {
-                                <svg class="foxy study-node__token" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
-                            }
 
                             <div class="study-node__header">
                                 <div class="study-node__tags">
@@ -228,58 +229,12 @@
                     <span class="tag" data-i18n="study.standalone_tag">Chuyên đề tự do</span>
                     <h2 id="study-recs-title" data-i18n="study.standalone_title">Gợi ý bài học ngoài lộ trình</h2>
                 </div>
-                <p data-i18n="study.standalone_desc">3 bài học chuyên sâu về Nghe hiểu, Ngữ pháp và Từ vựng nâng cao sẵn sàng học ngay.</p>
+                <p data-i18n="study.standalone_desc_dynamic">Bài học lẻ ngoài lộ trình bạn chưa học, sẵn sàng học ngay.</p>
             </div>
-            <div class="study-rec-grid">
-                <!-- BÀI 1: AT THE COFFEE SHOP (LISTENING) -->
-                <article class="sticker press study-rec">
-                    <span class="study-rec__hot" data-i18n="study.rec_listening">NGHE HIỂU</span>
-                    <div class="study-rec__art study-rec__art--wave" aria-hidden="true">
-                        <span class="study-rec__play">▶</span>
-                        <span class="study-rec__bars">@foreach (var h in new[] { 30, 70, 45, 90, 55, 80, 35, 65, 95, 50, 75, 40, 60, 85, 30 }) { <i style="--h: @(h)%"></i> }</span>
-                        <span class="study-rec__time">0:42</span>
-                    </div>
-                    <span class="tag" data-i18n="study.rec_listening_tag">Nghe hiểu · A2</span>
-                    <h3>At the Coffee Shop</h3>
-                    <p data-i18n="study.rec_coffee_desc">Luyện nghe hội thoại thực tế giữa khách hàng và barista tại quán cà phê.</p>
-                    <div class="study-rec__row">
-                        <span data-i18n="study.rec_coffee_time">8 phút · <b>+16 XP</b></span>
-                        <a class="btn btn--sm" href="/Lesson/at-the-coffee-shop" data-i18n="study.learn_now">Học ngay →</a>
-                    </div>
-                </article>
-
-                <!-- BÀI 2: PRESENT SIMPLE TENSE (GRAMMAR) -->
-                <article class="sticker press study-rec">
-                    <span class="study-rec__hot" data-i18n="study.rec_grammar">NGỮ PHÁP</span>
-                    <div class="study-rec__art study-rec__art--chat" aria-hidden="true" lang="en">
-                        <span class="study-bubble">He works at a bank in Hanoi.</span>
-                        <span class="study-bubble study-bubble--me">Do you play tennis every Sunday?</span>
-                    </div>
-                    <span class="tag" data-i18n="study.rec_grammar_tag">Ngữ pháp · A1</span>
-                    <h3>Present Simple Tense</h3>
-                    <p data-i18n="study.rec_present_desc">Thì hiện tại đơn diễn tả thói quen, chân lý và lịch trình thường nhật.</p>
-                    <div class="study-rec__row">
-                        <span data-i18n="study.rec_present_time">15 phút · <b>+30 XP</b></span>
-                        <a class="btn btn--sm" href="/Lesson/present-simple-tense" data-i18n="study.learn_now">Học ngay →</a>
-                    </div>
-                </article>
-
-                <!-- BÀI 3: AMBIGUOUS, VAGUE, EQUIVOCAL, OBSCURE (VOCABULARY) -->
-                <article class="sticker press study-rec">
-                    <span class="study-rec__hot" data-i18n="study.rec_vocab">TỪ VỰNG</span>
-                    <div class="study-rec__art study-rec__art--chat" aria-hidden="true" lang="en">
-                        <span class="study-bubble">His reply was very ambiguous.</span>
-                        <span class="study-bubble study-bubble--me">The instructions remain vague.</span>
-                    </div>
-                    <span class="tag" data-i18n="study.rec_vocab_tag">Từ vựng · B2</span>
-                    <h3>Ambiguous, Vague, Equivocal, Obscure</h3>
-                    <p data-i18n="study.rec_ambiguous_desc">Phân biệt 4 tính từ cao cấp chỉ tính chất mơ hồ, khó hiểu và đa nghĩa.</p>
-                    <div class="study-rec__row">
-                        <span data-i18n="study.rec_ambiguous_time">10 phút · <b>+20 XP</b></span>
-                        <a class="btn btn--sm" href="/Lesson/ambiguous-vague-equivocal-obscure" data-i18n="study.learn_now">Học ngay →</a>
-                    </div>
-                </article>
-            </div>
+            <p class="study-library-state" id="study-recs-state" role="status" data-state="loading" data-i18n="study.recs_loading">Đang tải gợi ý...</p>
+            <button class="btn btn--sm" id="study-recs-retry" type="button" data-i18n="dash.retry" hidden>Thử lại</button>
+            @* Thẻ gợi ý do study.js dựng từ GET /api/lessons/recommendations?scope=outside_path&limit=3 *@
+            <div class="study-rec-grid" id="study-rec-grid" aria-live="polite" hidden></div>
         </section>
     </div>
 </main>
@@ -328,135 +283,39 @@
         new("listening", "listening", "♪", "ui.listening", "Nghe hiểu", 4)
     };
 
-    private static BoardNode[] LoadBoardNodes(string progressiveLearningRoot)
+    /// <summary>
+    /// Khung bàn cờ: vị trí / tên / prerequisites lấy từ bố cục lộ trình dùng chung với
+    /// GET /api/learning-paths/{id}/board. Mọi node render "locked" (đang tải); study.js gán trạng thái thật từ API.
+    /// </summary>
+    private static BoardNode[] LoadBoardNodes(LearningPathLayout? path, ILessonService lessons)
     {
-        var pathFile = System.IO.Path.Combine(progressiveLearningRoot, "LearningPath.json");
-        if (!System.IO.File.Exists(pathFile))
+        if (path is null)
         {
             return Array.Empty<BoardNode>();
         }
 
-        using var doc = JsonDocument.Parse(System.IO.File.ReadAllText(pathFile));
-        var root = doc.RootElement;
-        var list = new List<BoardNode>();
-
-        LessonConfigDto? ReadConfig(string lid)
-        {
-            var cfgPath = System.IO.Path.Combine(progressiveLearningRoot, lid, LessonTemplateValidator.ConfigFile);
-            if (!System.IO.File.Exists(cfgPath)) return null;
-            try
+        var summaries = lessons.GetAll().ToDictionary(l => l.LessonId, StringComparer.Ordinal);
+        return path.Nodes
+            .Where(n => summaries.ContainsKey(n.LessonId))
+            .OrderBy(n => n.Column).ThenBy(n => n.IsBranch)
+            .Select(n =>
             {
-                return JsonSerializer.Deserialize<LessonConfigDto>(System.IO.File.ReadAllText(cfgPath));
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        // 1. Mạch chính (Main Line: Row = 1)
-        if (root.TryGetProperty("lessons", out var lessonsElem) && lessonsElem.ValueKind == JsonValueKind.Array)
-        {
-            var mainLessons = lessonsElem.EnumerateArray().ToArray();
-            for (int i = 0; i < mainLessons.Length; i++)
-            {
-                var item = mainLessons[i];
-                var lid = item.GetProperty("lessonId").GetString()!;
-                var order = item.GetProperty("order").GetInt32();
-                var config = ReadConfig(lid);
-                if (config == null) continue;
-
-                var prereqs = i == 0
-                    ? Array.Empty<string>()
-                    : new[] { mainLessons[i - 1].GetProperty("lessonId").GetString()! };
-
-                var state = order switch
-                {
-                    1 => "done",
-                    2 => "done",
-                    3 => "current",
-                    _ => "locked"
-                };
-
-                list.Add(new BoardNode(
-                    lid,
-                    config.Name,
-                    config.Category,
-                    config.Level,
-                    IsBranch: false,
-                    BranchTitle: string.Empty,
-                    Column: order,
-                    Row: 1, // Hàng giữa
-                    State: state,
-                    Prerequisites: prereqs,
-                    Topic: config.Topic ?? string.Empty,
-                    Description: config.Description ?? string.Empty
-                ));
-            }
-        }
-
-        // 2. Các nhánh mở rộng (Branches: Row 0 là nhánh trên, Row 2 là nhánh dưới)
-        var branchCoords = new Dictionary<string, (int Col, int Row, string BranchName)>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["ordinal-numbers"] = (4, 0, "Số thứ tự & Thời gian"),
-            ["time"] = (5, 0, "Số thứ tự & Thời gian"),
-            ["basic-foods-and-drinks-2"] = (7, 2, "Ẩm thực mở rộng"),
-            ["locations-and-destinations-2"] = (8, 0, "Địa điểm du lịch"),
-            ["occupations-2"] = (9, 2, "Nghề nghiệp nâng cao")
-        };
-
-        if (root.TryGetProperty("branches", out var branchesElem) && branchesElem.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var branch in branchesElem.EnumerateArray())
-            {
-                var branchTitle = branch.TryGetProperty("title", out var bt) ? bt.GetString() ?? "" : "";
-                if (branch.TryGetProperty("lessons", out var branchLessons) && branchLessons.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var bl in branchLessons.EnumerateArray())
-                    {
-                        var lid = bl.GetProperty("lessonId").GetString()!;
-                        var config = ReadConfig(lid);
-                        if (config == null) continue;
-
-                        var prereqsList = new List<string>();
-                        if (bl.TryGetProperty("prerequisites", out var preElem) && preElem.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (var p in preElem.EnumerateArray())
-                            {
-                                var s = p.GetString();
-                                if (!string.IsNullOrEmpty(s)) prereqsList.Add(s);
-                            }
-                        }
-
-                        int col = 4;
-                        int row = 0;
-                        if (branchCoords.TryGetValue(lid, out var coord))
-                        {
-                            col = coord.Col;
-                            row = coord.Row;
-                            if (!string.IsNullOrEmpty(coord.BranchName)) branchTitle = coord.BranchName;
-                        }
-
-                        list.Add(new BoardNode(
-                            lid,
-                            config.Name,
-                            config.Category,
-                            config.Level,
-                            IsBranch: true,
-                            BranchTitle: branchTitle,
-                            Column: col,
-                            Row: row,
-                            State: "locked",
-                            Prerequisites: prereqsList.ToArray(),
-                            Topic: config.Topic ?? string.Empty,
-                            Description: config.Description ?? string.Empty
-                        ));
-                    }
-                }
-            }
-        }
-
-        return list.ToArray();
+                var lesson = summaries[n.LessonId];
+                return new BoardNode(
+                    n.LessonId,
+                    lesson.Name,
+                    lesson.Category,
+                    lesson.Level,
+                    n.IsBranch,
+                    BranchTitle: n.BranchTitle ?? string.Empty,
+                    n.Column,
+                    n.Row,
+                    State: "locked",
+                    Prerequisites: n.Prerequisites.ToArray(),
+                    Topic: lesson.Topic,
+                    Description: lesson.Description);
+            })
+            .ToArray();
     }
 
     private static Category[] LoadCategories(string templateRoot, string progressiveLearningRoot, BoardNode[] boardNodes)

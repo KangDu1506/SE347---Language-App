@@ -211,6 +211,33 @@ async function connect() {
             assert.equal(params.request.method, 'GET');
             assert.equal(params.request.headers.Authorization, 'Bearer dashboard-test-token');
         }
+        if (path === '/api/lessons/recommendations') {
+            // Giả lập GET /api/lessons/recommendations (S3-25): bài đang học dở trước, rồi bài chưa học
+            // theo thứ tự catalog; bỏ bài đã hoàn thành và bài khóa (scenario.locked).
+            const limit = Number(new URL(params.request.url).searchParams.get('limit')) || 3;
+            const catalog = Array.isArray(scenario.lessons.body) ? scenario.lessons.body : [];
+            const progressItems = Array.isArray(scenario.progress.body?.lessons) ? scenario.progress.body.lessons : [];
+            const statusById = new Map(progressItems.map(item => [item.lessonId, item.status]));
+            const byId = new Map(catalog.map(item => [item.lessonId, item]));
+            const ordered = [
+                ...progressItems.filter(item => item.status === 'in_progress').map(item => byId.get(item.lessonId)).filter(Boolean),
+                ...catalog.filter(item => !statusById.has(item.lessonId))
+            ].filter(item => !scenario.locked?.includes(item.lessonId));
+            const body = ordered.slice(0, limit).map(item => ({
+                lesson: item,
+                reason: statusById.get(item.lessonId) === 'in_progress' ? 'continue' : 'outside_path',
+                progressStatus: statusById.get(item.lessonId) || 'not_started',
+                maxXp: 0,
+                learningPathId: null
+            }));
+            await send('Fetch.fulfillRequest', {
+                requestId: params.requestId,
+                responseCode: 200,
+                responseHeaders: [{ name: 'Content-Type', value: 'application/json; charset=utf-8' }],
+                body: Buffer.from(JSON.stringify(body)).toString('base64')
+            });
+            return;
+        }
         if (path.startsWith('/api/lessons/')) {
             const id = decodeURIComponent(path.split('/').at(-1));
             const locked = scenario.locked?.includes(id);
@@ -509,8 +536,16 @@ async function connect() {
     assert.equal(state.mode, 'first-use');
 
     assert.deepEqual(errors, []);
+    // Server chỉ gợi ý bài đã mở khóa: 3 bài đầu khóa thì vẫn gợi ý được bài thứ 4 (trước đây chỉ kiểm tra 3 bài đầu).
     setScenario({ progress: firstUseProgress, lessons });
     scenario.locked = lessons.slice(0, 3).map(item => item.lessonId);
+    await navigate('/Index', 'ready');
+    state = await readState();
+    assert.deepEqual(state.recs.map(item => item.href), [`/Lesson/${lessons[3].lessonId}`]);
+    assert.equal(state.currentHref, `/Lesson/${lessons[3].lessonId}`);
+
+    setScenario({ progress: firstUseProgress, lessons });
+    scenario.locked = lessons.map(item => item.lessonId);
     await navigate('/Index', 'ready');
     state = await readState();
     assert.equal(state.recs.length, 0);
