@@ -78,7 +78,15 @@ builder.Services.AddCors(options => options.AddPolicy(DevCorsPolicy, policy =>
 // 1. Kích hoạt tính năng đọc và render file .cshtml (SSR)
 builder.Services.AddRazorPages();
 
+// Lỗi chưa bắt ở /api/* trả JSON ProblemDetails (status, title, traceId) thay vì body rỗng
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler();
+}
 
 app.Use(async (context, next) =>
 {

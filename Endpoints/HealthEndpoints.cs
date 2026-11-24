@@ -14,27 +14,49 @@ namespace SE347.Endpoints
                 timestamp = DateTimeOffset.UtcNow
             }));
 
-            // GET /api/health: kiểm tra thêm kết nối tới database Supabase
-            app.MapGet("/api/health", async (ApplicationDbContext db, CancellationToken ct) =>
+            // GET /api/health: kiểm tra thêm kết nối tới database Supabase.
+            // 503 kèm "reason" để biết lỗi do thiếu cấu hình hay do không kết nối được (không trả chuỗi kết nối / mật khẩu).
+            app.MapGet("/api/health", async (ApplicationDbContext db, IConfiguration config, ILoggerFactory loggers, CancellationToken ct) =>
             {
-                bool isDbConnected = await db.Database.CanConnectAsync(ct);
-                
-                if (isDbConnected)
+                var logger = loggers.CreateLogger("SE347.Health");
+
+                if (db.Database.IsRelational() && string.IsNullOrWhiteSpace(config.GetConnectionString("Supabase")))
                 {
-                    return Results.Ok(new 
-                    { 
-                        status = "Healthy", 
-                        database = "Connected",
-                        timestamp = DateTimeOffset.UtcNow 
-                    });
+                    logger.LogError("ConnectionStrings:Supabase chưa được cấu hình (trên Azure: App Service > Environment variables > ConnectionStrings__Supabase).");
+                    return Unhealthy("missing_connection_string");
                 }
-                else
+
+                try
                 {
-                    return Results.StatusCode(503);
+                    if (await db.Database.CanConnectAsync(ct))
+                    {
+                        return Results.Ok(new
+                        {
+                            status = "Healthy",
+                            database = "Connected",
+                            timestamp = DateTimeOffset.UtcNow
+                        });
+                    }
+
+                    logger.LogError("Không kết nối được database Supabase (CanConnect = false).");
                 }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    logger.LogError(ex, "Không kết nối được database Supabase.");
+                }
+
+                return Unhealthy("connection_failed");
             });
 
             return app;
         }
+
+        private static IResult Unhealthy(string reason) => Results.Json(new
+        {
+            status = "Unhealthy",
+            database = "Unreachable",
+            reason,
+            timestamp = DateTimeOffset.UtcNow
+        }, statusCode: StatusCodes.Status503ServiceUnavailable);
     }
 }
