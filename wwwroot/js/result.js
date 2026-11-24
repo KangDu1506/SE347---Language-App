@@ -1,6 +1,7 @@
 // Trang Kết quả và ôn lại mini-game (SCRUM-60). Hướng dẫn: docs/frontend/RESULT_UI.md
-// Điểm, đáp án đúng, giải thích lấy từ response chấm điểm của server (QuizResult.read);
-// nội dung câu hỏi lấy từ GET /api/lessons/{id}; tiến độ mới nhất từ GET /api/progress/lessons/{id}.
+// Điểm, đáp án đúng, giải thích lấy từ response chấm điểm của server (QuizResult.read); nếu sessionStorage trống
+// (đã đóng tab) thì đọc lại lần nộp gần nhất từ DB qua GET /api/progress/lessons/{id}/quiz/latest.
+// Nội dung câu hỏi lấy từ GET /api/lessons/{id}; tiến độ mới nhất từ GET /api/progress/lessons/{id}.
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.result-page');
     if (!page) return;
@@ -15,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
     const fill = (text, values) => Object.entries(values).reduce((out, [k, v]) => out.replaceAll(`{${k}}`, v), text);
 
-    // Route mini-game (SCRUM-59). Đổi ở đây nếu trang mini-game dùng route khác.
-    const playUrl = id => `/MiniGame/${encodeURIComponent(id)}`;
+    // Làm lại: bài kiểm tra nằm cuối trang bài học (#lesson-quiz); chưa có trang /MiniGame riêng.
+    const playUrl = id => `/Lesson/${encodeURIComponent(id)}#lesson-quiz`;
     const lessonUrl = id => `/Lesson/${encodeURIComponent(id)}`;
     const flashcardUrl = id => `/Flashcard/${encodeURIComponent(id)}`;
 
@@ -259,13 +260,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const progress = state.progress;
         const text = $('[data-empty-text]');
         if (progress?.quizAttempts > 0 && Number.isInteger(progress.lastQuizScore)) {
-            text.textContent = fill(t('result.empty_with_attempts', 'Lần gần nhất bạn được {last} điểm, cao nhất {best} điểm. Chi tiết từng câu chỉ xem được ngay sau lượt làm. Làm lại để xem nhé.'),
+            text.textContent = fill(t('result.empty_with_attempts', 'Lần gần nhất bạn được {last} điểm, cao nhất {best} điểm. Lần làm này chưa lưu chi tiết từng câu, hãy làm lại để xem đáp án và các câu cần ôn.'),
                 { last: progress.lastQuizScore, best: progress.bestQuizScore ?? progress.lastQuizScore });
         } else {
-            text.textContent = t('result.empty_text', 'Làm mini-game của bài này để xem điểm, đáp án đúng và các câu cần ôn.');
+            text.textContent = t('result.empty_text', 'Làm bài kiểm tra cuối bài để xem điểm, đáp án đúng và các câu cần ôn.');
         }
         const play = $('[data-empty-play]');
-        play.textContent = progress?.quizAttempts > 0 ? t('result.retry', 'Làm lại') : t('result.start', 'Làm mini-game');
+        play.textContent = progress?.quizAttempts > 0 ? t('result.retry', 'Làm lại') : t('result.start', 'Làm bài kiểm tra');
         show('empty');
     }
 
@@ -304,6 +305,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Lần nộp gần nhất lưu ở DB (S3-19). null nếu chưa nộp, lần nộp cũ không có chi tiết từng câu, hoặc lỗi
+    // (lỗi ở đây không chặn trang: vẫn hiện trạng thái "chưa có kết quả" như trước).
+    async function readLatestFromServer() {
+        try {
+            const submission = await window.AppApi.get(`/api/progress/lessons/${encodeURIComponent(lessonId)}/quiz/latest`);
+            if (!window.QuizResult.isSubmission(submission)) return null;
+            // Lưu lại vào sessionStorage để reload không phải gọi API lần nữa
+            await window.QuizResult.save(lessonId, submission);
+            return { lessonId, savedAt: Date.now(), durationMs: null, submission };
+        } catch (error) {
+            if (error?.status === 401) throw error;
+            return null;
+        }
+    }
+
     async function load() {
         const currentRequest = ++requestId;
         Object.assign(state, { lesson: null, record: null, progress: null });
@@ -320,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (previewData) {
             const data = JSON.parse(previewData.textContent || 'null');
             if (!data || !validLesson(data.lesson)) {
-                setMessage('result.no_quiz_title', 'Bài học này không có mini-game', 'result.no_quiz_text', 'Chọn bài khác có phần ôn tập để xem kết quả.');
+                setMessage('result.no_quiz_title', 'Bài học này không có bài kiểm tra', 'result.no_quiz_text', 'Chọn bài khác có bài kiểm tra để xem kết quả.');
                 return;
             }
             state.lesson = data.lesson;
@@ -351,14 +367,16 @@ document.addEventListener('DOMContentLoaded', () => {
             setLessonLinks(lesson);
 
             if (lesson.quiz.length === 0) {
-                setMessage('result.no_quiz_title', 'Bài học này không có mini-game', 'result.no_quiz_text', 'Chọn bài khác có phần ôn tập để xem kết quả.');
+                setMessage('result.no_quiz_title', 'Bài học này không có bài kiểm tra', 'result.no_quiz_text', 'Chọn bài khác có bài kiểm tra để xem kết quả.');
                 return;
             }
 
-            if (record) {
-                state.record = record;
-                state.progress = record.submission.attempt.progress || null;
-                state.filter = record.submission.attempt.correctCount < record.submission.attempt.totalCount ? 'wrong' : 'all';
+            const saved = record || await readLatestFromServer();
+            if (currentRequest !== requestId) return;
+            if (saved) {
+                state.record = saved;
+                state.progress = saved.submission.attempt.progress || null;
+                state.filter = saved.submission.attempt.correctCount < saved.submission.attempt.totalCount ? 'wrong' : 'all';
                 renderReady();
                 show('ready');
                 refreshProgress(currentRequest);

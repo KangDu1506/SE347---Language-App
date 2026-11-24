@@ -243,7 +243,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Thời điểm hiện bài kiểm tra, để trang Kết quả hiển thị thời gian làm bài
+    let quizStartedAt = 0;
+
     function renderQuizQuestions(lesson) {
+        quizStartedAt = Date.now();
         const listEl = $('[data-quiz-questions]');
         const formEl = $('[data-quiz-form]');
         const resultEl = $('[data-quiz-result]');
@@ -668,6 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { answers }
             );
             renderQuizResult(submission);
+            await linkResultPage(currentLesson.lessonId, submission);
             loadPager(currentLesson.lessonId);
             if (submission.attempt?.xpAwarded > 0) {
                 window.AppToast?.success(`+${submission.attempt.xpAwarded} XP!`);
@@ -680,6 +685,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (submitBtn) submitBtn.disabled = false;
         }
     });
+
+    // Lưu kết quả cho trang /Result/{lessonId} (xem lại chi tiết, lọc câu sai); đóng tab thì trang đó đọc lại từ DB.
+    async function linkResultPage(lessonId, submission) {
+        const link = $('[data-quiz-result-link]');
+        if (!link || !window.QuizResult) return;
+        const durationMs = quizStartedAt ? Date.now() - quizStartedAt : null;
+        await window.QuizResult.save(lessonId, submission, { durationMs });
+        link.href = window.QuizResult.resultUrl(lessonId);
+        link.hidden = false;
+    }
 
     $('[data-action="retry-quiz"]')?.addEventListener('click', async () => {
         if (!currentLesson) return;

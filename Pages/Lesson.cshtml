@@ -18,6 +18,7 @@
 @section Scripts {
     <partial name="_SupabaseClient" />
     <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
+    <script src="~/js/Shared/quiz-result.js" asp-append-version="true" defer></script>
     <script src="~/js/lesson.js" asp-append-version="true" defer></script>
 }
 
@@ -119,6 +120,7 @@
                     <ol class="lesson-quiz__feedback" data-quiz-feedback></ol>
                     <div class="lesson-quiz__actions">
                         <button class="btn btn--ink" type="button" data-action="retry-quiz" data-i18n="lesson.quiz_retry">Làm lại bài kiểm tra</button>
+                        <a class="btn" href="#" data-quiz-result-link data-i18n="lesson.quiz_view_result" hidden>Xem kết quả chi tiết →</a>
                     </div>
                 </div>
 
