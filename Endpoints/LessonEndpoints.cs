@@ -50,6 +50,36 @@ namespace SE347.Endpoints
                 return Results.Ok(lessons);
             });
 
+            // GET /api/lessons/recommendations?limit=3&scope=all|outside_path: bài nên học tiếp (đã bỏ bài khóa / đã xong).
+            // Segment cố định nên được ưu tiên hơn /{lessonId}.
+            group.MapGet("/recommendations", async (ClaimsPrincipal user, int? limit, string? scope,
+                ILessonAccessService access, ILearningPathService paths, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var take = limit ?? 3;
+                if (take is < 1 or > 20)
+                {
+                    return Results.BadRequest(new { error = "limit phải từ 1 đến 20." });
+                }
+
+                var normalizedScope = string.IsNullOrWhiteSpace(scope) ? "all" : scope.Trim().ToLowerInvariant();
+                if (!ILearningPathService.RecommendationScopes.Contains(normalizedScope))
+                {
+                    return Results.BadRequest(new { error = $"scope phải là một trong: {string.Join(", ", ILearningPathService.RecommendationScopes)}." });
+                }
+
+                if (await access.CheckProfileAsync(userId, ct) is not LessonAccess.Allowed and var denied)
+                {
+                    return Forbidden(denied);
+                }
+
+                return Results.Ok(await paths.GetRecommendationsAsync(userId, take, normalizedScope, ct));
+            });
+
             // GET /api/lessons/{lessonId}: Lấy chi tiết bài học (nội dung và quiz không có đáp án)
             group.MapGet("/{lessonId}", async (string lessonId, ClaimsPrincipal user, ILessonService lessonService,
                 ILessonAccessService access, CancellationToken ct) =>
