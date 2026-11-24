@@ -124,6 +124,14 @@ namespace SE347.Tests
                 await db.SaveChangesAsync();
             }
 
+            // ApplicationDbContext tự gán created_at = thời điểm lưu (bỏ qua giá trị seed), nên đối chiếu với giá trị đã lưu
+            DateTimeOffset storedCreatedAt;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                storedCreatedAt = (await db.Profiles.FindAsync(userId))!.CreatedAt;
+            }
+
             var me = await _factory.CreateClientFor(userId).GetFromJsonAsync<MyProfileDto>("/api/users/me", Json);
 
             Assert.NotNull(me);
@@ -137,7 +145,7 @@ namespace SE347.Tests
             Assert.Equal("public", me.ProfileVisibility);
             Assert.Equal("admin", me.Role);
             Assert.Equal("active", me.Status);
-            Assert.Equal(joinedAt, me.CreatedAt);
+            Assert.Equal(storedCreatedAt, me.CreatedAt);
 
             Assert.NotNull(me.Setting);
             Assert.Equal("dark", me.Setting.Theme);
