@@ -5,7 +5,10 @@ namespace SE347.Services
         Allowed,
         /// <summary>Không có hồ sơ, hoặc hồ sơ bị khóa / đã xóa (cùng điều kiện ghi tiến độ của <see cref="ProgressService"/>).</summary>
         ProfileNotActive,
-        /// <summary>Còn bài prerequisite (LearningPath.json) chưa ở trạng thái completed trong user_lesson_progress.</summary>
+        /// <summary>
+        /// Còn bài prerequisite (bài mạch chính liền trước / prerequisites của nhánh) chưa completed,
+        /// và user chưa từng mở bài này (xem <see cref="LessonUnlockRule"/>).
+        /// </summary>
         Locked,
     }
 

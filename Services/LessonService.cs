@@ -27,6 +27,8 @@ namespace SE347.Services
         private readonly ILogger<LessonService> _logger;
         private readonly Dictionary<string, CachedLesson> _lessons = new(StringComparer.Ordinal);
         private readonly Dictionary<string, IReadOnlyList<string>> _prerequisites = new(StringComparer.Ordinal);
+        private readonly List<LearningPathLayout> _paths = new();
+        private readonly Dictionary<string, string> _pathIdByLesson = new(StringComparer.Ordinal);
 
         public LessonService(IWebHostEnvironment environment, ILogger<LessonService> logger)
         {
@@ -34,7 +36,7 @@ namespace SE347.Services
             _root = Path.GetFullPath(Path.Combine(environment.ContentRootPath, "Storage", "LessonTemplate"));
 
             LoadAllLessons();
-            LoadPrerequisites();
+            LoadLearningPaths();
         }
 
         public IReadOnlyList<LessonSummaryDto> GetAll(string? category = null, string? level = null)
@@ -107,6 +109,11 @@ namespace SE347.Services
 
             return _prerequisites.TryGetValue(lessonId, out var prerequisites) ? prerequisites : [];
         }
+
+        public IReadOnlyList<LearningPathLayout> GetLearningPaths() => _paths;
+
+        public string? GetLearningPathId(string lessonId) =>
+            !string.IsNullOrWhiteSpace(lessonId) && _pathIdByLesson.TryGetValue(lessonId, out var pathId) ? pathId : null;
 
         public string? GetAssetPath(string lessonId, string assetPath)
         {
@@ -291,10 +298,13 @@ namespace SE347.Services
         }
 
         /// <summary>
-        /// Đọc "prerequisites" của bài chính và bài trong nhánh ở mọi LearningPath.json.
-        /// Chỉ giữ prerequisite trỏ tới bài đã nạp được; LearningPath.json lỗi thì bỏ qua cả lộ trình (bài vẫn mở được).
+        /// Đọc mọi LearningPath.json: dựng bố cục bàn cờ và prerequisites của từng bài.
+        /// - Bài mạch chính (theo "order") khóa bởi bài mạch chính liền trước (cùng quy tắc với UI trang Study),
+        ///   cộng thêm "prerequisites" khai báo trong JSON nếu có.
+        /// - Bài trong nhánh dùng "prerequisites" khai báo trong JSON.
+        /// Chỉ giữ bài / prerequisite đã nạp được; LearningPath.json lỗi thì bỏ qua cả lộ trình (bài vẫn mở được).
         /// </summary>
-        private void LoadPrerequisites()
+        private void LoadLearningPaths()
         {
             if (!Directory.Exists(_root))
             {
@@ -321,15 +331,64 @@ namespace SE347.Services
                     continue;
                 }
 
-                foreach (var lesson in path.AllLessons())
+                var layout = BuildLayout(path);
+                _paths.Add(layout);
+
+                foreach (var node in layout.Nodes)
                 {
-                    var prerequisites = lesson.Prerequisites.Where(_lessons.ContainsKey).Distinct(StringComparer.Ordinal).ToList();
-                    if (_lessons.ContainsKey(lesson.LessonId) && prerequisites.Count > 0)
+                    _pathIdByLesson.TryAdd(node.LessonId, layout.Id);
+                    if (node.Prerequisites.Count > 0)
                     {
-                        _prerequisites[lesson.LessonId] = prerequisites;
+                        _prerequisites[node.LessonId] = node.Prerequisites;
                     }
                 }
             }
+        }
+
+        private LearningPathLayout BuildLayout(LearningPathDto path)
+        {
+            var nodes = new List<LearningPathLayoutNode>();
+            var mainColumnByLesson = new Dictionary<string, int>(StringComparer.Ordinal);
+
+            List<string> KnownPrerequisites(IEnumerable<string> ids, string lessonId) =>
+                ids.Where(id => _lessons.ContainsKey(id) && id != lessonId).Distinct(StringComparer.Ordinal).ToList();
+
+            string? previousMain = null;
+            var column = 0;
+            foreach (var lesson in path.Lessons.Where(l => _lessons.ContainsKey(l.LessonId)).OrderBy(l => l.Order))
+            {
+                column++;
+                var declared = lesson.Prerequisites.AsEnumerable();
+                var prerequisites = KnownPrerequisites(previousMain is null ? declared : declared.Prepend(previousMain), lesson.LessonId);
+
+                nodes.Add(new LearningPathLayoutNode(lesson.ItemId, lesson.LessonId, IsBranch: false,
+                    BranchId: null, BranchTitle: null, BranchRequired: true, Column: column, Row: 1, prerequisites));
+                mainColumnByLesson[lesson.LessonId] = column;
+                previousMain = lesson.LessonId;
+            }
+
+            for (var branchIndex = 0; branchIndex < path.Branches.Count; branchIndex++)
+            {
+                var branch = path.Branches[branchIndex];
+                var branchLessons = branch.Lessons.Where(l => _lessons.ContainsKey(l.LessonId)).OrderBy(l => l.Order).ToList();
+
+                // Nhánh gắn sau afterLessonId, hoặc sau bài mạch chính đầu tiên mà bài trong nhánh cần học trước
+                var anchor = branch.AfterLessonId is not null && mainColumnByLesson.ContainsKey(branch.AfterLessonId)
+                    ? branch.AfterLessonId
+                    : branchLessons.SelectMany(l => l.Prerequisites).FirstOrDefault(mainColumnByLesson.ContainsKey);
+                var anchorColumn = anchor is null ? 0 : mainColumnByLesson[anchor];
+                var row = branchIndex % 2 == 0 ? 0 : 2;
+
+                for (var i = 0; i < branchLessons.Count; i++)
+                {
+                    var lesson = branchLessons[i];
+                    nodes.Add(new LearningPathLayoutNode(lesson.ItemId, lesson.LessonId, IsBranch: true,
+                        BranchId: branch.Id, BranchTitle: branch.Title, BranchRequired: branch.Required,
+                        Column: anchorColumn + i + 1, Row: row, KnownPrerequisites(lesson.Prerequisites, lesson.LessonId)));
+                }
+            }
+
+            return new LearningPathLayout(path.Id, path.Title, path.Description, path.Version, nodes);
         }
 
         private static string? ResolveSafePath(string folder, string relativePath)
