@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using SE347.Auth;
 using SE347.Data;
@@ -79,7 +80,15 @@ builder.Services.AddCors(options => options.AddPolicy(DevCorsPolicy, policy =>
 // 1. Kích hoạt tính năng đọc và render file .cshtml (SSR)
 builder.Services.AddRazorPages();
 
+// Lỗi chưa bắt ở /api/* trả JSON ProblemDetails (status, title, traceId) thay vì body rỗng
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler();
+}
 
 app.Use(async (context, next) =>
 {
@@ -177,6 +186,53 @@ app.MapProgressEndpoints();
 app.MapLessonEndpoints();
 app.MapLearningPathEndpoints();
 app.MapHealthEndpoints();
+
+// robots.txt và sitemap.xml luôn phản ánh host hiện tại, không bị khóa vào hostname môi trường deploy.
+app.MapGet("/sitemap.xml", (HttpContext context, ILessonService lessons) =>
+{
+    XNamespace sitemapNamespace = "http://www.sitemaps.org/schemas/sitemap/0.9";
+    var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}";
+    var urls = new List<string>
+    {
+        baseUrl,
+        $"{baseUrl}/Account/Terms"
+    };
+
+    // Lesson detail pages render their content before the client-side auth guard runs.
+    // Include every lesson loaded by LessonService, so new lessons enter the sitemap automatically.
+    urls.AddRange(lessons.GetAll().Select(lesson => $"{baseUrl}/Lesson/{Uri.EscapeDataString(lesson.LessonId)}"));
+
+    var document = new XDocument(
+        new XDeclaration("1.0", "UTF-8", null),
+        new XElement(sitemapNamespace + "urlset",
+            urls.Select(url => new XElement(sitemapNamespace + "url", new XElement(sitemapNamespace + "loc", url)))));
+
+    return Results.Content(document.ToString(), "application/xml; charset=utf-8");
+}).AllowAnonymous();
+
+app.MapGet("/robots.txt", (HttpContext context) =>
+{
+    var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}";
+    var robots = string.Join('\n',
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /Index",
+        "Disallow: /Study",
+        "Disallow: /TrialTest",
+        "Disallow: /Ranking",
+        "Disallow: /CreateQuiz",
+        "Disallow: /Account/Profile",
+        "Disallow: /Account/Login",
+        "Disallow: /Account/Signup",
+        "Disallow: /Account/Authentication",
+        "Disallow: /Account/ForgetPassword",
+        "Disallow: /Account/ResetPassword",
+        "Disallow: /api/",
+        $"Sitemap: {baseUrl}/sitemap.xml",
+        string.Empty);
+
+    return Results.Text(robots, "text/plain; charset=utf-8");
+}).AllowAnonymous();
 
 // Kích hoạt Server chạy
 app.Run();
