@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nameSlot) return;
         nameSlot.removeAttribute('data-i18n');
         const meta = currentUser?.user_metadata || {};
-        const fullName = String(profileDisplayName || meta.display_name || meta.full_name || '').trim();
+        const fullName = String(profileDisplayName || meta.display_name || meta.full_name || meta.fullName || '').trim();
         nameSlot.textContent = fullName
             ? fullName.split(/\s+/).slice(-2).join(' ')
             : t('dash.friend', 'bạn');
@@ -231,6 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function render(data) {
         const { stats, completion } = data;
+        const inProgressCount = completion.inProgress ?? stats.lessonsInProgress;
 
         setText('[data-stat="total-xp"]', number(stats.totalXp));
         setText('[data-stat="today-xp"]', format('dash.stat_xp_today', 'Hôm nay +{xp} XP', {
@@ -240,10 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setText('[data-stat="completed-meta"]', format('dash.stat_completed_meta', 'trong tổng số {total} bài', {
             total: number(completion.total)
         }));
-        setText('[data-stat="lessons-in-progress"]', number(stats.lessonsInProgress));
-        setText('[data-stat="in-progress-meta"]', stats.lessonsInProgress > 0
+        setText('[data-stat="lessons-in-progress"]', number(inProgressCount));
+        setText('[data-stat="in-progress-meta"]', inProgressCount > 0
             ? format('dash.stat_in_progress_meta', '{count} bài đã bắt đầu', {
-                count: number(stats.lessonsInProgress)
+                count: number(inProgressCount)
             })
             : t('dash.stat_in_progress_meta_zero', 'Chưa có bài nào đang học'));
         setText('[data-completion-percent]', `${number(completion.percent)}%`);
@@ -276,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setSummary(format('dash.summary_progress', '{completed}/{total} bài đã hoàn thành · {inProgress} bài đang học', {
                 completed: number(completion.completed),
                 total: number(completion.total),
-                inProgress: number(stats.lessonsInProgress)
+                inProgress: number(inProgressCount)
             }));
         }
 
@@ -328,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function loadProfileFallbackName() {
+        const requestedUserId = currentUser?.id || null;
         try {
             const headers = { Accept: 'application/json' };
             if (window.sb) {
@@ -337,7 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/users/me', { headers });
             if (!response.ok) return;
             const profile = await response.json();
-            if (profile?.displayName) {
+            if (requestedUserId && currentUser?.id !== requestedUserId) return;
+            if (profile?.displayName && (!requestedUserId || !profile.id || profile.id === requestedUserId)) {
                 profileDisplayName = profile.displayName;
                 renderName();
             }
@@ -359,9 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error || !data?.user) return;
             currentUser = data.user;
             renderName();
-            if (!currentUser.user_metadata?.display_name && !currentUser.user_metadata?.full_name) {
-                loadProfileFallbackName();
-            }
+            loadProfileFallbackName();
         } catch {
             return;
         }
@@ -384,7 +385,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!user) return;
             const changed = currentUser?.id !== user.id;
             currentUser = user;
-            if (changed) profileDisplayName = '';
+            if (changed) {
+                profileDisplayName = '';
+                loadProfileFallbackName();
+            }
             renderName();
             if (changed) load();
         });

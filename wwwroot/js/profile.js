@@ -235,14 +235,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const catalog = Array.isArray(lessons) ? lessons : [];
-        const progressLessons = Array.isArray(overview?.lessons) ? overview.lessons : [];
+        const hasOverviewLessons = Array.isArray(overview?.lessons);
+        const progressLessons = hasOverviewLessons ? overview.lessons : [];
         const completedIds = new Set(progressLessons.filter(item => item.status === 'completed').map(item => item.lessonId));
+        const inProgressIds = new Set(progressLessons.filter(item => item.status === 'in_progress').map(item => item.lessonId));
         const totalCount = catalog.length;
-        const catalogCompletedCount = totalCount > 0
+        const useCatalogMetrics = totalCount > 0 && hasOverviewLessons;
+        const catalogCompletedCount = useCatalogMetrics
             ? catalog.filter(item => completedIds.has(item.lessonId)).length
-            : (stats?.lessonsCompleted ?? 0);
-        const totalCompletedCount = stats?.lessonsCompleted ?? catalogCompletedCount;
-        const inProgressCount = stats?.lessonsInProgress ?? profile?.activitySummary?.lessonsInProgress ?? 0;
+            : (stats?.lessonsCompleted ?? profile?.activitySummary?.lessonsCompleted ?? 0);
+        const totalCompletedCount = catalogCompletedCount;
+        const inProgressCount = useCatalogMetrics
+            ? catalog.filter(item => inProgressIds.has(item.lessonId)).length
+            : (stats?.lessonsInProgress ?? profile?.activitySummary?.lessonsInProgress ?? 0);
         const totalWordsLearned = profile?.activitySummary?.totalWordsLearned ?? 0;
         const totalPracticeMinutes = Math.round((profile?.activitySummary?.totalPracticeSeconds ?? 0) / 60);
         const longestStreak = stats?.longestStreak ?? profile?.stat?.longestStreak ?? 0;

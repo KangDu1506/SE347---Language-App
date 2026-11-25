@@ -52,5 +52,6 @@ namespace SE347.DTOs.Progress
         short Score,
         int XpAwarded,
         bool LessonCompletedNow,
-        LessonProgressDto Progress);
+        LessonProgressDto Progress,
+        int? DurationSeconds = null);
 }

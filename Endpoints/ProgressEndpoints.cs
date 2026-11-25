@@ -94,7 +94,7 @@ namespace SE347.Endpoints
                 return ToResult(await results.CheckQuizAnswerAsync(lessonId, request));
             }).AddEndpointFilter(RequireUnlockedLesson);
 
-            // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }] }.
+            // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }], durationSeconds }.
             // Trả điểm, XP, tiến độ bài và kết quả từng câu (kèm đáp án đúng, giải thích).
             group.MapPost("/lessons/{lessonId}/quiz", async (string lessonId, SubmitQuizRequestDto request, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
             {
@@ -103,7 +103,7 @@ namespace SE347.Endpoints
                     return Results.Unauthorized();
                 }
 
-                return ToResult(await results.SubmitQuizAsync(userId, lessonId, request.Answers, ct));
+                return ToResult(await results.SubmitQuizAsync(userId, lessonId, request.Answers, request.DurationSeconds, ct));
             }).AddEndpointFilter(RequireUnlockedLesson);
 
             // POST /api/progress/lessons/{lessonId}/complete: hoàn thành bài không có quiz (đã học hết các mục nội dung)

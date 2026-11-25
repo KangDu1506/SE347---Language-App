@@ -186,7 +186,11 @@ namespace SE347.Services
         }
 
         public Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
-            IReadOnlyList<QuizQuestionResultDto> answers, CancellationToken cancellationToken = default)
+            IReadOnlyList<QuizQuestionResultDto> answers, CancellationToken cancellationToken = default) =>
+            RecordQuizAttemptAsync(userId, lessonId, correctCount, totalCount, xp, answers, durationSeconds: null, cancellationToken);
+
+        public Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
+            IReadOnlyList<QuizQuestionResultDto> answers, int? durationSeconds, CancellationToken cancellationToken)
         {
             if (totalCount is <= 0 or > short.MaxValue || correctCount < 0 || correctCount > totalCount || xp < 0
                 || answers.Count != totalCount || answers.Count(a => a.IsCorrect) != correctCount)
@@ -195,6 +199,7 @@ namespace SE347.Services
             }
 
             var score = IProgressService.QuizScore(correctCount, totalCount);
+            int? normalizedDuration = durationSeconds is >= 0 and <= 86_400 ? durationSeconds : null;
 
             return WriteAsync(userId, lessonId, async (today, ct) =>
             {
@@ -206,8 +211,8 @@ namespace SE347.Services
 
                 var attemptId = await _db.Database
                     .SqlQuery<long>($"""
-                        insert into public.user_quiz_attempts (user_id, lesson_id, correct_count, total_count, score, xp_awarded)
-                        values ({userId}, {lessonId}, {(short)correctCount}, {(short)totalCount}, {score}, {awardedXp})
+                        insert into public.user_quiz_attempts (user_id, lesson_id, correct_count, total_count, score, xp_awarded, duration_seconds)
+                        values ({userId}, {lessonId}, {(short)correctCount}, {(short)totalCount}, {score}, {awardedXp}, {normalizedDuration})
                         returning id as "Value"
                         """)
                     .ToListAsync(ct);
@@ -238,7 +243,7 @@ namespace SE347.Services
 
                 var progress = (await LoadLessonAsync(userId, lessonId, ct))!;
                 return ProgressResult<QuizAttemptResultDto>.Ok(new QuizAttemptResultDto(
-                    attemptId.Single(), (short)correctCount, (short)totalCount, score, awardedXp, completesNow, progress));
+                    attemptId.Single(), (short)correctCount, (short)totalCount, score, awardedXp, completesNow, progress, normalizedDuration));
             }, cancellationToken);
         }
 
@@ -255,7 +260,7 @@ namespace SE347.Services
                 .AsNoTracking()
                 .Where(a => a.UserId == userId && a.LessonId == lessonId && a.AttemptType == UserQuizAttempt.TypeLessonQuiz)
                 .OrderByDescending(a => a.Id)
-                .Select(a => new { a.Id, a.CorrectCount, a.TotalCount, a.Score, a.XpAwarded })
+                .Select(a => new { a.Id, a.CorrectCount, a.TotalCount, a.Score, a.XpAwarded, a.DurationSeconds })
                 .FirstOrDefaultAsync(cancellationToken);
             if (attempt is null)
             {
@@ -290,9 +295,9 @@ namespace SE347.Services
                 questions.Clear();
             }
 
-            // XP chỉ được cộng ở lần nộp làm bài chuyển sang completed (RecordQuizAttemptAsync)
+            // Đây là lần đọc lại lịch sử từ DB (không phải vừa nộp ngay), tránh hiện badge "vừa hoàn thành" khi mở lại nhiều ngày sau
             var result = new QuizAttemptResultDto(attempt.Id, attempt.CorrectCount, attempt.TotalCount, attempt.Score,
-                attempt.XpAwarded, LessonCompletedNow: attempt.XpAwarded > 0, progress.Value!);
+                attempt.XpAwarded, LessonCompletedNow: false, progress.Value!, attempt.DurationSeconds);
             return ProgressResult<QuizSubmissionResultDto>.Ok(new QuizSubmissionResultDto(result, questions));
         }
 

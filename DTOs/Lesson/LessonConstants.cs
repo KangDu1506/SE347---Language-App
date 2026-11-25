@@ -8,8 +8,9 @@ namespace SE347.DTOs.Lesson
         public const string Vocabulary = "vocabulary";
         public const string Grammar = "grammar";
         public const string Listening = "listening";
+        public const string Speaking = "speaking";
 
-        public static readonly IReadOnlyList<string> All = [Vocabulary, Grammar, Listening];
+        public static readonly IReadOnlyList<string> All = [Vocabulary, Grammar, Listening, Speaking];
     }
 
     /// <summary>
@@ -18,7 +19,7 @@ namespace SE347.DTOs.Lesson
     /// </summary>
     public static class CefrLevels
     {
-        public static readonly IReadOnlyList<string> All = ["A1", "A2", "B1", "B2", "C1"];
+        public static readonly IReadOnlyList<string> All = ["A1", "A2", "B1", "B2", "C1", "C2"];
     }
 
     /// <summary>

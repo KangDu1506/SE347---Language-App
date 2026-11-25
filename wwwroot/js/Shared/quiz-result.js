@@ -27,7 +27,8 @@
         const attempt = value?.attempt;
         if (!attempt || !isCount(attempt.correctCount) || !isCount(attempt.totalCount) || attempt.totalCount === 0
             || attempt.correctCount > attempt.totalCount || !isCount(attempt.score) || attempt.score > 100
-            || !isCount(attempt.xpAwarded) || typeof attempt.lessonCompletedNow !== 'boolean') return false;
+            || !isCount(attempt.xpAwarded) || typeof attempt.lessonCompletedNow !== 'boolean'
+            || (attempt.durationSeconds != null && !isCount(attempt.durationSeconds))) return false;
         return Array.isArray(value.questions) && value.questions.length === attempt.totalCount
             && value.questions.every(q => q && typeof q.questionId === 'string' && typeof q.isCorrect === 'boolean'
                 && typeof q.type === 'string' && isArrayOfStrings(q.userAnswer) && isArrayOfStrings(q.correctAnswer)
@@ -37,10 +38,13 @@
 
     async function save(lessonId, submission, { durationMs = null } = {}) {
         if (!isSubmission(submission)) return false;
+        const serverDurationMs = isCount(submission.attempt?.durationSeconds)
+            ? submission.attempt.durationSeconds * 1000
+            : null;
         const record = {
             lessonId,
             savedAt: Date.now(),
-            durationMs: Number.isFinite(durationMs) && durationMs >= 0 ? Math.round(durationMs) : null,
+            durationMs: Number.isFinite(durationMs) && durationMs >= 0 ? Math.round(durationMs) : serverDurationMs,
             submission
         };
         try {

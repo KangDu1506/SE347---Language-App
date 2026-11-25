@@ -1,10 +1,6 @@
 @page
-@using Microsoft.AspNetCore.Hosting
-@using System.Text.Json
-@using System.Text.RegularExpressions
 @using SE347.DTOs.Lesson
 @using SE347.Services
-@inject IWebHostEnvironment Environment
 @inject ILessonService LessonService
 @*
     Học tập: Bàn cờ lộ trình học tập phân nhánh (Flowchart / Skill Tree), thư viện chủ đề và gợi ý.
@@ -56,7 +52,7 @@
                     </div>
                 </div>
                 <div class="study-board__controls">
-                    <span class="study-board__stars-pill">⭐ <span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_completed">bài đã học</span></span>
+                    <span class="study-board__stars-pill">✓ <span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_completed">bài đã học</span></span>
                     <div class="study-board__btn-group">
                         <button type="button" class="btn btn--sm study-board__nav-btn" id="study-scroll-left" data-i18n-aria-label="study.scroll_left" aria-label="Cuộn sang trái">◀</button>
                         <button type="button" class="btn btn--sm btn--ink study-board__nav-btn" id="study-scroll-current" data-i18n-title="study.scroll_current_title" data-i18n="study.current_position" title="Di chuyển tới bài đang học">Vị trí hiện tại</button>
@@ -120,11 +116,13 @@
                                 <span class="study-node__cat" data-i18n="@(node.Category switch {
                                     "speaking" => "study.cat_speaking",
                                     "grammar" => "ui.grammar",
+                                    "listening" => "ui.listening",
                                     _ => "ui.vocabulary"
                                 })">
                                     @(node.Category switch {
                                         "speaking" => "Giao tiếp",
                                         "grammar" => "Ngữ pháp",
+                                        "listening" => "Nghe hiểu",
                                         _ => "Từ vựng"
                                     })
                                 </span>
@@ -133,7 +131,7 @@
                             <div class="study-node__footer">
                                 @if (node.State == "done")
                                 {
-                                    <span class="study-node__status-text study-node__status-text--done" data-i18n="study.done_stars">Đã xong · 3★</span>
+                                    <span class="study-node__status-text study-node__status-text--done" data-i18n="study.done_stars">Đã hoàn thành</span>
                                 }
                                 else if (node.State == "current")
                                 {
@@ -256,34 +254,6 @@
         string Description = ""
     );
 
-    private sealed record Lesson(string Id, string Name, string State);
-    private sealed record Topic(
-        string Id,
-        string Category,
-        string Title,
-        string Desc,
-        Lesson[] Lessons,
-        string[] Levels,
-        string GroupName
-    );
-    private sealed record Group(string Name, Topic[] Topics);
-    private sealed record Category(string Id, string Icon, string LabelKey, string Label, string Meta, bool Open, Group[] Groups);
-    private sealed record CategoryDefinition(string Id, string ConfigCategory, string Icon, string LabelKey, string Label, int Order);
-    private sealed record LessonTemplateEntry(string Id, LessonConfigDto Config, string GroupId, int PartNumber, bool IsNumbered);
-
-    private static readonly Dictionary<string, string> NoteText = new()
-    {
-        ["done"] = "Đã xong · ★★★", ["current"] = "Đang học · +10 XP", ["locked"] = "Mở sau bài trước"
-    };
-
-    private static readonly CategoryDefinition[] CategoryDefinitions =
-    {
-        new("vocab", "vocabulary", "Aa", "ui.vocabulary", "Từ vựng", 1),
-        new("grammar", "grammar", "G", "ui.grammar", "Ngữ pháp", 2),
-        new("speaking", "speaking", "Hi", "study.cat_speaking", "Giao tiếp", 3),
-        new("listening", "listening", "♪", "ui.listening", "Nghe hiểu", 4)
-    };
-
     /// <summary>
     /// Khung bàn cờ: vị trí / tên / prerequisites lấy từ bố cục lộ trình dùng chung với
     /// GET /api/learning-paths/{id}/board. Mọi node render "locked" (đang tải); study.js gán trạng thái thật từ API.
@@ -318,170 +288,4 @@
             })
             .ToArray();
     }
-
-    private static Category[] LoadCategories(string templateRoot, string progressiveLearningRoot, BoardNode[] boardNodes)
-    {
-        var boardNodeMap = boardNodes.ToDictionary(n => n.Id, StringComparer.OrdinalIgnoreCase);
-
-        var folders = new List<string>();
-        if (Directory.Exists(progressiveLearningRoot))
-        {
-            folders.AddRange(Directory.EnumerateDirectories(progressiveLearningRoot));
-        }
-        if (Directory.Exists(templateRoot))
-        {
-            var standalone = Directory.EnumerateDirectories(templateRoot)
-                .Where(folder =>
-                {
-                    var name = System.IO.Path.GetFileName(folder) ?? string.Empty;
-                    return !string.Equals(name, "ProgressiveLearning-A", StringComparison.OrdinalIgnoreCase)
-                        && !string.Equals(name, "schemas", StringComparison.OrdinalIgnoreCase);
-                });
-            folders.AddRange(standalone);
-        }
-
-        if (folders.Count == 0) return Array.Empty<Category>();
-
-        var entries = folders
-            .Where(folder =>
-            {
-                var configPath = System.IO.Path.Combine(folder, LessonTemplateValidator.ConfigFile);
-                if (!System.IO.File.Exists(configPath)) return false;
-
-                var name = System.IO.Path.GetFileName(folder) ?? string.Empty;
-                // Lọc bỏ các bài test / template kiểm tra
-                if (name.Contains("test", StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("quiz", StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                return true;
-            })
-            .Select(folder =>
-            {
-                var id = System.IO.Path.GetFileName(folder)
-                    ?? throw new InvalidDataException($"Không xác định được tên thư mục bài học: {folder}");
-                var configPath = System.IO.Path.Combine(folder, LessonTemplateValidator.ConfigFile);
-                var config = JsonSerializer.Deserialize<LessonConfigDto>(System.IO.File.ReadAllText(configPath))
-                    ?? throw new InvalidDataException($"Config bài học không hợp lệ: {configPath}");
-
-                var folderPartMatch = Regex.Match(id, @"^(?<group>.+)-(?<part>[1-9]\d*)$");
-                var namePartMatch = Regex.Match(config.Name, @"^(?<group>.+?)\s+(?<part>[1-9]\d*)$");
-                var isNumbered = folderPartMatch.Success || namePartMatch.Success;
-                var groupId = folderPartMatch.Success
-                    ? folderPartMatch.Groups["group"].Value
-                    : namePartMatch.Success
-                        ? ToSlug(namePartMatch.Groups["group"].Value)
-                        : id;
-                var partNumber = folderPartMatch.Success
-                    ? int.Parse(folderPartMatch.Groups["part"].Value)
-                    : namePartMatch.Success
-                        ? int.Parse(namePartMatch.Groups["part"].Value)
-                        : 0;
-
-                return new LessonTemplateEntry(
-                    id,
-                    config,
-                    groupId,
-                    partNumber,
-                    isNumbered);
-            })
-            .ToArray();
-
-        return CategoryDefinitions
-            .OrderBy(definition => definition.Order)
-            .Select(definition =>
-            {
-                var categoryEntries = entries
-                    .Where(entry => entry.Config.Category == definition.ConfigCategory)
-                    .ToArray();
-
-                var groups = categoryEntries
-                    .GroupBy(entry => entry.Config.Topic)
-                    .OrderBy(group => group.Min(entry => entry.Config.Order))
-                    .Select(topicGroup => new Group(
-                        topicGroup.Key,
-                        topicGroup
-                            .GroupBy(entry => entry.GroupId)
-                            .OrderBy(group => group.Min(entry => entry.Config.Order))
-                            .Select(group =>
-                            {
-                                // LỌC BỎ BÀI KIỂM TRA NẰM Ở CUỐI HOẶC TRONG MỤC NỘI DUNG
-                                var orderedLessons = group
-                                    .Where(entry => !entry.Id.Contains("test", StringComparison.OrdinalIgnoreCase)
-                                                 && !entry.Config.Name.Contains("kiểm tra", StringComparison.OrdinalIgnoreCase)
-                                                 && !entry.Config.Name.Contains("test", StringComparison.OrdinalIgnoreCase)
-                                                 && !entry.Config.Name.Contains("quiz", StringComparison.OrdinalIgnoreCase)
-                                                 && !entry.Config.Name.Contains("ôn tập", StringComparison.OrdinalIgnoreCase))
-                                    .OrderBy(entry => entry.IsNumbered ? entry.PartNumber : entry.Config.Order)
-                                    .ThenBy(entry => entry.Config.Order)
-                                    .ThenBy(entry => entry.Id, StringComparer.Ordinal)
-                                    .ToArray();
-
-                                if (orderedLessons.Length == 0) return null;
-
-                                var first = orderedLessons[0];
-                                var numberedGroup = orderedLessons.Any(entry => entry.IsNumbered);
-                                var title = numberedGroup
-                                    ? Regex.Replace(first.Config.Name, @"\s+\d+(?::.*)?$", "").Trim()
-                                    : first.Config.Name;
-                                var topicId = $"{definition.Id}-{ToSlug(topicGroup.Key)}-{first.GroupId}";
-                                
-                                // ĐỒNG BỘ 100% BÀI THUỘC LỘ TRÌNH VỚI BOARD (TÊN VÀ TRẠNG THÁI) (YÊU CẦU 2)
-                                var lessons = orderedLessons
-                                    .Select(entry =>
-                                    {
-                                        if (boardNodeMap.TryGetValue(entry.Id, out var bNode))
-                                        {
-                                            return new Lesson(
-                                                entry.Id,
-                                                bNode.Name, // Tên bài học đồng bộ hoàn toàn với Board
-                                                bNode.State // Trạng thái ("done", "current", "locked") đồng bộ với Board
-                                            );
-                                        }
-
-                                        // Bài ngoài lộ trình: mở sẵn "current" để học tự do
-                                        return new Lesson(
-                                            entry.Id,
-                                            entry.Config.Name,
-                                            "current"
-                                        );
-                                    })
-                                    .ToArray();
-
-                                var description = string.Join(" ", orderedLessons
-                                    .Select(entry => entry.Config.Description)
-                                    .Distinct(StringComparer.Ordinal));
-
-                                var levels = orderedLessons
-                                    .Select(entry => entry.Config.Level)
-                                    .Where(l => !string.IsNullOrEmpty(l))
-                                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                                    .ToArray();
-
-                                return new Topic(topicId, topicGroup.Key, title, description, lessons, levels, topicGroup.Key);
-                            })
-                            .Where(topic => topic != null)
-                            .Select(topic => topic!)
-                            .ToArray()))
-                    .Where(group => group.Topics.Length > 0)
-                    .ToArray();
-
-                var totalLessons = groups.Sum(g => g.Topics.Sum(t => t.Lessons.Length));
-                return (definition, groups, LessonCount: totalLessons);
-            })
-            .Where(category => category.LessonCount > 0)
-            .Select(category => new Category(
-                category.definition.Id,
-                category.definition.Icon,
-                category.definition.LabelKey,
-                category.definition.Label,
-                category.LessonCount.ToString(),
-                false, // Mặc định đóng tất cả mục trong thư viện (Yêu cầu 1)
-                category.groups))
-            .ToArray();
-    }
-
-    private static string ToSlug(string value) =>
-        Regex.Replace(value.ToLowerInvariant(), @"[^a-z0-9]+", "-").Trim('-');
 }

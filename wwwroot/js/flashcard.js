@@ -1,4 +1,4 @@
-// Flashcard UI: local per-card choices; no server progress or XP writes.
+// Flashcard UI: local ratings synced two-way with lesson content progress API.
 document.addEventListener('DOMContentLoaded', () => {
     const page = document.querySelector('.flashcard-page');
     if (!page) return;
@@ -41,6 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem(ratingKey(id), value);
             unsavedRatings.delete(id);
         } catch { unsavedRatings.add(id); }
+    }
+
+    function clearRating(id) {
+        ratings.delete(id);
+        unsavedRatings.delete(id);
+        if (!ratingScope) return;
+        try {
+            localStorage.removeItem(ratingKey(id));
+        } catch { /* Keep the in-memory choice when storage is unavailable. */ }
+    }
+
+    function restorePreviousRating(id, previousRating, expectedScope) {
+        if (expectedScope !== ratingScope || readRating(id) !== 'know') return;
+        if (isRating(previousRating)) saveRating(id, previousRating);
+        else clearRating(id);
+        if (state.view === 'ready' && state.contents[state.index]?.id === id) {
+            renderCard();
+        }
     }
 
     const userScope = session => session?.user?.id ? `user:${session.user.id}` : null;
@@ -164,14 +182,37 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = `${lesson.name} · Wordfox`;
     }
 
-    function syncKnowProgress(contentId) {
+    function syncKnowProgress(contentId, previousRating) {
         if (!canSyncProgress || !window.AppApi || !contentId || syncedKnowIds.has(contentId)) return;
+        const expectedScope = ratingScope;
         syncedKnowIds.add(contentId);
         window.AppApi.post(
             `/api/progress/lessons/${encodeURIComponent(lessonId)}/contents/${encodeURIComponent(contentId)}/complete`
-        ).catch(() => {
+        ).catch(error => {
             syncedKnowIds.delete(contentId);
+            if (error?.status === 401) return;
+            restorePreviousRating(contentId, previousRating, expectedScope);
+            window.AppToast?.error(error?.message || t('flashcard.save_error', 'Không lưu được tiến độ thẻ này. Vui lòng thử lại.'));
         });
+    }
+
+    async function loadServerProgress(id, reqId) {
+        if (!canSyncProgress || !window.AppApi) return;
+        try {
+            const progress = await window.AppApi.get(`/api/progress/lessons/${encodeURIComponent(id)}`);
+            if (reqId !== requestId || !progress || !Array.isArray(progress.completedContentIds)) return;
+            let changed = false;
+            for (const contentId of progress.completedContentIds) {
+                syncedKnowIds.add(contentId);
+                if (readRating(contentId) === null) {
+                    saveRating(contentId, 'know');
+                    changed = true;
+                }
+            }
+            if (changed && state.view === 'ready') renderCard();
+        } catch {
+            // Bỏ qua nếu không tải được tiến độ bài; flashcard vẫn hoạt động với lựa chọn hiện tại
+        }
     }
 
     async function load() {
@@ -228,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             renderCard();
             show('ready');
+            loadServerProgress(lesson.lessonId, currentRequest);
         } catch (error) {
             if (currentRequest !== requestId) return;
             if (error.status === 401) return;
@@ -288,9 +330,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (['know', 'again'].includes(button.dataset.rating)) {
             const contentId = state.contents[state.index].id;
+            const previousRating = readRating(contentId);
             saveRating(contentId, button.dataset.rating);
             if (button.dataset.rating === 'know') {
-                syncKnowProgress(contentId);
+                syncKnowProgress(contentId, previousRating);
             }
             renderCard();
             emit('rate');

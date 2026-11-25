@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
     const fill = (text, values) => Object.entries(values).reduce((out, [k, v]) => out.replaceAll(`{${k}}`, v), text);
 
-    // Làm lại: bài kiểm tra nằm cuối trang bài học (#lesson-quiz); chưa có trang /MiniGame riêng.
-    const playUrl = id => `/Lesson/${encodeURIComponent(id)}#lesson-quiz`;
+    // Làm lại: bài kiểm tra nằm cuối trang bài học (?retry=1#lesson-quiz); chưa có trang /MiniGame riêng.
+    const playUrl = id => `/Lesson/${encodeURIComponent(id)}?retry=1#lesson-quiz`;
     const lessonUrl = id => `/Lesson/${encodeURIComponent(id)}`;
     const flashcardUrl = id => `/Flashcard/${encodeURIComponent(id)}`;
 
@@ -245,9 +245,11 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `${summary} ${fill(t('result.summary_wrong', 'Xem lại {wrong} câu sai bên dưới.'), { wrong })}`
             : summary;
 
+        const durationMs = state.record.durationMs
+            ?? (Number.isInteger(attempt.durationSeconds) && attempt.durationSeconds >= 0 ? attempt.durationSeconds * 1000 : null);
         $('[data-stat="correct"]').textContent = attempt.correctCount;
         $('[data-stat="wrong"]').textContent = wrong;
-        $('[data-stat="time"]').textContent = formatTime(state.record.durationMs);
+        $('[data-stat="time"]').textContent = formatTime(durationMs);
         $('[data-stat="xp"]').textContent = `+${attempt.xpAwarded}`;
         $('[data-flashcard]').hidden = wrong === 0 || !Array.isArray(state.lesson.contents) || state.lesson.contents.length === 0;
 
@@ -311,9 +313,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const submission = await window.AppApi.get(`/api/progress/lessons/${encodeURIComponent(lessonId)}/quiz/latest`);
             if (!window.QuizResult.isSubmission(submission)) return null;
+            const durationMs = Number.isInteger(submission.attempt?.durationSeconds) && submission.attempt.durationSeconds >= 0
+                ? submission.attempt.durationSeconds * 1000
+                : null;
             // Lưu lại vào sessionStorage để reload không phải gọi API lần nữa
-            await window.QuizResult.save(lessonId, submission);
-            return { lessonId, savedAt: Date.now(), durationMs: null, submission };
+            await window.QuizResult.save(lessonId, submission, { durationMs });
+            return { lessonId, savedAt: Date.now(), durationMs, submission };
         } catch (error) {
             if (error?.status === 401) throw error;
             return null;

@@ -173,6 +173,27 @@ public sealed class LearningResultServiceTests
     }
 
     [Fact]
+    public async Task SubmitQuiz_WithDurationSeconds_ForwardsDurationToProgressService()
+    {
+        var progress = new Mock<IProgressService>();
+        progress.Setup(p => p.GetLessonProgressAsync(It.IsAny<Guid>(), "l", default))
+            .ReturnsAsync(ProgressResult<LessonProgressDto>.Ok(Progress("in_progress")));
+        progress.Setup(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+                It.IsAny<IReadOnlyList<QuizQuestionResultDto>>(), 95, CancellationToken.None))
+            .ReturnsAsync((Guid _, string _, int correct, int total, int xp, IReadOnlyList<QuizQuestionResultDto> _, int? duration, CancellationToken _) =>
+                ProgressResult<QuizAttemptResultDto>.Ok(new QuizAttemptResultDto(1, (short)correct, (short)total, 100, xp, true, Progress("completed"), duration)));
+
+        var answers = new List<QuizAnswerDto> { new("1", ["true"]), new("2", ["true"]) };
+        var result = await new LearningResultService(Lessons(quizCount: 2).Object, progress.Object)
+            .SubmitQuizAsync(Guid.NewGuid(), "l", answers, 95, CancellationToken.None);
+
+        Assert.Equal(ProgressError.None, result.Error);
+        Assert.Equal(95, result.Value!.Attempt.DurationSeconds);
+        progress.Verify(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", 2, 2, 20,
+            It.Is<IReadOnlyList<QuizQuestionResultDto>>(a => a.Count == 2), 95, CancellationToken.None), Times.Once);
+    }
+
+    [Fact]
     public async Task SubmitQuiz_LessonWithoutQuizOrUnknownLesson_Fails()
     {
         var service = new LearningResultService(Lessons(quizCount: 0).Object, Mock.Of<IProgressService>());

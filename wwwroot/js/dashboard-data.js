@@ -90,13 +90,15 @@
         }
 
         const completedIds = new Set(progress.filter(item => item.status === 'completed').map(item => item.lessonId));
+        const inProgressIds = new Set(progress.filter(item => item.status === 'in_progress').map(item => item.lessonId));
         // ProgressService.GetOverviewAsync guarantees LastStudiedAt descending order.
         const currentProgress = progress.find(item => item.status === 'in_progress') || null;
         const currentLesson = currentProgress ? lessonById.get(currentProgress.lessonId) || null : null;
         const totalLessons = lessons.length;
         // GetAll returns the complete, unpaginated catalog. Historical progress may
-        // reference removed lessons: only count completed lessons in this denominator.
+        // reference removed lessons: only count completed / in-progress lessons in this denominator.
         const completed = lessons.filter(lesson => completedIds.has(lesson.lessonId)).length;
+        const inProgress = lessons.filter(lesson => inProgressIds.has(lesson.lessonId)).length;
         const percent = totalLessons === 0
             ? 0
             : Math.max(0, Math.min(100, Math.round(completed / totalLessons * 100)));
@@ -139,6 +141,7 @@
             stats,
             completion: {
                 completed,
+                inProgress,
                 total: totalLessons,
                 percent
             },
@@ -155,28 +158,37 @@
         };
     }
 
-    async function fetchOverviewAndLessons(api) {
-        const [progressResult, lessonsResult] = await Promise.allSettled([
+    async function fetchDashboardInputs(api) {
+        const [progressResult, lessonsResult, recsResult] = await Promise.allSettled([
             api.get('/api/progress'),
-            api.get('/api/lessons')
+            api.get('/api/lessons'),
+            // One extra slot: the first suggestion is usually the current lesson, shown separately.
+            api.get('/api/lessons/recommendations?limit=4')
         ]);
 
-        if (progressResult.status === 'fulfilled' && lessonsResult.status === 'fulfilled') {
-            return [progressResult.value, lessonsResult.value];
+        if (progressResult.status === 'fulfilled'
+            && lessonsResult.status === 'fulfilled'
+            && recsResult.status === 'fulfilled') {
+            return [progressResult.value, lessonsResult.value, recsResult.value];
         }
 
-        if (progressResult.status === 'rejected'
-            && progressResult.reason?.status === 404
-            && typeof api.post === 'function') {
+        const otherFailure = [progressResult, lessonsResult, recsResult]
+            .find(res => res.status === 'rejected' && res.reason?.status !== 404);
+        const needsInit = (progressResult.status === 'rejected' && progressResult.reason?.status === 404)
+            || (recsResult.status === 'rejected' && recsResult.reason?.status === 404);
+
+        if (!otherFailure && needsInit && typeof api.post === 'function') {
             await api.post('/api/progress/init');
             return await Promise.all([
                 api.get('/api/progress'),
-                api.get('/api/lessons')
+                api.get('/api/lessons'),
+                api.get('/api/lessons/recommendations?limit=4')
             ]);
         }
 
         if (progressResult.status === 'rejected') throw progressResult.reason;
-        throw lessonsResult.reason;
+        if (lessonsResult.status === 'rejected') throw lessonsResult.reason;
+        throw recsResult.reason;
     }
 
     // GET /api/lessons/recommendations: in-progress -> next unlocked lesson in the
@@ -201,11 +213,7 @@
     }
 
     async function loadDashboard(api, isCurrent = () => true) {
-        // One extra slot: the first suggestion is usually the current lesson, shown separately.
-        const [[overview, lessons], rawRecommendations] = await Promise.all([
-            fetchOverviewAndLessons(api),
-            api.get('/api/lessons/recommendations?limit=4')
-        ]);
+        const [overview, lessons, rawRecommendations] = await fetchDashboardInputs(api);
         if (!isCurrent()) return null;
         const data = mapDashboard(overview, lessons);
         if (!data) throw new Error('Invalid dashboard response');

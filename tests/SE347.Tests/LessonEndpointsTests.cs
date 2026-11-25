@@ -82,6 +82,22 @@ namespace SE347.Tests
                 lessons.Count);
         }
 
+        [Fact]
+        public async Task List_FilterBySpeakingCategory_Returns200AndMatchesCatalog()
+        {
+            var client = _factory.CreateClientFor(await _factory.CreateUserAsync());
+
+            var response = await client.GetAsync("/api/lessons?category=speaking");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var lessons = await response.Content.ReadFromJsonAsync<List<LessonSummaryDto>>(Json);
+            Assert.NotNull(lessons);
+            Assert.All(lessons, l => Assert.Equal(LessonCategories.Speaking, l.Category));
+            Assert.Equal(
+                Lessons.GetAll().Count(l => l.Category.Equals(LessonCategories.Speaking, StringComparison.OrdinalIgnoreCase)),
+                lessons.Count);
+        }
+
         [Theory]
         [InlineData("A1")]
         [InlineData("a2")]

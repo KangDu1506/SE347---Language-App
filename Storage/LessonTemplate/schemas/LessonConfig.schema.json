@@ -39,7 +39,7 @@
         },
         "level": {
             "type": "string",
-            "pattern": "^(A1|A2|B1|B2|C1)$",
+            "pattern": "^(A1|A2|B1|B2|C1|C2)$",
             "description": "CEFR level, matches user_learning_profiles.cefr_level in the database."
         },
         "order": {

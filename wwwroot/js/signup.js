@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernameInput = form.querySelector('#username');
     let lastCheckedUsername = '';
     let lastUsernameAvailable = null;
+    let usernameCustomErrorKey = 'validation.username_unavailable';
 
     const showFieldCustomError = (input, key, fallbackText) => {
         const label = input.closest('label');
@@ -70,20 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const checkUsernameAvailability = async (rawValue) => {
         const normalized = String(rawValue || '').trim().toLowerCase();
-        if (normalized.length < 3) return null;
+        if (normalized.length < 3) return { status: 'skip' };
         if (normalized === lastCheckedUsername && lastUsernameAvailable !== null) {
-            return lastUsernameAvailable;
+            return { status: 'ok', available: lastUsernameAvailable };
         }
         try {
             const response = await fetch(`/api/users/username-available?username=${encodeURIComponent(normalized)}`);
-            if (!response.ok) return null;
+            if (!response.ok) return { status: 'error' };
             const body = await response.json();
-            if (typeof body?.available !== 'boolean') return null;
+            if (typeof body?.available !== 'boolean') return { status: 'error' };
             lastCheckedUsername = normalized;
             lastUsernameAvailable = body.available;
-            return body.available;
+            return { status: 'ok', available: body.available };
         } catch {
-            return null;
+            return { status: 'error' };
         }
     };
 
@@ -91,8 +92,9 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('blur', async () => {
             setFieldError(input);
             if (input === usernameInput && input.checkValidity()) {
-                const available = await checkUsernameAvailability(input.value);
-                if (available === false && input === usernameInput) {
+                const result = await checkUsernameAvailability(input.value);
+                if (result.status === 'ok' && result.available === false && input === usernameInput) {
+                    usernameCustomErrorKey = 'validation.username_unavailable';
                     input.setCustomValidity('unavailable');
                     showFieldCustomError(input, 'validation.username_unavailable', 'Tên đăng nhập đã được sử dụng hoặc không hợp lệ.');
                 }
@@ -101,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener(input.type === 'checkbox' ? 'change' : 'input', () => {
             if (input === usernameInput) {
                 input.setCustomValidity('');
+                usernameCustomErrorKey = 'validation.username_unavailable';
                 lastCheckedUsername = '';
                 lastUsernameAvailable = null;
             }
@@ -121,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.setAttribute('aria-describedby', isInvalid ? errorId : '');
 
         const key = input.validity.customError
-            ? 'validation.username_unavailable'
+            ? (input === usernameInput ? usernameCustomErrorKey : 'validation.username_unavailable')
             : input.validity.valueMissing
                 ? 'validation.required'
                 : input.validity.typeMismatch
@@ -153,6 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
+        message.remove();
+
+        if (usernameCustomErrorKey === 'validation.username_check_failed') {
+            usernameInput.setCustomValidity('');
+            usernameCustomErrorKey = 'validation.username_unavailable';
+            setFieldError(usernameInput);
+        }
 
         if (!form.checkValidity()) {
             form.querySelectorAll('input').forEach((input) => {
@@ -163,10 +173,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
         const usernameValue = String(formData.get('username')).trim().toLowerCase();
-        const available = await checkUsernameAvailability(usernameValue);
-        if (available === false) {
+        const usernameCheck = await checkUsernameAvailability(usernameValue);
+        if (usernameCheck.status === 'ok' && usernameCheck.available === false) {
+            usernameCustomErrorKey = 'validation.username_unavailable';
             usernameInput.setCustomValidity('unavailable');
             showFieldCustomError(usernameInput, 'validation.username_unavailable', 'Tên đăng nhập đã được sử dụng hoặc không hợp lệ.');
+            usernameInput.focus();
+            return;
+        }
+        if (usernameCheck.status !== 'ok') {
+            usernameCustomErrorKey = 'validation.username_check_failed';
+            usernameInput.setCustomValidity('check_failed');
+            showFieldCustomError(usernameInput, 'validation.username_check_failed', 'Không kiểm tra được tên đăng nhập lúc này. Vui lòng thử lại.');
             usernameInput.focus();
             return;
         }

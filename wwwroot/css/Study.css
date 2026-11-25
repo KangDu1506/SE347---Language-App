@@ -759,6 +759,7 @@
 .study-lesson--current .study-lesson__no { background: var(--surface-orange); }
 .study-lesson--current .btn--ink { box-shadow: 3px 3px 0 var(--surface-orange-deep); }
 .study-lesson--locked { border-style: dashed; color: var(--text-secondary); }
+.study-lesson__btn--locked, .study-lesson [data-lesson-action][aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; pointer-events: none; box-shadow: none; }
 
 /* ---------- Gợi ý ---------- */
 .study-recs { padding: 8px 0 24px; }

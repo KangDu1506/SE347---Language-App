@@ -7,7 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const lessonId = page.dataset.lessonId || '';
     const LESSON_ID_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/; // khớp LessonIds.Pattern ở backend
-    const CATEGORY_KEYS = { vocabulary: 'ui.vocabulary', grammar: 'ui.grammar', listening: 'ui.listening' };
+    const CATEGORY_KEYS = {
+        vocabulary: 'ui.vocabulary',
+        grammar: 'ui.grammar',
+        listening: 'ui.listening',
+        speaking: 'study.cat_speaking'
+    };
+    const searchParams = new URLSearchParams(window.location.search);
+    let forceQuizRetry = searchParams.get('retry') === '1';
+    const openQuizOnLoad = forceQuizRetry || searchParams.get('quiz') === '1' || window.location.hash === '#lesson-quiz';
     // Route trang flashcard (SCRUM-58) mà nút "Bắt đầu ôn tập" trỏ tới
     const reviewUrl = id => `/Flashcard/${encodeURIComponent(id)}`;
 
@@ -470,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Thời điểm hiện bài kiểm tra, để trang Kết quả hiển thị thời gian làm bài
     let quizStartedAt = 0;
 
-    function renderQuizQuestions(lesson) {
+    function renderQuizQuestions(lesson, restoreDraft = true) {
         quizStartedAt = Date.now();
         const listEl = $('[data-quiz-questions]');
         const formEl = $('[data-quiz-form]');
@@ -479,6 +487,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const quizSection = $('[data-lesson-quiz-section]');
         if (!quizSection || !listEl || !formEl || !resultEl || !completeWrap) return;
 
+        const resultLink = $('[data-quiz-result-link]');
+        if (resultLink) resultLink.hidden = true;
+
         const hasQuiz = lesson.quiz.length > 0;
         const hasContent = lesson.contents.length > 0;
         quizSection.hidden = !hasQuiz && !hasContent;
@@ -486,9 +497,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hasQuiz) {
             formEl.hidden = true;
             resultEl.hidden = true;
-            $('[data-game-progress]').hidden = true;
-            $('[data-action="previous-question"]').hidden = true;
-            $('[data-action="next-question"]').hidden = true;
+            const gameProgress = $('[data-game-progress]');
+            if (gameProgress) gameProgress.hidden = true;
+            const prevBtn = $('[data-action="previous-question"]');
+            if (prevBtn) prevBtn.hidden = true;
+            const nextBtn = $('[data-action="next-question"]');
+            if (nextBtn) nextBtn.hidden = true;
+            const checkBtn = $('[data-action="check-answer"]');
+            if (checkBtn) checkBtn.hidden = true;
             completeWrap.hidden = !hasContent;
             const subtitle = $('[data-quiz-subtitle]');
             if (subtitle) {
@@ -855,17 +871,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const nextLesson = lessons[index + 1];
             setPagerLink(nextLink, nextLesson);
             if (nextLesson && nextLink) {
-                try {
-                    await window.AppApi.get(`/api/lessons/${encodeURIComponent(nextLesson.lessonId)}`);
+                if (nextLesson.isLocked) {
+                    nextLink.setAttribute('aria-disabled', 'true');
+                    nextLink.title = t('lesson.next_locked', 'Hoàn thành bài hiện tại để mở bài tiếp theo.');
+                    nextLink.classList.add('is-locked');
+                } else {
                     nextLink.removeAttribute('aria-disabled');
                     nextLink.removeAttribute('title');
                     nextLink.classList.remove('is-locked');
-                } catch (error) {
-                    if (error.status === 403 && error.body?.code === 'lesson_locked') {
-                        nextLink.setAttribute('aria-disabled', 'true');
-                        nextLink.title = t('lesson.next_locked', 'Hoàn thành bài hiện tại để mở bài tiếp theo.');
-                        nextLink.classList.add('is-locked');
-                    }
                 }
             }
         } catch {
@@ -888,7 +901,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function restoreLatestQuizState(progress) {
-        if (!currentLesson || !currentLesson.quiz.length || progress.quizAttempts < 1 || !Number.isInteger(progress.lastQuizScore)) return;
+        if (forceQuizRetry || !currentLesson || !currentLesson.quiz.length || progress.quizAttempts < 1 || !Number.isInteger(progress.lastQuizScore)) return;
+        const resultLink = $('[data-quiz-result-link]');
         try {
             // A resumed in-progress attempt takes precedence over a previously submitted result.
             if (sessionStorage.getItem(draftKey(currentLesson.lessonId))) return;
@@ -898,6 +912,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 && saved.submission.attempt?.progress?.quizAttempts === progress.quizAttempts
                 && Array.isArray(saved.submission.questions)) {
                 renderQuizResult(saved.submission);
+                if (resultLink && window.QuizResult) {
+                    resultLink.href = window.QuizResult.resultUrl(currentLesson.lessonId);
+                    resultLink.hidden = false;
+                }
                 return;
             }
         } catch { /* Use the server progress summary if the cached result is unavailable. */ }
@@ -906,6 +924,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!form || !result) return;
         form.hidden = true;
         result.hidden = false;
+        if (resultLink && window.QuizResult) {
+            resultLink.href = window.QuizResult.resultUrl(currentLesson.lessonId);
+            resultLink.hidden = false;
+        }
         const lastScore = progress.lastQuizScore ?? 0;
         const score = $('[data-quiz-score]');
         const title = $('[data-quiz-result-title]');
@@ -940,6 +962,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 userScope = data?.session?.user?.id || 'anonymous';
             } catch { /* Local development can run without an authenticated Supabase session. */ }
             const lesson = await window.AppApi.get(`/api/lessons/${encodeURIComponent(lessonId)}`);
+            if (forceQuizRetry) {
+                try {
+                    sessionStorage.removeItem(draftKey(lesson.lessonId));
+                    const cleanUrl = new URL(window.location.href);
+                    if (cleanUrl.searchParams.has('retry')) {
+                        cleanUrl.searchParams.delete('retry');
+                        window.history.replaceState(null, '', `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`);
+                    }
+                } catch { /* Ignore unavailable history or storage. */ }
+            }
             render(lesson);
             show('ready');
             loadPager(lesson.lessonId);
@@ -947,7 +979,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Ghi nhận đã mở bài; lỗi ở đây không ảnh hưởng việc học
             window.AppApi.post(`/api/progress/lessons/${encodeURIComponent(lesson.lessonId)}/open`).catch(() => {});
 
-            if (window.location.hash === '#lesson-quiz' || new URLSearchParams(window.location.search).get('quiz') === '1') {
+            if (openQuizOnLoad) {
                 $('[data-lesson-quiz-section]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         } catch (error) {
@@ -975,12 +1007,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (form) form.querySelectorAll('input').forEach(input => { input.disabled = true; });
         try {
             const answers = collectQuizAnswers();
+            const elapsedMs = quizStartedAt > 0 ? Math.max(0, Date.now() - quizStartedAt) : null;
+            const durationSeconds = elapsedMs !== null ? Math.min(86400, Math.round(elapsedMs / 1000)) : null;
+            const payload = durationSeconds === null ? { answers } : { answers, durationSeconds };
             const submission = await window.AppApi.post(
                 `/api/progress/lessons/${encodeURIComponent(currentLesson.lessonId)}/quiz`,
-                { answers }
+                payload
             );
+            forceQuizRetry = false;
             renderQuizResult(submission);
-            await linkResultPage(currentLesson.lessonId, submission);
+            await linkResultPage(currentLesson.lessonId, submission, elapsedMs);
             loadPager(currentLesson.lessonId);
             if (submission.attempt?.xpAwarded > 0) {
                 window.AppToast?.success(`+${submission.attempt.xpAwarded} XP!`);
@@ -997,11 +1033,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Lưu kết quả cho trang /Result/{lessonId} (xem lại chi tiết, lọc câu sai); đóng tab thì trang đó đọc lại từ DB.
-    async function linkResultPage(lessonId, submission) {
+    async function linkResultPage(lessonId, submission, durationMs = null) {
         const link = $('[data-quiz-result-link]');
         if (!link || !window.QuizResult) return;
-        const durationMs = quizStartedAt ? Date.now() - quizStartedAt : null;
-        await window.QuizResult.save(lessonId, submission, { durationMs });
+        const resolvedDurationMs = durationMs ?? (quizStartedAt ? Math.max(0, Date.now() - quizStartedAt) : null);
+        await window.QuizResult.save(lessonId, submission, { durationMs: resolvedDurationMs });
         link.href = window.QuizResult.resultUrl(lessonId);
         link.hidden = false;
     }

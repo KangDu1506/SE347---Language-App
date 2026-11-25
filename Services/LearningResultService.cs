@@ -36,7 +36,10 @@ namespace SE347.Services
             return _progress.MarkContentCompletedAsync(userId, lessonId, contentId, ILearningResultService.XpPerContent, countsAsWord, cancellationToken);
         }
 
-        public async Task<ProgressResult<QuizSubmissionResultDto>> SubmitQuizAsync(Guid userId, string lessonId, IReadOnlyList<QuizAnswerDto>? answers, CancellationToken cancellationToken = default)
+        public Task<ProgressResult<QuizSubmissionResultDto>> SubmitQuizAsync(Guid userId, string lessonId, IReadOnlyList<QuizAnswerDto>? answers, CancellationToken cancellationToken = default) =>
+            SubmitQuizAsync(userId, lessonId, answers, durationSeconds: null, cancellationToken);
+
+        public async Task<ProgressResult<QuizSubmissionResultDto>> SubmitQuizAsync(Guid userId, string lessonId, IReadOnlyList<QuizAnswerDto>? answers, int? durationSeconds, CancellationToken cancellationToken)
         {
             var questions = _lessons.GetQuizQuestions(lessonId);
             if (questions is null)
@@ -69,7 +72,9 @@ namespace SE347.Services
                 ? correctCount * ILearningResultService.XpPerCorrectAnswer
                 : 0;
 
-            var attempt = await _progress.RecordQuizAttemptAsync(userId, lessonId, correctCount, questions.Count, xp, results, cancellationToken);
+            var attempt = durationSeconds.HasValue
+                ? await _progress.RecordQuizAttemptAsync(userId, lessonId, correctCount, questions.Count, xp, results, durationSeconds, cancellationToken)
+                : await _progress.RecordQuizAttemptAsync(userId, lessonId, correctCount, questions.Count, xp, results, cancellationToken);
             return attempt.Error == ProgressError.None
                 ? ProgressResult<QuizSubmissionResultDto>.Ok(new QuizSubmissionResultDto(attempt.Value!, results))
                 : ProgressResult<QuizSubmissionResultDto>.Fail(attempt.Error, attempt.Detail);

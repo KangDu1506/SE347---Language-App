@@ -393,6 +393,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.querySelector('[data-library-empty]');
     let loadingLessons = false;
     let progressByLessonId = new Map();
+    let lessonsById = new Map();
+    let boardNodesById = new Map();
+
+    if (topicPanels) {
+        topicPanels.addEventListener('click', event => {
+            if (event.target.closest('[data-lesson-action][aria-disabled="true"]')) {
+                event.preventDefault();
+            }
+        });
+    }
 
     function createFoxToken() {
         const svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -455,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const textEl = document.createElement('span');
                 textEl.className = 'study-node__status-text study-node__status-text--done';
                 textEl.dataset.i18n = 'study.done_stars';
-                textEl.textContent = t('study.done_stars', 'Đã xong · 3★');
+                textEl.textContent = t('study.done_stars', 'Đã hoàn thành');
                 footer.replaceChildren(textEl);
             } else if (nextState === 'current') {
                 const link = document.createElement('a');
@@ -478,6 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // không tự suy từ data-prereq nữa.
     function applyBoard(board) {
         const apiNodes = new Map((board?.nodes || []).map(node => [node.lessonId, node]));
+        boardNodesById = apiNodes;
         canvas?.querySelector('.study-node__token')?.remove();
 
         boardNodes.forEach(nodeObj => {
@@ -501,26 +512,61 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollToCurrent(false);
     }
 
+    function syncLibraryLessonRow(row, { isLocked, progressStatus }) {
+        const lessonId = row.dataset.lessonId || '';
+        const action = row.querySelector('[data-lesson-action]');
+        row.classList.remove('study-lesson--done', 'study-lesson--current', 'study-lesson--locked');
+
+        if (isLocked) {
+            row.classList.add('study-lesson--locked');
+            if (action) {
+                action.className = 'btn btn--sm study-lesson__btn--locked';
+                action.removeAttribute('href');
+                action.setAttribute('aria-disabled', 'true');
+                action.tabIndex = -1;
+                action.dataset.i18n = 'study.action_locked';
+                action.textContent = t('study.action_locked', 'Đang khóa');
+            }
+            return;
+        }
+
+        if (action) {
+            action.href = `/Lesson/${encodeURIComponent(lessonId)}`;
+            action.removeAttribute('aria-disabled');
+            action.removeAttribute('tabindex');
+        }
+
+        if (progressStatus === 'completed') {
+            row.classList.add('study-lesson--done');
+            if (action) {
+                action.className = 'btn btn--sm';
+                action.dataset.i18n = 'study.action_done';
+                action.textContent = t('study.action_done', 'Ôn lại');
+            }
+        } else if (progressStatus === 'in_progress') {
+            row.classList.add('study-lesson--current');
+            if (action) {
+                action.className = 'btn btn--sm btn--ink';
+                action.dataset.i18n = 'study.action_continue';
+                action.textContent = t('study.action_continue', 'Tiếp tục →');
+            }
+        } else if (action) {
+            action.className = 'btn btn--sm btn--ink';
+            action.dataset.i18n = 'study.btn_start';
+            action.textContent = t('study.btn_start', 'Vào học →');
+        }
+    }
+
     function applyLibraryProgressStates() {
         if (!topicPanels) return;
         topicPanels.querySelectorAll('.study-lesson[data-lesson-id]').forEach(row => {
-            const item = progressByLessonId.get(row.dataset.lessonId);
-            row.classList.remove('study-lesson--done', 'study-lesson--current');
-            const link = row.querySelector('a.btn');
-            if (!item) return;
-            if (item.status === 'completed') {
-                row.classList.add('study-lesson--done');
-                if (link) {
-                    link.dataset.i18n = 'study.action_done';
-                    link.textContent = window.AppI18n?.t('study.action_done', 'Ôn lại') || 'Ôn lại';
-                }
-            } else if (item.status === 'in_progress') {
-                row.classList.add('study-lesson--current');
-                if (link) {
-                    link.dataset.i18n = 'study.action_current';
-                    link.textContent = window.AppI18n?.t('study.action_current', 'Bắt đầu →') || 'Bắt đầu →';
-                }
-            }
+            const id = row.dataset.lessonId;
+            const boardNode = boardNodesById.get(id);
+            const lessonMeta = lessonsById.get(id);
+            const progressItem = progressByLessonId.get(id);
+            const isLocked = boardNode ? boardNode.state === 'locked' : Boolean(lessonMeta?.isLocked);
+            const progressStatus = progressItem?.status || boardNode?.progressStatus || lessonMeta?.progressStatus || 'not_started';
+            syncLibraryLessonRow(row, { isLocked, progressStatus });
         });
     }
 
@@ -639,8 +685,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const link = createElement('a', 'btn btn--sm');
         link.href = `/Lesson/${encodeURIComponent(lesson.lessonId)}`;
         const continuing = item.progressStatus === 'in_progress';
-        link.dataset.i18n = continuing ? 'study.action_current' : 'study.learn_now';
-        link.textContent = continuing ? t('study.action_current', 'Bắt đầu →') : t('study.learn_now', 'Học ngay →');
+        link.dataset.i18n = continuing ? 'study.action_continue' : 'study.learn_now';
+        link.textContent = continuing ? t('study.action_continue', 'Tiếp tục →') : t('study.learn_now', 'Học ngay →');
         row.append(time, link);
 
         card.append(hot, art, tag, title, desc, row);
@@ -707,6 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!libraryList || !topicPanels) return;
         libraryList.replaceChildren();
         topicPanels.replaceChildren();
+        lessonsById = new Map(lessons.map(item => [item.lessonId, item]));
 
         const categories = new Map();
         for (const lesson of lessons) {
@@ -785,10 +832,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const detail = createElement('span');
                     detail.appendChild(createElement('b', '', lesson.name));
                     if (lesson.level) detail.appendChild(createElement('small', '', lesson.level));
-                    const link = createElement('a', 'btn btn--sm btn--ink', window.AppI18n?.t('study.btn_start', 'Bắt đầu →') || 'Bắt đầu →');
-                    link.href = `/Lesson/${encodeURIComponent(lesson.lessonId)}`;
-                    link.dataset.i18n = 'study.btn_start';
+                    const link = createElement('a', 'btn btn--sm btn--ink', '');
+                    link.dataset.lessonAction = '';
                     row.append(detail, link);
+                    syncLibraryLessonRow(row, {
+                        isLocked: Boolean(lesson.isLocked),
+                        progressStatus: lesson.progressStatus || 'not_started'
+                    });
                     lessonList.appendChild(row);
                 });
                 panel.append(panelHead, lessonList);

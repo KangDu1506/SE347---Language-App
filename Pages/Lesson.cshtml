@@ -105,15 +105,15 @@
                 <form class="lesson-quiz__form" data-quiz-form hidden>
                     <div class="lesson-quiz__game-progress" data-game-progress hidden aria-live="polite">
                         <span data-game-progress-label></span>
-                        <div class="lesson-quiz__game-track" role="progressbar" aria-label="Tiến độ câu hỏi" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1" data-game-progressbar>
+                        <div class="lesson-quiz__game-track" role="progressbar" aria-label="Tiến độ câu hỏi" data-i18n-aria-label="lesson.game_progress_aria" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1" data-game-progressbar>
                             <span data-game-progress-fill></span>
                         </div>
                     </div>
                     <ol class="lesson-quiz__list" data-quiz-questions></ol>
                     <div class="lesson-quiz__actions">
-                        <button class="btn" type="button" data-action="previous-question" hidden>← Câu trước</button>
-                        <button class="btn" type="button" data-action="check-answer">Kiểm tra đáp án</button>
-                        <button class="btn" type="button" data-action="next-question" hidden>Câu tiếp →</button>
+                        <button class="btn" type="button" data-action="previous-question" hidden data-i18n="lesson.prev_question">← Câu trước</button>
+                        <button class="btn btn--ink" type="button" data-action="check-answer" data-i18n="lesson.check_answer">Kiểm tra đáp án</button>
+                        <button class="btn btn--ink" type="button" data-action="next-question" hidden data-i18n="lesson.next_question">Câu tiếp →</button>
                         <button class="btn btn--ink btn--lg" type="submit" data-action="submit-quiz" data-i18n="lesson.quiz_submit">Nộp bài kiểm tra</button>
                     </div>
                 </form>

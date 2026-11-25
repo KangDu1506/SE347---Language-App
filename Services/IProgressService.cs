@@ -75,6 +75,11 @@ namespace SE347.Services
         Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
             IReadOnlyList<QuizQuestionResultDto> answers, CancellationToken cancellationToken = default);
 
+        /// <summary>Nạp chồng nhận thêm thời gian làm bài (giây) để lưu user_quiz_attempts.duration_seconds.</summary>
+        Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
+            IReadOnlyList<QuizQuestionResultDto> answers, int? durationSeconds, CancellationToken cancellationToken) =>
+            RecordQuizAttemptAsync(userId, lessonId, correctCount, totalCount, xp, answers, cancellationToken);
+
         /// <summary>
         /// Lần nộp quiz gần nhất của bài (cùng shape với response POST .../quiz) cho trang Kết quả khi đã đóng tab.
         /// LessonCompletedNow = lần nộp đó làm bài chuyển sang completed (chỉ lần đó được cộng XP).

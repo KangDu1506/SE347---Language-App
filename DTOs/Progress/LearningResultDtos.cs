@@ -6,7 +6,7 @@ namespace SE347.DTOs.Progress
     /// POST /api/progress/lessons/{lessonId}/quiz: bài làm quiz / mini-game gửi lên để chấm ở server.
     /// Câu không gửi đáp án tính là sai; điểm luôn tính trên toàn bộ câu hỏi của bài.
     /// </summary>
-    public record SubmitQuizRequestDto(IReadOnlyList<QuizAnswerDto>? Answers);
+    public record SubmitQuizRequestDto(IReadOnlyList<QuizAnswerDto>? Answers, int? DurationSeconds = null);
 
     /// <summary>
     /// Answer: đáp án user chọn / điền. single-choice, true-false: 1 phần tử ("true" / "false" với true-false).
