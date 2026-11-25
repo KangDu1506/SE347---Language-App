@@ -27,6 +27,10 @@ namespace SE347.Data
         public DbSet<UserLessonProgress> UserLessonProgresses { get; set; } = null!;
         public DbSet<UserContentProgress> UserContentProgresses { get; set; } = null!;
         public DbSet<UserQuizAttempt> UserQuizAttempts { get; set; } = null!;
+        public DbSet<UserQuizAttemptAnswer> UserQuizAttemptAnswers { get; set; } = null!;
+        public DbSet<Quiz> Quizzes { get; set; } = null!;
+        public DbSet<Question> Questions { get; set; } = null!;
+        public DbSet<QuizQuestion> QuizQuestions { get; set; } = null!;
 
       
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,6 +47,7 @@ namespace SE347.Data
             ConfigureAchievement(modelBuilder);
             ConfigureUserAchievement(modelBuilder);
             ConfigureLearningProgress(modelBuilder);
+            ConfigureQuizzes(modelBuilder);
         }
 
         // ─────────────────────────────────────────────────────────────
@@ -434,8 +439,127 @@ namespace SE347.Data
                       .HasDatabaseName("idx_quiz_attempts_lesson")
                       .IsDescending(false, false, true);
 
-                entity.Property(e => e.SubmittedAt)
+                entity.HasIndex(e => new { e.UserId, e.QuizId })
+                      .HasDatabaseName("uq_quiz_attempts_in_progress")
+                      .IsUnique()
+                      .HasFilter("status = 'in_progress' and quiz_id is not null");
+
+                entity.HasIndex(e => new { e.QuizId, e.UserId, e.Score, e.DurationSeconds, e.SubmittedAt })
+                      .HasDatabaseName("idx_quiz_attempts_ranking")
+                      .IsDescending(false, false, true, false, false)
+                      .HasFilter("status = 'submitted' and quiz_id is not null");
+
+                // Cột submitted_at có default now() ở DB (cho SQL cũ của ProgressService), nhưng EF KHÔNG khai báo
+                // default: nếu khai báo, EF sẽ bỏ qua SubmittedAt = null và DB tự gán now() cho lượt in_progress.
+                // Lưu qua EF thì luôn gán SubmittedAt rõ ràng (null khi đang làm, thời điểm nộp khi submitted).
+
+                entity.Property(e => e.StartedAt)
                       .HasDefaultValueSql("now()");
+
+                entity.Property(e => e.QuestionOrder)
+                      .HasColumnType("jsonb");
+
+                entity.HasMany(e => e.Answers)
+                      .WithOne(a => a.Attempt)
+                      .HasForeignKey(a => a.AttemptId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<UserQuizAttemptAnswer>(entity =>
+            {
+                entity.ToTable("user_quiz_attempt_answers", tb => tb.ExcludeFromMigrations());
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .UseIdentityAlwaysColumn();
+
+                entity.HasIndex(e => new { e.AttemptId, e.QuestionKey })
+                      .HasDatabaseName("uq_attempt_answers_key")
+                      .IsUnique();
+
+                entity.Property(e => e.UserAnswer)
+                      .HasColumnType("jsonb");
+
+                entity.Property(e => e.QuestionSnapshot)
+                      .HasColumnType("jsonb");
+
+                entity.Property(e => e.AnsweredAt)
+                      .HasDefaultValueSql("now()");
+            });
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // 9. quizzes, questions, quiz_questions
+        //    (supabase/migrations/20261111141500_learning_catalog_and_quizzes.sql)
+        // ─────────────────────────────────────────────────────────────
+        private static void ConfigureQuizzes(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Quiz>(entity =>
+            {
+                entity.ToTable("quizzes", tb => tb.ExcludeFromMigrations());
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasDefaultValueSql("gen_random_uuid()");
+
+                entity.HasIndex(e => e.Slug)
+                      .IsUnique();
+
+                entity.Property(e => e.CreatedAt)
+                      .HasDefaultValueSql("now()");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasDefaultValueSql("now()");
+
+                entity.HasMany(e => e.Questions)
+                      .WithOne(q => q.Quiz)
+                      .HasForeignKey(q => q.QuizId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Question>(entity =>
+            {
+                entity.ToTable("questions", tb => tb.ExcludeFromMigrations());
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .HasDefaultValueSql("gen_random_uuid()");
+
+                entity.Property(e => e.Options)
+                      .HasColumnType("jsonb");
+
+                entity.Property(e => e.CorrectAnswers)
+                      .HasColumnType("jsonb");
+
+                entity.Property(e => e.CreatedAt)
+                      .HasDefaultValueSql("now()");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasDefaultValueSql("now()");
+            });
+
+            modelBuilder.Entity<QuizQuestion>(entity =>
+            {
+                entity.ToTable("quiz_questions", tb => tb.ExcludeFromMigrations());
+
+                // Composite PK
+                entity.HasKey(e => new { e.QuizId, e.QuestionId });
+
+                entity.HasIndex(e => new { e.QuizId, e.QuestionNo })
+                      .HasDatabaseName("uq_quiz_questions_no")
+                      .IsUnique();
+
+                entity.HasIndex(e => new { e.QuizId, e.QuestionKey })
+                      .HasDatabaseName("uq_quiz_questions_key")
+                      .IsUnique();
+
+                entity.HasOne(e => e.Question)
+                      .WithMany()
+                      .HasForeignKey(e => e.QuestionId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
 
@@ -503,6 +627,21 @@ namespace SE347.Data
             foreach (var entry in ChangeTracker.Entries<UserStat>()
                 .Where(e => e.State is EntityState.Added or EntityState.Modified))
             {
+                entry.Entity.UpdatedAt = now;
+            }
+
+            // ── Quiz / Question: updated_at (DB cũng có trigger set_updated_at) ──
+            foreach (var entry in ChangeTracker.Entries<Quiz>()
+                .Where(e => e.State == EntityState.Modified))
+            {
+                entry.Property(e => e.CreatedAt).IsModified = false;
+                entry.Entity.UpdatedAt = now;
+            }
+
+            foreach (var entry in ChangeTracker.Entries<Question>()
+                .Where(e => e.State == EntityState.Modified))
+            {
+                entry.Property(e => e.CreatedAt).IsModified = false;
                 entry.Entity.UpdatedAt = now;
             }
 
