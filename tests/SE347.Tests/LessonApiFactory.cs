@@ -28,9 +28,12 @@ namespace SE347.Tests
         {
             // Không đọc appsettings.Development.json (chứa key thật ở máy dev)
             builder.UseEnvironment("Testing");
+            builder.ConfigureLogging(logging => logging.ClearProviders());
 
             builder.ConfigureTestServices(services =>
             {
+                services.RemoveAll<ILoggerProvider>();
+                services.AddLogging(logging => logging.AddConsole());
                 services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
                 services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
                 services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(_databaseName));

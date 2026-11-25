@@ -26,6 +26,9 @@ namespace SE347.Services
         /// </summary>
         Task<ProgressResult<QuizSubmissionResultDto>> SubmitQuizAsync(Guid userId, string lessonId, IReadOnlyList<QuizAnswerDto>? answers, CancellationToken cancellationToken = default);
 
+        /// <summary>Chấm một câu riêng lẻ để mini-game có thể phản hồi ngay; không ghi nhận attempt hay XP.</summary>
+        Task<ProgressResult<QuizQuestionResultDto>> CheckQuizAnswerAsync(string lessonId, QuizAnswerDto answer);
+
         /// <summary>Hoàn thành bài không có quiz; cần học hết các mục nội dung trước.</summary>
         Task<ProgressResult<LessonProgressDto>> CompleteLessonAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default);
     }
