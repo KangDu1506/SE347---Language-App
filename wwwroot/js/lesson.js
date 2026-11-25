@@ -18,6 +18,230 @@ document.addEventListener('DOMContentLoaded', () => {
     let lessonProgress = null;
     let completedContentIds = new Set();
     let renderedQuizQuestions = [];
+    let suppressDraftSave = false;
+    let activeQuestionIndex = 0;
+    let userScope = 'anonymous';
+    const checkedAnswers = new Map();
+
+    const draftKey = id => `wordfox:quiz-draft:${userScope}:${id}`;
+    function saveQuizDraft() {
+        if (!currentLesson || suppressDraftSave) return;
+        try {
+            const answers = collectQuizAnswers();
+            if (answers.every(item => item.answer.every(value => !value))) {
+                sessionStorage.removeItem(draftKey(currentLesson.lessonId));
+                return;
+            }
+            sessionStorage.setItem(draftKey(currentLesson.lessonId), JSON.stringify({
+                savedAt: Date.now(),
+                quizSignature: quizSignature(),
+                activeQuestionIndex,
+                answers,
+                checkedAnswers: [...checkedAnswers.entries()]
+            }));
+        } catch { /* Browser storage may be unavailable. */ }
+    }
+
+    function restoreQuizDraft() {
+        if (!currentLesson) return;
+        try {
+            const key = draftKey(currentLesson.lessonId);
+            const draft = JSON.parse(sessionStorage.getItem(key) || 'null');
+            if (!draft) return;
+            if (!Array.isArray(draft.answers) || Date.now() - draft.savedAt > 7 * 24 * 60 * 60 * 1000 || draft.quizSignature !== quizSignature()) {
+                sessionStorage.removeItem(key);
+                return;
+            }
+            suppressDraftSave = true;
+            for (const item of draft.answers) {
+                const row = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(item.questionId)}"]`);
+                if (!row || !Array.isArray(item.answer)) continue;
+                const inputs = [...row.querySelectorAll('input')];
+                if (row.dataset.questionType === 'fill-in-the-blank') inputs.forEach((input, i) => { input.value = item.answer[i] || ''; });
+                else inputs.forEach(input => { input.checked = item.answer.includes(input.value); });
+            }
+            if (Array.isArray(draft.checkedAnswers)) {
+                for (const [questionId, checked] of draft.checkedAnswers) {
+                    if (!checked?.result || !Array.isArray(checked.answer)) continue;
+                    checkedAnswers.set(questionId, checked);
+                    renderInstantFeedback(checked.result);
+                }
+            }
+            if (Number.isInteger(draft.activeQuestionIndex)) {
+                activeQuestionIndex = Math.max(0, Math.min(draft.activeQuestionIndex, renderedQuizQuestions.length - 1));
+            }
+        } catch {
+            try { sessionStorage.removeItem(draftKey(currentLesson.lessonId)); } catch { /* Ignore unavailable storage. */ }
+        } finally { suppressDraftSave = false; }
+    }
+
+    function quizSignature() {
+        return JSON.stringify((currentLesson?.quiz || []).map(q => [q.id, q.type, q.question, q.options]));
+    }
+
+    function isQuestionAnswered(index = activeQuestionIndex) {
+        const question = renderedQuizQuestions[index];
+        if (!question) return false;
+        const row = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(question.id)}"]`);
+        if (!row) return false;
+        if (question.type === 'fill-in-the-blank') {
+            const blanks = [...row.querySelectorAll('.lesson-quiz__blank')];
+            return blanks.length > 0 && blanks.every(input => input.value.trim().length > 0);
+        }
+        return row.querySelectorAll('input:checked').length > 0;
+    }
+
+    function getQuestionAnswer(index = activeQuestionIndex) {
+        const question = renderedQuizQuestions[index];
+        if (!question) return { questionId: '', answer: [] };
+        const row = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(question.id)}"]`);
+        if (!row) return { questionId: question.id, answer: [] };
+        const answer = question.type === 'fill-in-the-blank'
+            ? [...row.querySelectorAll('.lesson-quiz__blank')].map(input => input.value.trim())
+            : [...row.querySelectorAll('input:checked')].map(input => input.value);
+        return { questionId: question.id, answer };
+    }
+
+    function isCurrentAnswerChecked() {
+        const current = getQuestionAnswer();
+        const checked = checkedAnswers.get(current.questionId);
+        return Boolean(checked && answersEqual(renderedQuizQuestions[activeQuestionIndex], checked.answer, current.answer));
+    }
+
+    function answersEqual(question, left, right) {
+        if (!question || !Array.isArray(left) || !Array.isArray(right)) return false;
+        if (question.type === 'multiple-choice') {
+            const normalizedLeft = [...left].sort();
+            const normalizedRight = [...right].sort();
+            return normalizedLeft.length === normalizedRight.length
+                && normalizedLeft.every((value, index) => value === normalizedRight[index]);
+        }
+        return JSON.stringify(left) === JSON.stringify(right);
+    }
+
+    function clearStaleCheck() {
+        const current = getQuestionAnswer();
+        const checked = checkedAnswers.get(current.questionId);
+        if (!checked || answersEqual(renderedQuizQuestions[activeQuestionIndex], checked.answer, current.answer)) return;
+        checkedAnswers.delete(current.questionId);
+        const row = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(current.questionId)}"]`);
+        const feedback = row?.querySelector('[data-instant-feedback]');
+        if (feedback) {
+            feedback.hidden = true;
+            feedback.replaceChildren();
+        }
+    }
+
+    function renderInstantFeedback(result) {
+        const row = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(result.questionId)}"]`);
+        if (!row) return;
+        const feedback = row.querySelector('[data-instant-feedback]');
+        if (!feedback) return;
+        feedback.classList.toggle('is-wrong', !result.isCorrect);
+        const title = document.createElement('strong');
+        title.textContent = result.isCorrect
+            ? t('lesson.fb_correct', '✓ Chính xác')
+            : t('lesson.fb_wrong', '✕ Chưa đúng');
+        feedback.replaceChildren(title);
+        if (!result.isCorrect && result.correctAnswer?.length) {
+            const correct = document.createElement('p');
+            correct.textContent = `${t('lesson.fb_correct_answer', 'Đáp án đúng')}: ${result.correctAnswer.join(', ')}`;
+            feedback.appendChild(correct);
+        }
+        if (result.explanation) {
+            const explanation = document.createElement('p');
+            explanation.textContent = `${t('lesson.fb_explanation', 'Giải thích')}: ${result.explanation}`;
+            feedback.appendChild(explanation);
+        }
+        if (result.translation) {
+            const translation = document.createElement('p');
+            translation.textContent = `${t('lesson.fb_translation', 'Dịch')}: ${result.translation}`;
+            feedback.appendChild(translation);
+        }
+        feedback.hidden = false;
+    }
+
+    async function checkCurrentAnswer() {
+        if (!currentLesson || !isQuestionAnswered()) {
+            const firstInput = page.querySelector(`.lesson-quiz__item[data-question-id="${CSS.escape(renderedQuizQuestions[activeQuestionIndex]?.id || '')}"] input`);
+            window.AppToast?.error(t('lesson.answer_required', 'Hãy trả lời câu này trước khi tiếp tục.'));
+            firstInput?.focus();
+            return false;
+        }
+        clearStaleCheck();
+        if (isCurrentAnswerChecked()) return true;
+        const answer = getQuestionAnswer();
+        const button = $('[data-action="check-answer"]');
+        if (button) button.disabled = true;
+        try {
+            const result = await window.AppApi.post(
+                `/api/progress/lessons/${encodeURIComponent(currentLesson.lessonId)}/quiz/check`,
+                answer
+            );
+            checkedAnswers.set(answer.questionId, { answer: answer.answer, result });
+            renderInstantFeedback(result);
+            updateGameStep();
+            return true;
+        } catch (error) {
+            if (error.status !== 401) window.AppToast?.error(error.message || t('lesson.quiz_submit_error', 'Không kiểm tra được đáp án.'));
+            return false;
+        } finally {
+            if (button) button.disabled = false;
+        }
+    }
+
+    function updateGameStep() {
+        const rows = [...page.querySelectorAll('[data-quiz-questions] > .lesson-quiz__item')];
+        const count = renderedQuizQuestions.length;
+        const progress = $('[data-game-progress]');
+        const progressLabel = $('[data-game-progress-label]');
+        const progressBar = $('[data-game-progressbar]');
+        const progressFill = $('[data-game-progress-fill]');
+        const previous = $('[data-action="previous-question"]');
+        const next = $('[data-action="next-question"]');
+        const submit = $('[data-action="submit-quiz"]');
+        if (!count) return;
+
+        rows.forEach((row, index) => {
+            const isCurrent = index === activeQuestionIndex;
+            row.dataset.gameStepHidden = String(!isCurrent);
+            if (isCurrent) row.removeAttribute('aria-hidden');
+            else row.setAttribute('aria-hidden', 'true');
+        });
+        const correctSoFar = [...checkedAnswers.entries()].filter(([questionId, checked]) => {
+            const index = renderedQuizQuestions.findIndex(q => q.id === questionId);
+            return index >= 0 && checked.result?.isCorrect
+                && answersEqual(renderedQuizQuestions[index], checked.answer, getQuestionAnswer(index).answer);
+        }).length;
+        const currentChecked = isCurrentAnswerChecked();
+        const provisionalScore = Math.round((correctSoFar / count) * 100);
+        if (progress) progress.hidden = false;
+        if (progressLabel) progressLabel.textContent = `${t('ui.question', 'Câu hỏi')} ${activeQuestionIndex + 1} / ${count} · ${t('lesson.provisional_score', 'Điểm tạm tính')} ${provisionalScore}% (${correctSoFar}/${count})`;
+        if (progressBar) {
+            progressBar.setAttribute('aria-valuemax', String(count));
+            progressBar.setAttribute('aria-valuenow', String(activeQuestionIndex + 1));
+        }
+        if (progressFill) progressFill.style.width = `${((activeQuestionIndex + 1) / count) * 100}%`;
+        if (previous) previous.hidden = count < 2 || activeQuestionIndex === 0;
+        if (next) next.hidden = count < 2 || activeQuestionIndex === count - 1 || !currentChecked;
+        if (submit) submit.hidden = activeQuestionIndex !== count - 1 || !currentChecked;
+        const check = $('[data-action="check-answer"]');
+        if (check) check.hidden = currentChecked;
+    }
+
+    function moveQuestion(step) {
+        if (step > 0 && !isCurrentAnswerChecked()) {
+            window.AppToast?.error(t('lesson.check_before_continue', 'Hãy kiểm tra đáp án câu này trước khi tiếp tục.'));
+            return false;
+        }
+        const nextIndex = activeQuestionIndex + step;
+        if (nextIndex < 0 || nextIndex >= renderedQuizQuestions.length) return false;
+        activeQuestionIndex = nextIndex;
+        saveQuizDraft();
+        updateGameStep();
+        page.querySelector('[data-quiz-questions] > .lesson-quiz__item:not([data-game-step-hidden="true"])')?.querySelector('input')?.focus({ preventScroll: true });
+        return true;
+    }
 
     const $ = (selector, root = page) => root.querySelector(selector);
     const t = (key, fallback) => window.AppI18n?.t(key, fallback) || fallback;
@@ -243,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderQuizQuestions(lesson) {
+    function renderQuizQuestions(lesson, restoreDraft = true) {
         const listEl = $('[data-quiz-questions]');
         const formEl = $('[data-quiz-form]');
         const resultEl = $('[data-quiz-result]');
@@ -258,6 +482,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hasQuiz) {
             formEl.hidden = true;
             resultEl.hidden = true;
+            $('[data-game-progress]').hidden = true;
+            $('[data-action="previous-question"]').hidden = true;
+            $('[data-action="next-question"]').hidden = true;
             completeWrap.hidden = !hasContent;
             const subtitle = $('[data-quiz-subtitle]');
             if (subtitle) {
@@ -276,6 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const shouldShuffleQ = Boolean(settings['shuffle-questions'] || settings['randomize-questions']);
         const shouldShuffleA = Boolean(settings['shuffle-answers']);
         renderedQuizQuestions = shouldShuffleQ ? shuffleCopy(lesson.quiz) : [...lesson.quiz];
+        activeQuestionIndex = 0;
+        checkedAnswers.clear();
 
         const typeLabels = {
             'single-choice': t('lesson.q_type_single', 'Chọn 1 đáp án'),
@@ -392,8 +621,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 li.appendChild(optionsWrap);
             }
 
+            const feedback = document.createElement('div');
+            feedback.className = 'lesson-quiz__instant-feedback';
+            feedback.dataset.instantFeedback = '';
+            feedback.hidden = true;
+            feedback.setAttribute('aria-live', 'polite');
+            li.appendChild(feedback);
+
             return li;
         }));
+        if (restoreDraft) restoreQuizDraft();
+        updateGameStep();
     }
 
     function collectQuizAnswers() {
@@ -420,9 +658,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!formEl || !resultEl || !feedbackEl) return;
 
         const attempt = submission.attempt;
+        const subtitle = $('[data-quiz-subtitle]');
+        if (subtitle) subtitle.textContent = t('lesson.quiz_subtitle', 'Hoàn thành từ 60% số câu trở lên để mở khóa bài tiếp theo.');
         const passed = attempt.score >= 60;
+        try { sessionStorage.setItem(`${draftKey(currentLesson.lessonId)}:result`, JSON.stringify({ quizSignature: quizSignature(), submission })); } catch { /* Result is still visible for this page. */ }
         formEl.hidden = true;
         resultEl.hidden = false;
+        try { sessionStorage.removeItem(draftKey(currentLesson.lessonId)); } catch { /* Ignore unavailable storage. */ }
 
         scoreCard?.classList.toggle('is-pass', passed);
         if (scoreEl) scoreEl.textContent = `${attempt.score}%`;
@@ -605,7 +847,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = lessons.findIndex(lesson => lesson.lessonId === id);
             if (index < 0) return;
             setPagerLink($('[data-lesson-prev]'), lessons[index - 1]);
-            setPagerLink($('[data-lesson-next]'), lessons[index + 1]);
+            const nextLink = $('[data-lesson-next]');
+            const nextLesson = lessons[index + 1];
+            setPagerLink(nextLink, nextLesson);
+            if (nextLesson && nextLink) {
+                try {
+                    await window.AppApi.get(`/api/lessons/${encodeURIComponent(nextLesson.lessonId)}`);
+                    nextLink.removeAttribute('aria-disabled');
+                    nextLink.removeAttribute('title');
+                    nextLink.classList.remove('is-locked');
+                } catch (error) {
+                    if (error.status === 403 && error.body?.code === 'lesson_locked') {
+                        nextLink.setAttribute('aria-disabled', 'true');
+                        nextLink.title = t('lesson.next_locked', 'Hoàn thành bài hiện tại để mở bài tiếp theo.');
+                        nextLink.classList.add('is-locked');
+                    }
+                }
+            }
         } catch {
             // Không có danh sách thì ẩn điều hướng, nội dung bài vẫn dùng được
         }
@@ -619,9 +877,45 @@ document.addEventListener('DOMContentLoaded', () => {
             completedContentIds = new Set(progress.completedContentIds);
             syncContentButtons();
             renderProgressBadge();
+            restoreLatestQuizState(progress);
         } catch {
             // Bỏ qua nếu không tải được tiến độ; nội dung bài vẫn hiển thị bình thường
         }
+    }
+
+    function restoreLatestQuizState(progress) {
+        if (!currentLesson || !currentLesson.quiz.length || progress.quizAttempts < 1 || !Number.isInteger(progress.lastQuizScore)) return;
+        try {
+            // A resumed in-progress attempt takes precedence over a previously submitted result.
+            if (sessionStorage.getItem(draftKey(currentLesson.lessonId))) return;
+            const saved = JSON.parse(sessionStorage.getItem(`${draftKey(currentLesson.lessonId)}:result`) || 'null');
+            if (saved?.quizSignature === quizSignature()
+                && saved.submission?.attempt?.score === progress.lastQuizScore
+                && saved.submission.attempt?.progress?.quizAttempts === progress.quizAttempts
+                && Array.isArray(saved.submission.questions)) {
+                renderQuizResult(saved.submission);
+                return;
+            }
+        } catch { /* Use the server progress summary if the cached result is unavailable. */ }
+        const form = $('[data-quiz-form]');
+        const result = $('[data-quiz-result]');
+        if (!form || !result) return;
+        form.hidden = true;
+        result.hidden = false;
+        const lastScore = progress.lastQuizScore ?? 0;
+        const score = $('[data-quiz-score]');
+        const title = $('[data-quiz-result-title]');
+        const meta = $('[data-quiz-result-meta]');
+        result.querySelector('.lesson-quiz__score-card')?.classList.toggle('is-pass', lastScore >= 60);
+        if (score) score.textContent = `${lastScore}%`;
+        if (title) title.textContent = lastScore >= 60
+            ? t('lesson.quiz_pass_title', 'Chúc mừng! Bạn đã đạt bài kiểm tra')
+            : t('lesson.quiz_fail_title', 'Chưa đạt — hãy thử lại nhé');
+        if (meta) meta.textContent = `${t('lesson.restored_attempt', 'Đã khôi phục kết quả gần nhất')} · ${progress.quizAttempts} ${t('lesson.attempts', 'lần làm')}`;
+        const retry = $('[data-action="retry-quiz"]');
+        if (retry) retry.hidden = false;
+        const subtitle = $('[data-quiz-subtitle]');
+        if (subtitle) subtitle.textContent = t('lesson.restored_feedback_note', 'Phản hồi chi tiết từng câu chỉ hiển thị ngay sau khi nộp bài.');
     }
 
     // ---------- Tải bài ----------
@@ -637,6 +931,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         show('loading');
         try {
+            try {
+                const { data } = await window.sb?.auth.getSession();
+                userScope = data?.session?.user?.id || 'anonymous';
+            } catch { /* Local development can run without an authenticated Supabase session. */ }
             const lesson = await window.AppApi.get(`/api/lessons/${encodeURIComponent(lessonId)}`);
             render(lesson);
             show('ready');
@@ -659,8 +957,18 @@ document.addEventListener('DOMContentLoaded', () => {
     $('[data-quiz-form]')?.addEventListener('submit', async event => {
         event.preventDefault();
         if (!currentLesson || renderedQuizQuestions.length === 0) return;
+        if (activeQuestionIndex < renderedQuizQuestions.length - 1) {
+            moveQuestion(1);
+            return;
+        }
+        if (!isCurrentAnswerChecked()) {
+            await checkCurrentAnswer();
+            return;
+        }
         const submitBtn = $('[data-action="submit-quiz"]');
         if (submitBtn) submitBtn.disabled = true;
+        const form = $('[data-quiz-form]');
+        if (form) form.querySelectorAll('input').forEach(input => { input.disabled = true; });
         try {
             const answers = collectQuizAnswers();
             const submission = await window.AppApi.post(
@@ -668,6 +976,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 { answers }
             );
             renderQuizResult(submission);
+            const retry = $('[data-action="retry-quiz"]');
+            if (retry) retry.hidden = false;
             loadPager(currentLesson.lessonId);
             if (submission.attempt?.xpAwarded > 0) {
                 window.AppToast?.success(`+${submission.attempt.xpAwarded} XP!`);
@@ -678,6 +988,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } finally {
             if (submitBtn) submitBtn.disabled = false;
+            const activeForm = $('[data-quiz-form]');
+            if (activeForm && !activeForm.hidden) activeForm.querySelectorAll('input').forEach(input => { input.disabled = false; });
         }
     });
 
@@ -691,7 +1003,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch {
             // Giữ danh sách câu hỏi hiện có nếu lỗi mạng
         }
-        renderQuizQuestions(currentLesson);
+        const form = $('[data-quiz-form]');
+        const result = $('[data-quiz-result]');
+        if (result) result.hidden = true;
+        if (form) form.hidden = false;
+        if (form) form.querySelectorAll('input').forEach(input => { input.disabled = false; });
+        try { sessionStorage.removeItem(draftKey(currentLesson.lessonId)); } catch { /* Ignore unavailable storage. */ }
+        renderQuizQuestions(currentLesson, false);
+    });
+
+    $('[data-action="check-answer"]')?.addEventListener('click', checkCurrentAnswer);
+    $('[data-action="previous-question"]')?.addEventListener('click', () => moveQuestion(-1));
+    $('[data-action="next-question"]')?.addEventListener('click', () => moveQuestion(1));
+    $('[data-quiz-form]')?.addEventListener('input', () => {
+        clearStaleCheck();
+        saveQuizDraft();
+        updateGameStep();
+    });
+    $('[data-quiz-form]')?.addEventListener('change', () => {
+        clearStaleCheck();
+        saveQuizDraft();
+        updateGameStep();
+    });
+    $('[data-lesson-next]')?.addEventListener('click', event => {
+        if (event.currentTarget.getAttribute('aria-disabled') === 'true') event.preventDefault();
     });
 
     $('[data-action="complete-lesson"]')?.addEventListener('click', async () => {

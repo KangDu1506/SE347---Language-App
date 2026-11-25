@@ -71,6 +71,17 @@ namespace SE347.Endpoints
                 return ToResult(await results.CompleteContentAsync(userId, lessonId, contentId, ct));
             }).AddEndpointFilter(RequireUnlockedLesson);
 
+            // POST /api/progress/lessons/{lessonId}/quiz/check: chấm một câu ngay trong mini-game, không ghi attempt/XP.
+            group.MapPost("/lessons/{lessonId}/quiz/check", async (string lessonId, QuizAnswerDto request, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await results.CheckQuizAnswerAsync(lessonId, request));
+            }).AddEndpointFilter(RequireUnlockedLesson);
+
             // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }] }.
             // Trả điểm, XP, tiến độ bài và kết quả từng câu (kèm đáp án đúng, giải thích).
             group.MapPost("/lessons/{lessonId}/quiz", async (string lessonId, SubmitQuizRequestDto request, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>

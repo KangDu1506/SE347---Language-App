@@ -75,6 +75,32 @@ namespace SE347.Services
                 : ProgressResult<QuizSubmissionResultDto>.Fail(attempt.Error, attempt.Detail);
         }
 
+        public Task<ProgressResult<QuizQuestionResultDto>> CheckQuizAnswerAsync(string lessonId, QuizAnswerDto answer)
+        {
+            var questions = _lessons.GetQuizQuestions(lessonId);
+            if (questions is null)
+            {
+                return Task.FromResult(ProgressResult<QuizQuestionResultDto>.Fail(ProgressError.LessonNotFound));
+            }
+
+            if (questions.Count == 0)
+            {
+                return Task.FromResult(ProgressResult<QuizQuestionResultDto>.Fail(ProgressError.QuizNotFound));
+            }
+
+            var error = Grade(questions, [answer], out var results);
+            if (error is not null)
+            {
+                return Task.FromResult(ProgressResult<QuizQuestionResultDto>.Fail(ProgressError.InvalidInput, error));
+            }
+
+            var questionResult = results.FirstOrDefault(result =>
+                string.Equals(result.QuestionId, answer.QuestionId?.Trim(), StringComparison.Ordinal));
+            return questionResult is null
+                ? Task.FromResult(ProgressResult<QuizQuestionResultDto>.Fail(ProgressError.InvalidInput, "Câu hỏi không hợp lệ."))
+                : Task.FromResult(ProgressResult<QuizQuestionResultDto>.Ok(questionResult));
+        }
+
         public async Task<ProgressResult<LessonProgressDto>> CompleteLessonAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default)
         {
             var lesson = _lessons.GetDetail(lessonId);
