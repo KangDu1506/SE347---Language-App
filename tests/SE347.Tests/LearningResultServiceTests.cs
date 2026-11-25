@@ -153,8 +153,9 @@ public sealed class LearningResultServiceTests
         var progress = new Mock<IProgressService>();
         progress.Setup(p => p.GetLessonProgressAsync(It.IsAny<Guid>(), "l", default))
             .ReturnsAsync(ProgressResult<LessonProgressDto>.Ok(Progress(status)));
-        progress.Setup(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), default))
-            .ReturnsAsync((Guid _, string _, int correct, int total, int xp, CancellationToken _) =>
+        progress.Setup(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+                It.IsAny<IReadOnlyList<QuizQuestionResultDto>>(), default))
+            .ReturnsAsync((Guid _, string _, int correct, int total, int xp, IReadOnlyList<QuizQuestionResultDto> _, CancellationToken _) =>
                 ProgressResult<QuizAttemptResultDto>.Ok(new QuizAttemptResultDto(1, (short)correct, (short)total, 0, xp, false, Progress(status))));
 
         var answers = Enumerable.Range(1, 5)
@@ -165,7 +166,10 @@ public sealed class LearningResultServiceTests
 
         Assert.Equal(ProgressError.None, result.Error);
         Assert.Equal(expectedXp, result.Value!.Attempt.XpAwarded);
-        progress.Verify(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", correctCount, 5, expectedXp, default));
+        // Lưu kèm kết quả từng câu (S3-19) theo đúng thứ tự trong quiz.json
+        progress.Verify(p => p.RecordQuizAttemptAsync(It.IsAny<Guid>(), "l", correctCount, 5, expectedXp,
+            It.Is<IReadOnlyList<QuizQuestionResultDto>>(a => a.Count == 5 && a.Count(r => r.IsCorrect) == correctCount
+                && a.Select(r => r.QuestionId).SequenceEqual(new[] { "1", "2", "3", "4", "5" })), default));
     }
 
     [Fact]

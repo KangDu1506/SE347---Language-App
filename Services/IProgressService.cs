@@ -18,6 +18,8 @@ namespace SE347.Services
         QuizRequired,
         /// <summary>Đánh dấu hoàn thành bài khi chưa học hết các mục nội dung.</summary>
         ContentsIncomplete,
+        /// <summary>User chưa nộp quiz của bài lần nào.</summary>
+        QuizAttemptNotFound,
     }
 
     /// <summary>Kết quả ghi tiến độ: Value có khi Error = None; Detail là mô tả lỗi cụ thể (nếu có) để trả cho client.</summary>
@@ -67,8 +69,19 @@ namespace SE347.Services
         /// <summary>
         /// Lưu một lần nộp quiz đã chấm ở server. Score = % đúng; Score ≥ <see cref="QuizPassScore"/>
         /// lần đầu thì bài chuyển sang completed. xp chỉ được cộng ở lần nộp làm bài chuyển sang completed, các lần khác ghi 0.
+        /// answers (kết quả chấm từng câu) được lưu vào user_quiz_attempt_answers trong cùng transaction,
+        /// kèm bản chụp đáp án đúng / giải thích để xem lại kể cả khi quiz.json thay đổi.
         /// </summary>
-        Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp, CancellationToken cancellationToken = default);
+        Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
+            IReadOnlyList<QuizQuestionResultDto> answers, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Lần nộp quiz gần nhất của bài (cùng shape với response POST .../quiz) cho trang Kết quả khi đã đóng tab.
+        /// LessonCompletedNow = lần nộp đó làm bài chuyển sang completed (chỉ lần đó được cộng XP).
+        /// Questions rỗng với lần nộp trước khi có lưu chi tiết câu trả lời (S3-19).
+        /// QuizAttemptNotFound nếu user chưa nộp lần nào.
+        /// </summary>
+        Task<ProgressResult<QuizSubmissionResultDto>> GetLatestQuizAttemptAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default);
 
         /// <summary>Đánh dấu hoàn thành bài không có quiz. Bài đã completed thì không cộng xp lần nữa.</summary>
         Task<ProgressResult<LessonProgressDto>> MarkLessonCompletedAsync(Guid userId, string lessonId, int xp, CancellationToken cancellationToken = default);

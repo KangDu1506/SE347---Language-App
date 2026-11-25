@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using SE347.Data;
+using SE347.DTOs.Lesson;
 using SE347.DTOs.Progress;
 using SE347.Models;
 
@@ -183,9 +185,11 @@ namespace SE347.Services
             }, cancellationToken);
         }
 
-        public Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp, CancellationToken cancellationToken = default)
+        public Task<ProgressResult<QuizAttemptResultDto>> RecordQuizAttemptAsync(Guid userId, string lessonId, int correctCount, int totalCount, int xp,
+            IReadOnlyList<QuizQuestionResultDto> answers, CancellationToken cancellationToken = default)
         {
-            if (totalCount is <= 0 or > short.MaxValue || correctCount < 0 || correctCount > totalCount || xp < 0)
+            if (totalCount is <= 0 or > short.MaxValue || correctCount < 0 || correctCount > totalCount || xp < 0
+                || answers.Count != totalCount || answers.Count(a => a.IsCorrect) != correctCount)
             {
                 return Task.FromResult(ProgressResult<QuizAttemptResultDto>.Fail(ProgressError.InvalidInput));
             }
@@ -208,6 +212,17 @@ namespace SE347.Services
                         """)
                     .ToListAsync(ct);
 
+                // Chi tiết từng câu (S3-19): question_id null vì câu hỏi bài học nằm trong quiz.json, chưa có ở bảng questions
+                foreach (var answer in answers)
+                {
+                    var userAnswer = JsonSerializer.Serialize(answer.UserAnswer);
+                    var snapshot = JsonSerializer.Serialize(new QuizAnswerSnapshot(answer.Type, answer.CorrectAnswer, answer.Explanation, answer.Translation), SnapshotJson);
+                    await _db.Database.ExecuteSqlInterpolatedAsync($"""
+                        insert into public.user_quiz_attempt_answers (attempt_id, question_key, user_answer, is_correct, question_snapshot)
+                        values ({attemptId.Single()}, {answer.QuestionId}, {userAnswer}::jsonb, {answer.IsCorrect}, {snapshot}::jsonb)
+                        """, ct);
+                }
+
                 await _db.Database.ExecuteSqlInterpolatedAsync($"""
                     update public.user_lesson_progress
                     set quiz_attempts   = quiz_attempts + 1,
@@ -226,6 +241,69 @@ namespace SE347.Services
                     attemptId.Single(), (short)correctCount, (short)totalCount, score, awardedXp, completesNow, progress));
             }, cancellationToken);
         }
+
+        public async Task<ProgressResult<QuizSubmissionResultDto>> GetLatestQuizAttemptAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default)
+        {
+            var progress = await GetLessonProgressAsync(userId, lessonId, cancellationToken);
+            if (progress.Error != ProgressError.None)
+            {
+                return ProgressResult<QuizSubmissionResultDto>.Fail(progress.Error, progress.Detail);
+            }
+
+            // Chỉ chọn cột có từ migration 20261111141500 (không đọc expires_at / question_order của Sprint 3)
+            var attempt = await _db.UserQuizAttempts
+                .AsNoTracking()
+                .Where(a => a.UserId == userId && a.LessonId == lessonId && a.AttemptType == UserQuizAttempt.TypeLessonQuiz)
+                .OrderByDescending(a => a.Id)
+                .Select(a => new { a.Id, a.CorrectCount, a.TotalCount, a.Score, a.XpAwarded })
+                .FirstOrDefaultAsync(cancellationToken);
+            if (attempt is null)
+            {
+                return ProgressResult<QuizSubmissionResultDto>.Fail(ProgressError.QuizAttemptNotFound);
+            }
+
+            var rows = await _db.UserQuizAttemptAnswers
+                .AsNoTracking()
+                .Where(a => a.AttemptId == attempt.Id)
+                .OrderBy(a => a.Id)
+                .Select(a => new { a.QuestionKey, a.IsCorrect, a.UserAnswer, a.QuestionSnapshot })
+                .ToListAsync(cancellationToken);
+
+            var questions = new List<QuizQuestionResultDto>();
+            foreach (var row in rows)
+            {
+                var snapshot = row.QuestionSnapshot is null ? null : JsonSerializer.Deserialize<QuizAnswerSnapshot>(row.QuestionSnapshot, SnapshotJson);
+                if (snapshot is null)
+                {
+                    // Không đủ dữ liệu dựng lại câu: trả rỗng thay vì danh sách thiếu câu
+                    questions.Clear();
+                    break;
+                }
+
+                questions.Add(new QuizQuestionResultDto(row.QuestionKey, snapshot.Type, row.IsCorrect,
+                    JsonSerializer.Deserialize<List<string>>(row.UserAnswer) ?? [],
+                    snapshot.CorrectAnswer, snapshot.Explanation, snapshot.Translation));
+            }
+
+            if (questions.Count != attempt.TotalCount)
+            {
+                questions.Clear();
+            }
+
+            // XP chỉ được cộng ở lần nộp làm bài chuyển sang completed (RecordQuizAttemptAsync)
+            var result = new QuizAttemptResultDto(attempt.Id, attempt.CorrectCount, attempt.TotalCount, attempt.Score,
+                attempt.XpAwarded, LessonCompletedNow: attempt.XpAwarded > 0, progress.Value!);
+            return ProgressResult<QuizSubmissionResultDto>.Ok(new QuizSubmissionResultDto(result, questions));
+        }
+
+        /// <summary>user_quiz_attempt_answers.question_snapshot của quiz bài học.</summary>
+        private sealed record QuizAnswerSnapshot(
+            LessonQuizQuestionType Type,
+            IReadOnlyList<string> CorrectAnswer,
+            string Explanation,
+            string Translation);
+
+        private static readonly JsonSerializerOptions SnapshotJson = new(JsonSerializerDefaults.Web);
 
         public Task<ProgressResult<LessonProgressDto>> MarkLessonCompletedAsync(Guid userId, string lessonId, int xp, CancellationToken cancellationToken = default)
         {
