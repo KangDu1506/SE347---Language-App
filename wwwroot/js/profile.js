@@ -57,43 +57,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     let loadedState = null;
     let isLoading = false;
 
-    function initialsFrom(name, username, email) {
-        const clean = String(name || username || email?.split('@')[0] || 'U').trim();
-        const parts = clean.split(/\s+/).filter(Boolean);
-        if (parts.length >= 2) {
-            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-        }
-        return clean.slice(0, 2).toUpperCase();
-    }
-
-    function resolveAvatarUrl(avatarPath) {
-        const clean = String(avatarPath || '').trim();
-        if (!clean) return null;
-        if (/^(https?:\/\/|\/)/i.test(clean)) return clean;
-        if (!supabaseUrl) return null;
-        const normalized = clean.replace(/^\/+/, '').replace(/^avatars\/+/, '');
-        if (!normalized) return null;
-        const encoded = normalized.split('/').map(encodeURIComponent).join('/');
-        return `${supabaseUrl}/storage/v1/object/public/avatars/${encoded}`;
-    }
-
     function renderAvatar(displayName, username, email, avatarPath) {
         if (!avatarEl) return;
-        const initials = initialsFrom(displayName, username, email);
-        const url = resolveAvatarUrl(avatarPath);
-        if (!url) {
-            avatarEl.textContent = initials;
+        if (window.AppUserBadge) {
+            window.AppUserBadge.renderAvatar(avatarEl, {
+                displayName,
+                username,
+                email,
+                avatarPath,
+                imgClass: 'profile-avatar__img',
+                alt: displayName || username || '',
+                supabaseUrl
+            });
             return;
         }
-
-        const img = document.createElement('img');
-        img.className = 'profile-avatar__img';
-        img.alt = displayName || username || '';
-        img.src = url;
-        img.addEventListener('error', () => {
-            avatarEl.textContent = initials;
-        }, { once: true });
-        avatarEl.replaceChildren(img);
+        avatarEl.textContent = String(displayName || username || email?.split('@')[0] || 'U').trim().slice(0, 2).toUpperCase();
     }
 
     function parseDateValue(value) {
@@ -126,6 +104,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const displayName = profile?.displayName || profile?.username || fallbackName || t('profile.default_name', 'Người học');
 
         renderAvatar(displayName, profile?.username || meta.username, email, profile?.avatarPath);
+        if (profile) {
+            window.AppUserBadge?.syncProfile(profile, authUser);
+        }
 
         if (titleEl) {
             titleEl.removeAttribute('data-i18n');

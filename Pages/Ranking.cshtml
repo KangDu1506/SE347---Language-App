@@ -2,20 +2,23 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Bảng xếp hạng";
+    ViewData["NoticeSectionKey"] = "ui.leaderboard";
+    ViewData["NoticeSectionFallback"] = "Bảng xếp hạng";
+    ViewData["NoticeDescriptionKey"] = "ui.ranking_in_development_desc";
+    ViewData["NoticeDescriptionFallback"] = "Tính năng bảng xếp hạng đang được xây dựng và sẽ sớm ra mắt. Bạn hãy tiếp tục học tập và quay lại sau nhé!";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/Ranking.css" />
+    <link rel="stylesheet" href="~/css/Shared/UnderDevelopment.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/Ranking.css" asp-append-version="true" />
 }
 
 @section Scripts {
     <partial name="_SupabaseClient" />
     <script src="~/js/auth-guard.js" asp-append-version="true" defer></script>
-    <script src="~/js/ranking.js" defer></script>
+    <script src="~/js/ranking.js" asp-append-version="true" defer></script>
 }
 
-		<main class="ranking-page">
-			<header class="ranking-header"><div><p class="ranking-eyebrow" data-i18n="ui.learning_community">Cộng đồng học tập</p><h1 data-i18n="ui.leaderboard">Bảng xếp hạng</h1><p data-i18n="ui.compete_with_this_week_s_most_active_learners">Thi đua cùng những người học tích cực nhất tuần này.</p></div><svg class="foxy ranking-fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg></header>
-			<nav class="ranking-tabs" aria-label="Phạm vi bảng xếp hạng" data-i18n-aria-label="ui.leaderboard_period"><button class="ranking-tab ranking-tab--active" type="button" data-i18n="ui.this_week">Tuần này</button><button class="ranking-tab" type="button" data-i18n="ui.this_month">Tháng này</button><button class="ranking-tab" type="button" data-i18n="ui.all">Tất cả</button></nav>
-			<section class="ranking-table-wrap" aria-labelledby="ranking-title"><div class="ranking-table-heading"><h2 id="ranking-title" data-i18n="ui.top_learners">Top người học</h2><span data-i18n="ui.xp_points">Điểm XP</span></div><div class="ranking-table"><div class="ranking-row ranking-row--header"><span data-i18n="ui.rank">Hạng</span><span data-i18n="ui.learner">Người học</span><span data-i18n="ui.progress">Tiến độ</span><span data-i18n="ui.points">Điểm</span></div><div class="ranking-row ranking-row--highlight"><strong>01</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--gold">ML</i><b>Mai Linh</b></span><span class="ranking-bar"><i style="width: 92%"></i></span><strong>4,820</strong></div><div class="ranking-row"><strong>02</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--blue">TN</i><b>Trần Nam</b></span><span class="ranking-bar"><i style="width: 84%"></i></span><strong>4,360</strong></div><div class="ranking-row"><strong>03</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--green">HP</i><b>Hà Phương</b></span><span class="ranking-bar"><i style="width: 76%"></i></span><strong>3,940</strong></div><div class="ranking-row ranking-row--you"><strong>12</strong><span class="ranking-user"><i class="ranking-avatar ranking-avatar--self">NA</i><b>Nguyễn An <small data-i18n="ui.you">Bạn</small></b></span><span class="ranking-bar"><i style="width: 54%"></i></span><strong>2,840</strong></div></div></section>
-		</main>
+<main class="ranking-page dev-notice-page">
+    <partial name="_UnderDevelopmentNotice" />
+</main>

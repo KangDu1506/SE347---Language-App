@@ -1,37 +1,96 @@
 @*
     Header dùng chung (SCRUM-32), render trong _Layout.
     Ẩn header: ViewData["ShowHeader"] = false (ví dụ trang làm bài).
-    Trên màn hình ≤ 760px, .site-nav chuyển thành thanh tab cố định ở đáy.
+    Trên màn hình ≤ 760px, 4 mục điều hướng chính + Đăng xuất + Tùy chọn giao diện nằm trong menu nổi bên trái; nút Hồ sơ nằm ở góc phải header.
 *@
 @{
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
-    var links = new (string Href, string Label, string Icon)[]
+    var drawerLinks = new (string Href, string Label, string I18nKey, string Icon)[]
     {
-        ("/Index", "Trang chủ", "M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"),
-        ("/Study", "Học tập", "M4 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4zm16 0h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"),
-        ("/TrialTest", "Thi thử", "M9 3h6v3H9zM5 5h2v3h10V5h2v16H5zm4 8 2 2 4-4"),
-        ("/Ranking", "Xếp hạng", "M4 21V11h4v10zm6 0V4h4v17zm6 0v-7h4v7z"),
-        ("/Account/Profile", "Hồ sơ", "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-8 9a8 8 0 0 1 16 0z")
+        ("/Index", "Trang chủ", "ui.home", "M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"),
+        ("/Study", "Học tập", "ui.study", "M4 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4zm16 0h-7a3 3 0 0 0-3 3v14a2 2 0 0 1 2-2h8z"),
+        ("/TrialTest", "Thi thử", "ui.practice_test", "M9 3h6v3H9zM5 5h2v3h10V5h2v16H5zm4 8 2 2 4-4"),
+        ("/Ranking", "Xếp hạng", "ui.rankings", "M4 21V11h4v10zm6 0V4h4v17zm6 0v-7h4v7z")
     };
+    var isProfileActive = string.Equals(currentPage, "/Account/Profile", StringComparison.OrdinalIgnoreCase);
 }
-<header class="site-header">
+<header class="site-header" data-site-header>
     <div class="site-header__inner">
+        <button class="site-header__menu-btn"
+                type="button"
+                data-drawer-open
+                aria-controls="mobile-nav-drawer"
+                aria-expanded="false"
+                aria-label="Mở menu điều hướng"
+                data-i18n-aria-label="ui.open_menu"
+                title="Mở menu điều hướng"
+                data-i18n-title="ui.open_menu">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+        </button>
+
         <partial name="_Brand" />
 
-        <nav class="site-nav" aria-label="Điều hướng chính" data-i18n-aria-label="ui.main_navigation">
-            @foreach (var link in links)
-            {
-                // Trang chi tiết bài học thuộc mục Học tập
-                var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase)
-                    || (link.Href == "/Study" && string.Equals(currentPage, "/Lesson", StringComparison.OrdinalIgnoreCase));
-                <a class="site-nav__link@(isActive ? " is-active" : string.Empty)" href="@link.Href" aria-current="@(isActive ? "page" : null)">
-                    <svg class="site-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="@link.Icon" /></svg>
-                    <span data-i18n="@(link.Href switch { "/Index" => "ui.home", "/Study" => "ui.study", "/TrialTest" => "ui.practice_test", "/Ranking" => "ui.rankings", _ => "ui.profile" })">@link.Label</span>
-                </a>
-            }
-        </nav>
+        <div class="site-drawer__backdrop" data-drawer-backdrop aria-hidden="true"></div>
 
-        <a class="site-header__logout" href="/Account/Login?logout=1"><span data-i18n="ui.log_out">Đăng xuất</span></a>
-        <partial name="_PreferencesMenu" />
+        <div class="site-drawer"
+             id="mobile-nav-drawer"
+             data-site-drawer
+             aria-label="Điều hướng chính"
+             data-i18n-aria-label="ui.main_navigation">
+            <div class="site-drawer__header">
+                <span class="site-drawer__brand">
+                    <span class="brand__badge" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><use href="/images/mascot/foxy.svg#foxy-head" /></svg></span>
+                    <span class="brand__name" aria-hidden="true">word<b>fox</b></span>
+                </span>
+                <button class="site-drawer__close"
+                        type="button"
+                        data-drawer-close
+                        aria-label="Đóng menu điều hướng"
+                        data-i18n-aria-label="ui.close_menu"
+                        title="Đóng menu điều hướng"
+                        data-i18n-title="ui.close_menu">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M6 6l12 12M18 6 6 18" />
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="site-nav" aria-label="Điều hướng chính" data-i18n-aria-label="ui.main_navigation">
+                @foreach (var link in drawerLinks)
+                {
+                    // Trang chi tiết bài học thuộc mục Học tập
+                    var isActive = string.Equals(currentPage, link.Href, StringComparison.OrdinalIgnoreCase)
+                        || (link.Href == "/Study" && string.Equals(currentPage, "/Lesson", StringComparison.OrdinalIgnoreCase));
+                    <a class="site-nav__link@(isActive ? " is-active" : string.Empty)" href="@link.Href" aria-current="@(isActive ? "page" : null)">
+                        <svg class="site-nav__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="@link.Icon" /></svg>
+                        <span data-i18n="@link.I18nKey">@link.Label</span>
+                    </a>
+                }
+            </nav>
+
+            <div class="site-drawer__footer">
+                <a class="site-header__logout" href="/Account/Login?logout=1">
+                    <svg class="site-header__logout-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+                    </svg>
+                    <span data-i18n="ui.log_out">Đăng xuất</span>
+                </a>
+                <partial name="_PreferencesMenu" />
+            </div>
+        </div>
+
+        <a class="site-nav__link site-nav__link--profile@(isProfileActive ? " is-active" : string.Empty)"
+           href="/Account/Profile"
+           data-header-profile
+           aria-current="@(isProfileActive ? "page" : null)"
+           aria-label="Hồ sơ cá nhân"
+           data-i18n-aria-label="ui.profile"
+           title="Hồ sơ cá nhân"
+           data-i18n-title="ui.profile">
+            <span class="header-profile__avatar" data-header-avatar aria-hidden="true">--</span>
+            <span class="header-profile__name" data-header-name data-i18n="profile.default_name">Người học</span>
+        </a>
     </div>
 </header>

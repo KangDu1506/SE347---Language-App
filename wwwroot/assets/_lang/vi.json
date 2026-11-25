@@ -748,5 +748,11 @@
     "lesson.attempts": "lần làm",
     "lesson.restored_feedback_note": "Phản hồi chi tiết từng câu chỉ hiển thị ngay sau khi nộp bài.",
     "flashcard.save_error": "Không lưu được tiến độ thẻ này. Vui lòng thử lại.",
-    "validation.username_check_failed": "Không kiểm tra được tên đăng nhập lúc này. Vui lòng thử lại."
+    "validation.username_check_failed": "Không kiểm tra được tên đăng nhập lúc này. Vui lòng thử lại.",
+    "ui.in_development_badge": "Đang phát triển",
+    "ui.in_development_title": "Trang đang trong quá trình phát triển",
+    "ui.ranking_in_development_desc": "Tính năng bảng xếp hạng đang được xây dựng và sẽ sớm ra mắt. Bạn hãy tiếp tục học tập và quay lại sau nhé!",
+    "ui.trial_in_development_desc": "Tính năng thi thử đang được xây dựng và sẽ sớm ra mắt. Bạn hãy tiếp tục luyện tập ở mục Học tập nhé!",
+    "ui.open_menu": "Mở menu điều hướng",
+    "ui.close_menu": "Đóng menu điều hướng"
 }

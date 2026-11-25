@@ -340,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) return;
             const profile = await response.json();
             if (requestedUserId && currentUser?.id !== requestedUserId) return;
+            window.AppUserBadge?.syncProfile(profile, currentUser);
             if (profile?.displayName && (!requestedUserId || !profile.id || profile.id === requestedUserId)) {
                 profileDisplayName = profile.displayName;
                 renderName();
@@ -373,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastData = null;
                 currentUser = null;
                 profileDisplayName = '';
+                window.AppUserBadge?.clearCache();
                 views.ready.replaceChildren();
                 streakCard.hidden = true;
                 page.hidden = true;

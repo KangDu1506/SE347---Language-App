@@ -126,8 +126,12 @@ html[lang="en"] .app-preferences__en { display: block; }
 ::placeholder { color: var(--text-secondary); opacity: 1; }
 /* Text may wrap; preserve the controls and their surrounding layout. */
 .home-actions > a { flex: 1; text-align: center; }
-.site-nav__link { justify-content: center; min-width: 0; }
-.site-nav__link span { overflow-wrap: anywhere; text-align: center; }
+.site-nav__link { min-width: 0; }
+@media (min-width: 761px) {
+    .site-nav__link { justify-content: center; }
+    .site-nav__link span { overflow-wrap: anywhere; text-align: center; }
+}
+.site-drawer .site-nav__link span { overflow-wrap: anywhere; }
 .site-nav__icon { flex-shrink: 0; }
 .home-course-grid > *, .study-grid > *, .profile-content > *, .quiz-form-grid > * { min-width: 0; }
 .home-course-card, .study-card, .profile-panel { overflow-wrap: anywhere; }
@@ -138,8 +142,7 @@ html[lang="en"] .app-preferences__en { display: block; }
 }
 @media (max-width: 1000px) and (min-width: 761px) {
     .site-header__inner { flex-wrap: wrap; gap: var(--space-3); padding-block: var(--space-3); }
-    .site-nav { order: 2; flex-basis: 100%; }
-    .site-header__logout { margin-left: auto; }
+    .site-nav { order: 4; flex-basis: 100%; }
 }
 @media (max-width: 430px) {
     .ranking-row { grid-template-columns: 30px minmax(0, 1fr) 60px; gap: 8px; padding-inline: 10px; }

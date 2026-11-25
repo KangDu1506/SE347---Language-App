@@ -2,6 +2,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('logout') === '1') {
         try {
+            sessionStorage.removeItem('wordfox.headerProfile');
+        } catch {
+            // Bỏ qua nếu trình duyệt chặn sessionStorage
+        }
+        try {
             await window.sb?.auth.signOut();
         } catch {
             // Tiếp tục xóa query logout ngay cả khi mạng lỗi

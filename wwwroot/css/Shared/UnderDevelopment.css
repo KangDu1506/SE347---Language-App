@@ -1,0 +1,186 @@
+/* Bố cục thông báo giữa trang cho các tính năng đang phát triển (dùng bởi Ranking & TrialTest).
+   Tôn trọng [hidden] do auth-guard.js đặt trong lúc xác thực phiên Supabase. */
+.dev-notice-page[hidden] {
+    display: none;
+}
+
+.dev-notice-page:not([hidden]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(1240px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: clamp(28px, 6vh, 64px) 0;
+}
+
+.dev-notice-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    width: min(560px, 100%);
+    padding: clamp(28px, 5vw, 44px) clamp(20px, 5vw, 40px);
+    border: var(--border-sticker);
+    border-radius: 24px;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sticker);
+    text-align: center;
+}
+
+.dev-notice-card__badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.dev-notice-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 2px solid var(--ink);
+    border-radius: var(--radius-pill);
+    color: var(--paper-text);
+    font-family: var(--font-sans);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-heavy);
+    line-height: 1.2;
+}
+
+.dev-notice-card__badge--section {
+    background: var(--surface-sand);
+}
+
+.dev-notice-card__badge--status {
+    background: var(--surface-orange);
+}
+
+.dev-notice-card__badge--status::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.dev-notice-card__mascot {
+    margin: var(--space-2) 0 0;
+}
+
+.dev-notice-card__fox {
+    display: block;
+    width: 136px;
+    height: 136px;
+    margin: 0 auto;
+}
+
+.dev-notice-card__title {
+    margin: 0;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: clamp(1.375rem, 2.5vw, 1.875rem);
+    font-weight: var(--fw-heavy);
+    line-height: 1.25;
+}
+
+.dev-notice-card__desc {
+    max-width: 44ch;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.dev-notice-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-3);
+    width: 100%;
+    margin-top: var(--space-2);
+}
+
+.dev-notice-btn {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0 var(--space-5);
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-sans);
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-heavy);
+    text-decoration: none;
+    transition: transform .12s ease, box-shadow .12s ease, background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.dev-notice-btn--primary {
+    color: var(--paper-text);
+    background: var(--surface-orange);
+    box-shadow: var(--shadow-sticker-sm);
+}
+
+.dev-notice-btn--primary:hover {
+    color: var(--paper-text);
+    background: var(--surface-sand);
+    box-shadow: var(--shadow-sticker);
+    transform: translate(-1px, -1px);
+}
+
+.dev-notice-btn--secondary {
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+
+.dev-notice-btn--secondary:hover {
+    color: var(--paper-text);
+    background: var(--surface-sand);
+    box-shadow: var(--shadow-sticker-sm);
+    transform: translate(-1px, -1px);
+}
+
+.dev-notice-btn:active {
+    box-shadow: none;
+    transform: translate(1px, 1px);
+}
+
+.dev-notice-btn:focus-visible {
+    outline: 3px solid var(--color-secondary);
+    outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+    .dev-notice-page:not([hidden]) {
+        width: calc(100% - 32px);
+        padding: clamp(20px, 4vh, 40px) 0;
+    }
+
+    .dev-notice-card__fox {
+        width: 112px;
+        height: 112px;
+    }
+
+    .dev-notice-card__actions {
+        flex-direction: column;
+    }
+
+    .dev-notice-btn {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dev-notice-btn {
+        transition: none;
+    }
+
+    .dev-notice-btn:hover,
+    .dev-notice-btn:active {
+        transform: none;
+    }
+}

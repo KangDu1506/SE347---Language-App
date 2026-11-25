@@ -748,5 +748,11 @@
     "lesson.attempts": "attempts",
     "lesson.restored_feedback_note": "Detailed per-question feedback is shown on the Result page.",
     "flashcard.save_error": "Could not save progress for this card. Please try again.",
-    "validation.username_check_failed": "Could not verify username availability right now. Please try again."
+    "validation.username_check_failed": "Could not verify username availability right now. Please try again.",
+    "ui.in_development_badge": "In development",
+    "ui.in_development_title": "This page is under development",
+    "ui.ranking_in_development_desc": "The leaderboard feature is currently under construction and will launch soon. Keep studying and check back later!",
+    "ui.trial_in_development_desc": "The practice test feature is currently under construction and will launch soon. Keep practicing in the Study section!",
+    "ui.open_menu": "Open navigation menu",
+    "ui.close_menu": "Close navigation menu"
 }

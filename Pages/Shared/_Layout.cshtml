@@ -55,6 +55,10 @@
         }
 
         <script src="~/js/Shared/toast.js"></script>
+        @if (showHeader)
+        {
+            <script src="~/js/Shared/navigation.js" asp-append-version="true" defer></script>
+        }
         @await RenderSectionAsync("Scripts", required: false)
     </body>
 </html>

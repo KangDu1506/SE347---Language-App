@@ -1,0 +1,30 @@
+@{
+    var sectionKey = ViewData["NoticeSectionKey"] as string ?? "";
+    var sectionFallback = ViewData["NoticeSectionFallback"] as string ?? "";
+    var descriptionKey = ViewData["NoticeDescriptionKey"] as string ?? "";
+    var descriptionFallback = ViewData["NoticeDescriptionFallback"] as string ?? "";
+}
+
+<section class="dev-notice-card" aria-labelledby="dev-notice-title">
+    <div class="dev-notice-card__badges">
+        @if (!string.IsNullOrEmpty(sectionKey))
+        {
+            <span class="dev-notice-card__badge dev-notice-card__badge--section" data-i18n="@sectionKey">@sectionFallback</span>
+        }
+        <span class="dev-notice-card__badge dev-notice-card__badge--status" data-i18n="ui.in_development_badge">Đang phát triển</span>
+    </div>
+
+    <div class="dev-notice-card__mascot">
+        <svg class="dev-notice-card__fox" aria-hidden="true">
+            <use href="/images/mascot/foxy.svg#foxy-wave" />
+        </svg>
+    </div>
+
+    <h1 id="dev-notice-title" class="dev-notice-card__title" data-i18n="ui.in_development_title">Trang đang trong quá trình phát triển</h1>
+    <p class="dev-notice-card__desc" data-i18n="@descriptionKey">@descriptionFallback</p>
+
+    <div class="dev-notice-card__actions">
+        <a class="dev-notice-btn dev-notice-btn--primary" href="/Study" data-i18n="lesson.back_to_study">&#8592; Về trang Học tập</a>
+        <a class="dev-notice-btn dev-notice-btn--secondary" href="/Index" data-i18n="ui.back_to_home">Quay lại trang chủ</a>
+    </div>
+</section>
