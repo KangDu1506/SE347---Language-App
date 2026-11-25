@@ -489,6 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
             || boardNodes.find(n => n.state === 'current')?.element;
         if (currentEl) currentEl.prepend(createFoxToken());
 
+        const levelEl = document.querySelector('[data-board-level]');
+        const currentLevel = currentEl?.dataset.level;
+        if (levelEl && currentLevel) levelEl.textContent = currentLevel;
+
         const completed = Number.isInteger(board?.completedCount) ? board.completedCount : boardNodes.filter(n => n.state === 'done').length;
         document.querySelectorAll('[data-board-completed]').forEach(el => { el.textContent = String(completed); });
 

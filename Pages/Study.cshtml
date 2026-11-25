@@ -37,8 +37,9 @@
         <section class="study-head" aria-labelledby="study-title">
             <h1 id="study-title"><span data-i18n="study.title_a">Học</span> <span class="study-head__accent" data-i18n="study.title_b">tập</span></h1>
             <div class="sticker study-level">
-                <b>A2</b>
-                <p><span data-i18n="study.level_name">Lộ trình Sơ cấp</span><small><span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_unit">bài</span> · 1.247 <span data-i18n="study.oxford_words">từ Oxford</span></small></p>
+                @* Trình độ: của bài đang học (study.js cập nhật từ /board); trước khi tải xong dùng trình độ bài đầu lộ trình *@
+                <b data-board-level>@(BoardNodes.FirstOrDefault()?.Level ?? "A1")</b>
+                <p><span lang="en">@(LearningPath?.Title ?? string.Empty)</span><small><span data-board-completed>0</span>/@TotalBoardCount <span data-i18n="study.lessons_unit">bài</span></small></p>
             </div>
         </section>
 

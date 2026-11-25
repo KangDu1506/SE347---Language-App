@@ -1,5 +1,5 @@
 const protectedPage = document.querySelector(
-    '.home-page, .study-page, .profile-page, .ranking-page, .trial-page, .create-quiz-page, .lesson-detail-page'
+    '.home-page, .study-page, .profile-page, .ranking-page, .trial-page, .create-quiz-page'
 );
 const localAuthBypassEnabled = document.querySelector('meta[name="local-auth-bypass"]')?.content === 'true';
 const hasTestSessionToken = (() => {

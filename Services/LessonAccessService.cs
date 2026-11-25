@@ -61,5 +61,25 @@ namespace SE347.Services
 
             return LessonUnlockRule.IsUnlocked(prerequisites, completed, alreadyOpened) ? LessonAccess.Allowed : LessonAccess.Locked;
         }
+
+        public async Task<LessonLockState> GetLockStateAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            var statusByLesson = await _db.UserLessonProgresses
+                .AsNoTracking()
+                .Where(p => p.UserId == userId)
+                .ToDictionaryAsync(p => p.LessonId, p => p.Status, StringComparer.Ordinal, cancellationToken);
+
+            var completed = statusByLesson
+                .Where(p => p.Value == UserLessonProgress.StatusCompleted)
+                .Select(p => p.Key)
+                .ToHashSet(StringComparer.Ordinal);
+
+            var locked = _lessons.GetAll()
+                .Select(l => l.LessonId)
+                .Where(id => !LessonUnlockRule.IsUnlocked(_lessons.GetPrerequisites(id), completed, statusByLesson.ContainsKey(id)))
+                .ToHashSet(StringComparer.Ordinal);
+
+            return new LessonLockState(statusByLesson, locked);
+        }
     }
 }

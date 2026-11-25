@@ -3,10 +3,13 @@
 ## Route
 
 `/Result/{lessonId}`: điểm, số câu đúng/sai, thời gian, XP, đáp án đúng, giải thích và các câu cần ôn
-của lượt mini-game vừa làm. Nút **Làm lại** mở `/MiniGame/{lessonId}`, **Về bài học** mở `/Lesson/{lessonId}`,
+của lượt làm bài kiểm tra gần nhất. Nút **Làm lại** mở bài kiểm tra cuối trang bài học `/Lesson/{lessonId}#lesson-quiz`
+(chưa có trang `/MiniGame` riêng), **Về bài học** mở `/Lesson/{lessonId}`,
 **Ôn từ bằng Flashcard** (chỉ hiện khi có câu sai) mở `/Flashcard/{lessonId}`.
 
-Route mini-game nằm ở hằng `playUrl` trong `wwwroot/js/result.js`. Nếu SCRUM-59 dùng route khác thì sửa ở đó.
+Route làm lại nằm ở hằng `playUrl` trong `wwwroot/js/result.js`. Nếu SCRUM-59 làm trang mini-game riêng thì sửa ở đó.
+
+Trang bài học (`lesson.js`) sau khi nộp bài kiểm tra gọi `QuizResult.save` và hiện nút **Xem kết quả chi tiết →** sang trang này.
 
 ## Mini-game nối sang trang Kết quả
 
@@ -23,7 +26,10 @@ location.assign(QuizResult.resultUrl(id));
 
 - `result` là nguyên response `QuizSubmissionResultDto` (`attempt` + `questions`). `save` trả `false` nếu sai shape.
 - Lưu trong `sessionStorage`, key `se347.quiz-result.v1:<scope>:<lessonId>`, scope `user:<Supabase user id>`
-  (hoặc `local` khi không có phiên). Reload trang Kết quả vẫn còn, đóng tab thì mất, tài khoản khác không đọc được.
+  (hoặc `local` khi không có phiên). Reload trang Kết quả vẫn còn, tài khoản khác không đọc được.
+- Đóng tab (sessionStorage trống): trang Kết quả đọc lại lần nộp gần nhất từ DB qua
+  `GET /api/progress/lessons/{lessonId}/quiz/latest` (S3-19, cùng shape với response nộp bài) rồi lưu lại vào sessionStorage.
+  404 `quiz_attempt_not_found` hoặc lần nộp cũ không có chi tiết từng câu → hiện trạng thái "Chưa có kết quả".
 - Thời gian do client đo. Không truyền thì ô Thời gian hiện `—`.
 
 ## Dữ liệu trang dùng
