@@ -49,6 +49,18 @@ namespace SE347.Endpoints
                 return ToResult(await progress.GetLessonProgressAsync(userId, lessonId, ct));
             });
 
+            // GET /api/progress/lessons/{lessonId}/quiz/latest: lần nộp quiz gần nhất, cùng shape với POST .../quiz,
+            // để trang Kết quả đọc lại từ DB khi đã đóng tab (404 quiz_attempt_not_found nếu chưa nộp lần nào)
+            group.MapGet("/lessons/{lessonId}/quiz/latest", async (string lessonId, ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await progress.GetLatestQuizAttemptAsync(userId, lessonId, ct));
+            });
+
             // POST /api/progress/lessons/{lessonId}/open: ghi nhận user mở bài học (403 nếu bài đang khóa)
             group.MapPost("/lessons/{lessonId}/open", async (string lessonId, ClaimsPrincipal user, IProgressService progress, CancellationToken ct) =>
             {
@@ -69,6 +81,17 @@ namespace SE347.Endpoints
                 }
 
                 return ToResult(await results.CompleteContentAsync(userId, lessonId, contentId, ct));
+            }).AddEndpointFilter(RequireUnlockedLesson);
+
+            // POST /api/progress/lessons/{lessonId}/quiz/check: chấm một câu ngay trong mini-game, không ghi attempt/XP.
+            group.MapPost("/lessons/{lessonId}/quiz/check", async (string lessonId, QuizAnswerDto request, ClaimsPrincipal user, ILearningResultService results, CancellationToken ct) =>
+            {
+                if (user.GetUserId() is not Guid userId)
+                {
+                    return Results.Unauthorized();
+                }
+
+                return ToResult(await results.CheckQuizAnswerAsync(lessonId, request));
             }).AddEndpointFilter(RequireUnlockedLesson);
 
             // POST /api/progress/lessons/{lessonId}/quiz: nộp quiz / mini-game, body { answers: [{ questionId, answer: [...] }] }.
@@ -126,6 +149,7 @@ namespace SE347.Endpoints
             ProgressError.QuizNotFound => Results.NotFound(new { error = "Bài học không có quiz." }),
             ProgressError.QuizRequired => Results.Conflict(new { error = "Bài học có quiz, hãy nộp quiz để hoàn thành bài." }),
             ProgressError.ContentsIncomplete => Results.Conflict(new { error = "Chưa học hết các mục nội dung của bài." }),
+            ProgressError.QuizAttemptNotFound => Results.NotFound(new { error = "Bạn chưa nộp quiz của bài này.", code = "quiz_attempt_not_found" }),
             _ => Results.BadRequest(new { error = result.Detail ?? "Dữ liệu không hợp lệ." }),
         };
     }

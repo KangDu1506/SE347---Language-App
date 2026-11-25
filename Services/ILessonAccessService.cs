@@ -23,5 +23,14 @@ namespace SE347.Services
 
         /// <summary>Gọi sau khi đã biết bài tồn tại.</summary>
         Task<LessonAccess> CheckLessonAsync(Guid userId, string lessonId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Tiến độ của user với mọi bài đã mở (lessonId -> "in_progress" / "completed") và tập bài đang khóa,
+        /// cùng quy tắc với <see cref="CheckLessonAsync"/> (dùng cho cờ isLocked ở GET /api/lessons, 1 truy vấn DB).
+        /// Gọi sau khi đã kiểm tra hồ sơ active.
+        /// </summary>
+        Task<LessonLockState> GetLockStateAsync(Guid userId, CancellationToken cancellationToken = default);
     }
+
+    public sealed record LessonLockState(IReadOnlyDictionary<string, string> StatusByLesson, IReadOnlySet<string> LockedLessonIds);
 }
