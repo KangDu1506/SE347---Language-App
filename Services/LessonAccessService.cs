@@ -47,14 +47,19 @@ namespace SE347.Services
                 return LessonAccess.Allowed;
             }
 
-            var completed = await _db.UserLessonProgresses
+            var progress = await _db.UserLessonProgresses
                 .AsNoTracking()
-                .Where(p => p.UserId == userId
-                    && prerequisites.Contains(p.LessonId)
-                    && p.Status == UserLessonProgress.StatusCompleted)
-                .CountAsync(cancellationToken);
+                .Where(p => p.UserId == userId && (p.LessonId == lessonId || prerequisites.Contains(p.LessonId)))
+                .Select(p => new { p.LessonId, p.Status })
+                .ToListAsync(cancellationToken);
 
-            return completed == prerequisites.Count ? LessonAccess.Allowed : LessonAccess.Locked;
+            var completed = progress
+                .Where(p => p.Status == UserLessonProgress.StatusCompleted)
+                .Select(p => p.LessonId)
+                .ToHashSet(StringComparer.Ordinal);
+            var alreadyOpened = progress.Any(p => p.LessonId == lessonId);
+
+            return LessonUnlockRule.IsUnlocked(prerequisites, completed, alreadyOpened) ? LessonAccess.Allowed : LessonAccess.Locked;
         }
     }
 }

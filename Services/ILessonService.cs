@@ -35,10 +35,17 @@ namespace SE347.Services
         IReadOnlyList<LessonQuizQuestionDto>? GetQuizQuestions(string lessonId);
 
         /// <summary>
-        /// LessonId phải học xong trước khi mở bài (khai báo "prerequisites" trong LearningPath.json).
-        /// Rỗng với bài lẻ, bài không khai báo prerequisites hoặc bài không tồn tại.
+        /// LessonId phải học xong trước khi mở bài: bài mạch chính cần bài mạch chính liền trước,
+        /// bài trong nhánh cần các bài khai báo "prerequisites" trong LearningPath.json.
+        /// Rỗng với bài lẻ, bài đầu lộ trình hoặc bài không tồn tại.
         /// </summary>
         IReadOnlyList<string> GetPrerequisites(string lessonId);
+
+        /// <summary>Bố cục các lộ trình (mạch chính + nhánh) chỉ gồm bài đã nạp được, sắp theo tên folder lộ trình.</summary>
+        IReadOnlyList<LearningPathLayout> GetLearningPaths();
+
+        /// <summary>Id lộ trình đầu tiên chứa bài; null nếu là bài lẻ.</summary>
+        string? GetLearningPathId(string lessonId);
 
         /// <summary>
         /// Đường dẫn đầy đủ tới file audio/ảnh/txt của bài học (assetPath tương đối với folder bài học).

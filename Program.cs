@@ -67,6 +67,7 @@ builder.Services.AddSingleton<ILessonService, LessonService>();
 builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
 builder.Services.AddScoped<IProgressService, ProgressService>();
 builder.Services.AddScoped<ILessonAccessService, LessonAccessService>();
+builder.Services.AddScoped<ILearningPathService, LearningPathService>();
 builder.Services.AddScoped<ILearningResultService, LearningResultService>();
 
 // CORS chỉ dùng khi dev: frontend chạy ở origin khác (Live Server, Vite) gọi /api/*.
@@ -183,6 +184,7 @@ app.MapUserEndpoints();
 app.MapAuthEndpoints();
 app.MapProgressEndpoints();
 app.MapLessonEndpoints();
+app.MapLearningPathEndpoints();
 app.MapHealthEndpoints();
 
 // robots.txt và sitemap.xml luôn phản ánh host hiện tại, không bị khóa vào hostname môi trường deploy.
