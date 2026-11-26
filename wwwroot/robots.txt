@@ -1,10 +1,7 @@
 User-agent: *
 Allow: /
-Disallow: /Index
-Disallow: /Study
-Disallow: /TrialTest
-Disallow: /Ranking
-Disallow: /CreateQuiz
+Allow: /Lesson/
+Allow: /Account/Terms
 Disallow: /Account/Profile
 Disallow: /Account/Login
 Disallow: /Account/Signup
