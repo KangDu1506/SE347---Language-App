@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /Lesson/
+Allow: /Account/Terms
+Disallow: /api/
+
+Sitemap: https://hononu-ead7cjd2f2ftb4hr.malaysiawest-01.azurewebsites.net/sitemap.xml

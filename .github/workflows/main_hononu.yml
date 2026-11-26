@@ -18,6 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+
+      - name: Generate sitemap from lesson catalog
+        run: node tools/generate-sitemap.mjs
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
