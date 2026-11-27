@@ -56,7 +56,7 @@ namespace SE347.Tests
         }
 
         /// <summary>Tạo hồ sơ với status cho trước, trả về user id.</summary>
-        public async Task<Guid> CreateUserAsync(string status = "active")
+        public async Task<Guid> CreateUserAsync(string status = "active", string visibility = "private")
         {
             var userId = Guid.NewGuid();
             await WithDbAsync(db =>
@@ -67,6 +67,7 @@ namespace SE347.Tests
                     Username = $"u{userId:N}"[..20],
                     DisplayName = "Test user",
                     Status = status,
+                    ProfileVisibility = visibility,
                 });
             });
             return userId;
@@ -83,7 +84,7 @@ namespace SE347.Tests
             });
         });
 
-        private async Task WithDbAsync(Action<ApplicationDbContext> change)
+        public async Task WithDbAsync(Action<ApplicationDbContext> change)
         {
             using var scope = Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
