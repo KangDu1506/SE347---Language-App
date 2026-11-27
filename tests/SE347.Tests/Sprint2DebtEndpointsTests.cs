@@ -151,7 +151,8 @@ namespace SE347.Tests
 
             Assert.Equal(100, result!.Attempt.Score);
             Assert.Equal(20, result.Attempt.XpAwarded);
-            Assert.True(result.Attempt.LessonCompletedNow);
+            // Đọc lại lịch sử từ DB: không báo "vừa hoàn thành" dù lần nộp đó đã được cộng XP (ProgressService.GetLatestQuizAttemptAsync)
+            Assert.False(result.Attempt.LessonCompletedNow);
             Assert.Equal(lessonId, result.Attempt.Progress.LessonId);
             Assert.Equal(["q1", "q2"], result.Questions.Select(q => q.QuestionId));
             Assert.Equal(LessonQuizQuestionType.SingleChoice, result.Questions[0].Type);
