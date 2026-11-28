@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SE347.Data;
 using SE347.Models;
+using SE347.Services;
 
 namespace SE347.Tests
 {
@@ -23,6 +24,9 @@ namespace SE347.Tests
     public class LessonApiFactory : WebApplicationFactory<Program>
     {
         private readonly string _databaseName = $"lesson-tests-{Guid.NewGuid()}";
+
+        /// <summary>Thay Supabase Storage: test không gọi mạng, đọc lại file đã upload/xóa ở đây.</summary>
+        public FakeAvatarStorage AvatarStorage { get; } = new();
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -37,6 +41,8 @@ namespace SE347.Tests
                 services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
                 services.RemoveAll<IDbContextOptionsConfiguration<ApplicationDbContext>>();
                 services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase(_databaseName));
+                services.RemoveAll<IAvatarStorage>();
+                services.AddSingleton<IAvatarStorage>(AvatarStorage);
 
                 services.AddAuthentication(TestAuthHandler.SchemeName)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.SchemeName, _ => { });
@@ -83,12 +89,40 @@ namespace SE347.Tests
             });
         });
 
-        private async Task WithDbAsync(Action<ApplicationDbContext> change)
+        public async Task WithDbAsync(Action<ApplicationDbContext> change)
         {
             using var scope = Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             change(db);
             await db.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>IAvatarStorage giả: lưu file trong bộ nhớ, có thể cho lệnh xóa ném lỗi.</summary>
+    public class FakeAvatarStorage : IAvatarStorage
+    {
+        public System.Collections.Concurrent.ConcurrentDictionary<string, (byte[] Content, string ContentType)> Files { get; } = new();
+
+        public System.Collections.Concurrent.ConcurrentBag<string> Deleted { get; } = new();
+
+        public bool FailDeletes { get; set; }
+
+        public Task UploadAsync(string path, byte[] content, string contentType, CancellationToken cancellationToken = default)
+        {
+            Files[path] = (content, contentType);
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteAsync(string path, CancellationToken cancellationToken = default)
+        {
+            if (FailDeletes)
+            {
+                throw new AvatarStorageException("Storage giả đang lỗi.");
+            }
+
+            Deleted.Add(path);
+            Files.TryRemove(path, out _);
+            return Task.CompletedTask;
         }
     }
 

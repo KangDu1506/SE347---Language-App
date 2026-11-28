@@ -92,3 +92,90 @@ Lỗi trả về `{ error }`:
 | 403 | `code: "lesson_locked"`: bài đang khóa (chưa hoàn thành bài prerequisite). `code: "profile_inactive"`: tài khoản bị khóa hoặc đã xóa |
 | 404 | Không có bài học hoặc mục nội dung, hay nộp quiz cho bài không có quiz |
 | 409 | Gọi `/complete` cho bài có quiz, hoặc khi chưa học hết các mục nội dung |
+
+## Tự sửa hồ sơ, cài đặt và avatar (SCRUM-92)
+
+Cả bốn endpoint cần Bearer token. Server lấy user từ claim `sub` của token, body không có `userId`.
+
+| Method | URL | Dùng khi |
+|---|---|---|
+| PATCH | `/api/users/me` | Sửa hồ sơ và cài đặt. Trả `MyProfileDto` mới, cùng shape với `GET /api/users/me` |
+| POST | `/api/users/me/avatar` | Tải ảnh đại diện (multipart, field `file`). Trả `MyProfileDto` mới |
+| DELETE | `/api/users/me/avatar` | Gỡ ảnh đại diện, `avatarPath` thành `null`. Gọi khi chưa có ảnh vẫn trả 200 |
+| DELETE | `/api/users/me` | Tự vô hiệu hóa tài khoản: `status = "deactivated"`, hồ sơ chuyển `private`. Trả 204, gọi lại vẫn 204 |
+
+`AppApi` hiện chỉ có `get` và `post`. Hàm `patch` và `delete` thuộc S3-02, nên trước khi có thì gọi `fetch` trực tiếp (xem ví dụ bên dưới). Upload avatar luôn phải dùng `fetch` với `FormData`, vì `AppApi.post` gửi body dạng JSON.
+
+### PATCH /api/users/me
+
+Chỉ gửi những trường muốn đổi. Trường không có trong body thì giữ nguyên. Gửi `null` khác với không gửi: `"bio": null` xóa giới thiệu.
+
+```js
+const token = (await window.sb.auth.getSession()).data.session?.access_token;
+const response = await fetch('/api/users/me', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+        displayName: 'Trần Minh Anh',
+        bio: null,                 // xóa bio
+        theme: 'dark',
+        reminderEnabled: true,
+        reminderTime: '20:15'
+    })
+});
+const profile = await response.json(); // MyProfileDto, hoặc { error, field } khi lỗi
+```
+
+| Trường | Giá trị hợp lệ |
+|---|---|
+| `displayName` | Chuỗi, bỏ khoảng trắng hai đầu, dài 1–80 ký tự. Không nhận `null` |
+| `username` | Server bỏ khoảng trắng và đổi sang chữ thường. Dài 3–30, chỉ gồm `a-z`, `0-9`, `.`, `_`, ký tự đầu và cuối là chữ hoặc số, không có hai dấu `.`/`_` liền nhau, không thuộc tên cấm (`admin`, `administrator`, `support`, `system`, `root`, `moderator`, `api`, `null`, `undefined`, `me`, `help`). Gửi lại đúng username hiện tại thì không bị coi là trùng |
+| `bio` | Tối đa 160 ký tự. `null` hoặc chuỗi rỗng sẽ xóa bio |
+| `uiLocale` | `vi` hoặc `en` |
+| `timezone` | Tên múi giờ IANA, ví dụ `Asia/Ho_Chi_Minh`, tối đa 64 ký tự |
+| `profileVisibility` | `public` hoặc `private` |
+| `learningReason` | `travel`, `work`, `school`, `exam`, `fun`, `other`, hoặc `null` để xóa |
+| `theme` | `light`, `dark` hoặc `system` |
+| `dailyGoalXp` | `10`, `20`, `30` hoặc `50` |
+| `soundEnabled`, `reminderEnabled` | `true` hoặc `false` |
+| `reminderTime` | `"HH:mm"` hoặc `"HH:mm:ss"`, giờ địa phương theo `timezone`. `null` để xóa |
+
+Khi `reminderEnabled` là `true` (gửi lên hoặc đang lưu) thì phải có `reminderTime` (gửi lên hoặc đang lưu). Ví dụ bật nhắc nhở cho tài khoản chưa từng đặt giờ mà không gửi `reminderTime` sẽ bị 400.
+
+Trường không có trong bảng trên (`status`, `role`, `avatarPath`, ...) bị từ chối với 400. Request có một trường sai thì không trường nào được lưu.
+
+Lỗi trả `{ error, field }`, `field` là tên trường sai theo đúng tên trong body:
+
+```json
+{ "error": "dailyGoalXp phải là 10, 20, 30 hoặc 50.", "field": "dailyGoalXp" }
+```
+
+| Status | Khi nào |
+|---|---|
+| 400 | Giá trị không hợp lệ, sai kiểu, trường lạ, body không phải JSON |
+| 403 | `code: "profile_inactive"`: tài khoản không ở trạng thái active (bị khóa hoặc đã vô hiệu hóa) |
+| 404 | Không tìm thấy hồ sơ |
+| 409 | `code: "username_taken"` (kèm `field: "username"`): username đã có người dùng. `code: "concurrent_update"`: hồ sơ vừa được sửa ở request khác, tải lại rồi thử lại |
+
+### Avatar
+
+```js
+const token = (await window.sb.auth.getSession()).data.session?.access_token;
+const form = new FormData();
+form.append('file', input.files[0]);
+const response = await fetch('/api/users/me/avatar', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }, // không tự đặt Content-Type, trình duyệt sẽ thêm boundary
+    body: form
+});
+const profile = await response.json();
+AppUserBadge.resolveAvatarUrl(profile.avatarPath); // URL public trong bucket avatars
+```
+
+- Ảnh tối đa 2 MB (2097152 byte), chỉ nhận PNG, JPEG, WebP. Server kiểm tra nội dung file, không dựa vào đuôi hay `Content-Type`, nên file GIF đổi tên thành `.png` vẫn bị 400.
+- `avatarPath` có dạng `{userId}/{tên ngẫu nhiên}.{png|jpg|webp}`, không có tiền tố `avatars/`. Mỗi lần upload sinh tên mới nên không cần chống cache. Server tự xóa ảnh cũ.
+- Lỗi: 400 (`field: "file"`) khi thiếu file, file quá 2 MB hoặc sai định dạng. 403 như PATCH. 502 khi Supabase Storage không nhận file, `avatarPath` lúc đó giữ nguyên.
+
+### Vô hiệu hóa tài khoản
+
+`DELETE /api/users/me` trả 204, không có body. Sau đó `GET /api/users/me` vẫn đọc được hồ sơ (`status: "deactivated"`) nhưng PATCH và avatar trả 403. Tài khoản bị khóa (`suspended`) gọi endpoint này cũng nhận 403.

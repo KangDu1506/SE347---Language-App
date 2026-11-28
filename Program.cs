@@ -62,6 +62,8 @@ else
 builder.Services.AddScoped<IUserProfileInitializer, UserProfileInitializer>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IAvatarStorage, SupabaseAvatarStorage>(client => client.Timeout = TimeSpan.FromSeconds(30));
+builder.Services.AddScoped<IMyProfileService, MyProfileService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<ILessonService, LessonService>();
 builder.Services.AddSingleton<ILessonLookup, FileLessonLookup>();
