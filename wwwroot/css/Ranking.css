@@ -1,1 +1,377 @@
-/* Style trang Xếp hạng. Giao diện thông báo đang phát triển nằm tại wwwroot/css/Shared/UnderDevelopment.css */
+/* Bảng xếp hạng tổng (SCRUM-95). Phong cách sticker, token ở assets/_colorpalettes/themes.css.
+   Markup: Pages/Ranking.cshtml, dữ liệu render bởi wwwroot/js/ranking.js. */
+
+:root {
+    /* Hiệu ứng chuyển tab và mở/đóng modal (transitions.dev: tabs sliding, modal) */
+    --tabs-dur: 250ms;
+    --tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --modal-open-dur: 250ms;
+    --modal-close-dur: 150ms;
+    --modal-scale: 0.96;
+    --modal-scale-close: 0.96;
+    --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ranking-page { padding-bottom: var(--space-7); background: var(--bg-dotted); }
+.ranking-page [hidden] { display: none !important; }
+.ranking-wrap { display: grid; gap: var(--space-5); width: min(1080px, calc(100% - 40px)); margin: 0 auto; }
+.ranking-page h1, .ranking-page h2, .ranking-page h3 { font-family: var(--font-display); font-weight: var(--fw-heavy); line-height: var(--lh-tight); text-wrap: balance; }
+.ranking-page ::selection { color: var(--paper-text); background: var(--surface-sand); }
+
+/* ---------- Tiêu đề + thẻ hạng của bạn ---------- */
+.ranking-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--space-5); padding: 36px 0 4px; }
+.ranking-head__text { display: grid; gap: var(--space-3); max-width: 34rem; }
+.ranking-head h1 { margin: 0; font-size: clamp(44px, 7vw, 96px); line-height: .9; letter-spacing: -.04em; }
+.ranking-head__accent { color: var(--surface-orange-deep); -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; }
+.ranking-head__text p { margin: 0; color: var(--text-secondary); font-size: var(--fs-lg); line-height: 1.45; text-wrap: pretty; }
+
+.ranking-me {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-width: 280px;
+    padding: 16px 22px 16px 16px;
+    background: var(--surface-mint);
+    transform: rotate(2deg);
+}
+.ranking-me__avatar { width: 64px; height: 64px; font-size: 22px; }
+.ranking-me:not([data-state="loading"]) .ranking-me__avatar:empty:not([class*="ranking-avatar--"]) { display: none; }
+.ranking-me__body { display: grid; gap: 2px; }
+.ranking-me p { margin: 0; }
+.ranking-me__label { color: var(--text-primary); font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+.ranking-me__period { color: var(--text-secondary); font-weight: var(--fw-semibold); }
+.ranking-me__rank { font-family: var(--font-display); font-size: 40px; font-weight: var(--fw-heavy); line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.ranking-me[data-unranked] .ranking-me__rank { font-size: var(--fs-xl); line-height: 1.2; }
+.ranking-me__xp { color: var(--text-secondary); font-size: var(--fs-sm); font-weight: var(--fw-semibold); font-variant-numeric: tabular-nums; }
+.ranking-me[data-state="loading"] :is(.ranking-me__rank, .ranking-me__xp, .ranking-me__avatar) { border-radius: var(--radius-sm); color: transparent; background: color-mix(in srgb, var(--paper-text) 12%, transparent); animation: ranking-pulse 1.2s linear infinite; }
+.ranking-me[data-state="loading"] .ranking-me__avatar { border-radius: 50%; }
+.ranking-me[data-state="loading"] .ranking-me__rank { width: 4ch; }
+.ranking-me[data-state="loading"] .ranking-me__xp { width: 10ch; }
+
+/* ---------- Banner nhắc bật công khai ---------- */
+.ranking-private {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--surface-sand);
+}
+.ranking-private__icon { flex: none; width: 32px; height: 32px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ranking-private__text { flex: 1; display: grid; gap: 2px; }
+.ranking-private h2 { margin: 0; font-size: var(--fs-lg); }
+.ranking-private p { margin: 0; color: var(--text-secondary); font-size: var(--fs-sm); line-height: 1.5; text-wrap: pretty; }
+.ranking-private__cta { flex: none; }
+
+/* ---------- Bảng xếp hạng ---------- */
+.ranking-board { padding: var(--space-5); }
+.ranking-board__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-5); margin-bottom: var(--space-5); }
+.ranking-board__head h2 { margin: 0; font-size: 32px; }
+.ranking-board__since { min-height: 1.5em; margin: 4px 0 0; color: var(--text-secondary); font-size: var(--fs-sm); font-weight: var(--fw-semibold); }
+.ranking-board__since::first-letter { text-transform: uppercase; }
+
+/* Tabs: thanh segmented, pill trượt theo tab đang chọn (vị trí do ranking.js ghi) */
+.ranking-tabs {
+    position: relative;
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    border: var(--border-sticker);
+    border-radius: var(--radius-pill);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sticker-sm);
+}
+.ranking-tab {
+    position: relative;
+    z-index: 1;
+    min-height: 40px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    color: var(--text-secondary);
+    background: transparent;
+    font: inherit;
+    font-weight: var(--fw-heavy);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--tabs-dur) var(--tabs-ease);
+}
+.ranking-tab:hover { color: var(--text-primary); }
+.ranking-tab[aria-selected="true"] { color: var(--paper-text); }
+.ranking-tab:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+.ranking-tabs__pill {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    border: var(--border-sticker-thin);
+    border-radius: var(--radius-pill);
+    background: var(--surface-orange);
+    transform: translateX(0);
+    transition:
+        transform var(--tabs-dur) var(--tabs-ease),
+        width     var(--tabs-dur) var(--tabs-ease);
+    will-change: transform, width;
+    pointer-events: none;
+}
+
+.ranking-panel:focus { outline: none; }
+.ranking-panel:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 6px; border-radius: var(--radius-md); }
+
+/* Một dòng: hạng | avatar | tên | thanh XP | điểm */
+.ranking-list, .ranking-skeleton { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ranking-row,
+.ranking-skeleton__row {
+    display: grid;
+    grid-template-columns: 44px 48px minmax(0, 1fr) minmax(96px, 30%) 96px;
+    align-items: center;
+    gap: var(--space-4);
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 68px;
+    padding: 10px 18px 10px 12px;
+    border-radius: var(--radius-md);
+}
+.ranking-row {
+    border: var(--border-sticker-thin);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease, background-color var(--transition-fast);
+}
+.ranking-row:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sticker-sm); }
+.ranking-row:active { transform: translate(2px, 2px); box-shadow: none; }
+.ranking-row:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; }
+
+.ranking-row__rank {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-heavy);
+    font-variant-numeric: tabular-nums;
+}
+.ranking-row--top1 .ranking-row__rank { border: var(--border-sticker-thin); background: var(--surface-sand); transform: rotate(-8deg); }
+.ranking-row--top2 .ranking-row__rank { border: var(--border-sticker-thin); background: var(--surface-mint); transform: rotate(6deg); }
+.ranking-row--top3 .ranking-row__rank { border: var(--border-sticker-thin); background: var(--surface-pink); transform: rotate(-5deg); }
+
+.ranking-avatar {
+    display: grid;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    place-items: center;
+    border: var(--border-sticker-thin);
+    border-radius: 50%;
+    color: var(--paper-text);
+    background: var(--surface-sand);
+    font-family: var(--font-display);
+    font-size: var(--fs-md);
+    font-weight: var(--fw-heavy);
+}
+.ranking-avatar--sand { background: var(--surface-sand); }
+.ranking-avatar--mint { background: var(--surface-mint); }
+.ranking-avatar--pink { background: var(--surface-pink); }
+.ranking-avatar--orange { background: var(--surface-orange); }
+.ranking-avatar--purple { background: var(--surface-purple); }
+.ranking-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+
+.ranking-row__who { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; min-width: 0; }
+.ranking-row__name { overflow: hidden; max-width: 100%; font-weight: var(--fw-heavy); text-overflow: ellipsis; white-space: nowrap; }
+.ranking-row__you { padding: 0 8px; font-size: 11px; }
+.ranking-row__handle { flex-basis: 100%; overflow: hidden; color: var(--text-secondary); font-size: var(--fs-sm); text-overflow: ellipsis; white-space: nowrap; }
+
+.ranking-row__bar { display: block; height: 14px; overflow: hidden; border: var(--border-sticker-thin); border-radius: var(--radius-pill); background: var(--bg-soft); }
+.ranking-row__bar i { display: block; height: 100%; background: var(--surface-orange-deep); transform: scaleX(var(--ratio, 0)); transform-origin: left center; }
+.ranking-row__xp { display: flex; align-items: baseline; justify-content: flex-end; gap: 4px; font-variant-numeric: tabular-nums; }
+.ranking-row__xp b { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: var(--fw-heavy); }
+.ranking-row__xp small { color: var(--text-secondary); font-size: var(--fs-xs); font-weight: var(--fw-bold); }
+
+/* Dòng của chính mình */
+.ranking-row--you { border: var(--border-sticker); background: var(--surface-orange); box-shadow: var(--shadow-sticker-sm); }
+.ranking-row--you:hover { box-shadow: 5px 5px 0 var(--ink); }
+.ranking-row--you .ranking-row__bar { background: var(--paper-card); }
+.ranking-row--you .ranking-row__bar i { background: var(--ink); }
+
+/* Vào danh sách: các dòng trồi lên lần lượt, thanh XP chạy từ 0 */
+.ranking-list.is-entering .ranking-item { animation: ranking-row-in 250ms var(--tabs-ease) both; animation-delay: calc(var(--i, 0) * 25ms); }
+.ranking-list.is-entering .ranking-row__bar i { animation: ranking-bar-in 500ms var(--tabs-ease) both; animation-delay: calc(80ms + var(--i, 0) * 25ms); }
+@keyframes ranking-row-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes ranking-bar-in { from { transform: scaleX(0); } }
+
+/* Skeleton */
+.ranking-skeleton__row { border: var(--border-sticker-thin); border-style: dashed; border-color: var(--border-strong); }
+.ranking-skeleton__row i { display: block; height: 14px; border-radius: var(--radius-pill); background: var(--bg-soft); animation: ranking-pulse 1.2s linear infinite; }
+.ranking-skeleton__row i:nth-child(1) { width: 32px; height: 32px; border-radius: 50%; }
+.ranking-skeleton__row i:nth-child(2) { width: 44px; height: 44px; border-radius: 50%; }
+.ranking-skeleton__row i:nth-child(3) { width: 60%; height: 16px; }
+.ranking-skeleton__row:nth-child(even) i:nth-child(3) { width: 42%; }
+.ranking-skeleton__row i:nth-child(4) { grid-column: span 2; width: 100%; }
+@keyframes ranking-pulse { 50% { opacity: .45; } }
+
+/* Trống / lỗi */
+.ranking-state { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-6) var(--space-4); text-align: center; }
+.ranking-state__fox { width: 132px; height: 132px; }
+.ranking-state h3 { margin: 0; font-size: var(--fs-xl); }
+.ranking-state p { max-width: 42ch; margin: 0 0 var(--space-2); color: var(--text-secondary); line-height: 1.5; text-wrap: pretty; }
+
+/* ---------- Modal hồ sơ công khai ---------- */
+.ranking-profile {
+    width: min(440px, calc(100% - 32px));
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    color: var(--text-primary);
+    background: transparent;
+}
+.ranking-profile::backdrop { background: rgb(26 18 9 / 0%); transition: background-color var(--modal-open-dur) var(--modal-ease); }
+.ranking-profile.is-open::backdrop { background: rgb(26 18 9 / 55%); }
+.has-ranking-modal { overflow: hidden; }
+
+.ranking-profile__card { position: relative; display: grid; gap: var(--space-4); padding: var(--space-5); box-shadow: var(--shadow-sticker-lg); }
+.ranking-profile__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: var(--border-sticker-thin);
+    border-radius: 50%;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform .12s ease;
+}
+.ranking-profile__close:hover { background: var(--surface-sand); color: var(--paper-text); }
+.ranking-profile__close:active { transform: scale(.96); }
+.ranking-profile__close:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+.ranking-profile__close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; }
+
+.ranking-profile__hero { display: flex; align-items: center; gap: var(--space-4); padding-right: 52px; }
+.ranking-profile__avatar { width: 80px; height: 80px; border-width: var(--line); font-size: 28px; box-shadow: var(--shadow-sticker-sm); }
+.ranking-profile__who { display: grid; gap: 4px; min-width: 0; }
+.ranking-profile__who h2 { margin: 0; overflow-wrap: anywhere; font-size: var(--fs-xl); }
+.ranking-profile__username { margin: 0; overflow: hidden; color: var(--text-secondary); font-weight: var(--fw-semibold); text-overflow: ellipsis; white-space: nowrap; }
+
+.ranking-profile__stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin: 0; }
+.ranking-profile__stats div { padding: 10px 14px; border: var(--border-sticker-thin); border-radius: 12px; background: var(--surface-sand); color: var(--paper-text); }
+.ranking-profile__stats div + div { background: var(--surface-mint); }
+.ranking-profile__stats dt { color: var(--paper-text-2); font-size: var(--fs-xs); font-weight: var(--fw-heavy); letter-spacing: .06em; text-transform: uppercase; }
+.ranking-profile__stats dd { margin: 2px 0 0; font-family: var(--font-display); font-size: var(--fs-xl); font-weight: var(--fw-heavy); font-variant-numeric: tabular-nums; }
+
+.ranking-profile__bio { display: grid; justify-items: start; gap: var(--space-3); min-height: 3.2em; padding-top: var(--space-4); border-top: 2px dashed var(--border-strong); }
+.ranking-profile__bio p { margin: 0; line-height: var(--lh-body); overflow-wrap: anywhere; white-space: pre-line; text-wrap: pretty; }
+.ranking-profile__bio:is([data-state="empty"], [data-state="private"], [data-state="error"]) p { color: var(--text-secondary); }
+.ranking-profile__bio[data-state="error"] p { color: var(--status-error); font-weight: var(--fw-semibold); }
+.ranking-profile__bio-skeleton { display: block; width: 100%; height: 12px; border-radius: var(--radius-pill); background: var(--bg-soft); animation: ranking-pulse 1.2s linear infinite; }
+.ranking-profile__bio-skeleton + .ranking-profile__bio-skeleton { width: 70%; }
+
+/* transitions.dev: modal open / close */
+.t-modal {
+    transform-origin: center;
+    transform: scale(var(--modal-scale));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        transform var(--modal-open-dur) var(--modal-ease),
+        opacity   var(--modal-open-dur) var(--modal-ease);
+    will-change: transform, opacity;
+}
+.t-modal.is-open {
+    transform: scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+.t-modal.is-closing {
+    transform: scale(var(--modal-scale-close));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        transform var(--modal-close-dur) var(--modal-ease),
+        opacity   var(--modal-close-dur) var(--modal-ease);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+    .ranking-wrap { width: calc(100% - 32px); gap: var(--space-4); }
+    .ranking-head { padding-top: var(--space-5); gap: var(--space-4); }
+    .ranking-head__accent { -webkit-text-stroke-width: 2px; }
+    .ranking-head__text p { font-size: var(--fs-md); }
+    .ranking-me { width: 100%; min-width: 0; transform: rotate(1deg); }
+    .ranking-me__rank { font-size: 32px; }
+    .ranking-private { flex-wrap: wrap; padding: var(--space-4); }
+    .ranking-private__icon { align-self: start; }
+    .ranking-private__text { flex-basis: calc(100% - 48px); }
+    .ranking-private__cta { width: 100%; min-height: 44px; }
+    .ranking-board { padding: var(--space-4); }
+    .ranking-board__head h2 { font-size: var(--fs-xl); }
+    .ranking-tabs { display: flex; width: 100%; }
+    .ranking-tab { flex: 1; min-height: 44px; padding: 0 10px; }
+
+    .ranking-row,
+    .ranking-skeleton__row {
+        grid-template-columns: 34px 44px minmax(0, 1fr) auto;
+        grid-template-areas:
+            "rank avatar who xp"
+            "rank avatar bar bar";
+        gap: 6px var(--space-3);
+        padding: 10px 12px 10px 8px;
+    }
+    .ranking-row__rank { grid-area: rank; width: 34px; height: 34px; font-size: var(--fs-md); }
+    .ranking-row .ranking-avatar { grid-area: avatar; width: 44px; height: 44px; }
+    .ranking-row__who { grid-area: who; }
+    .ranking-row__handle { display: none; }
+    .ranking-row__bar { grid-area: bar; height: 10px; }
+    .ranking-row__xp { grid-area: xp; }
+    .ranking-skeleton__row i:nth-child(1) { grid-area: rank; }
+    .ranking-skeleton__row i:nth-child(2) { grid-area: avatar; }
+    .ranking-skeleton__row i:nth-child(3) { grid-area: who; }
+    .ranking-skeleton__row i:nth-child(4) { grid-area: bar; grid-column: auto; }
+}
+
+@media (max-width: 360px) {
+    .ranking-tab { padding: 0 6px; font-size: var(--fs-sm); }
+    .ranking-row__xp small { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ranking-tabs__pill, .ranking-tab { transition: none !important; }
+    .t-modal { transition: none !important; }
+    .ranking-profile::backdrop { transition: none; }
+    .ranking-list.is-entering .ranking-item,
+    .ranking-list.is-entering .ranking-row__bar i { animation: none; }
+    .ranking-skeleton__row i, .ranking-profile__bio-skeleton, .ranking-me[data-state="loading"] :is(.ranking-me__rank, .ranking-me__xp, .ranking-me__avatar) { animation: none; }
+    .ranking-me, .ranking-row--top1 .ranking-row__rank, .ranking-row--top2 .ranking-row__rank, .ranking-row--top3 .ranking-row__rank { transform: none; }
+    .ranking-row:hover, .ranking-row:active { transform: none; }
+}
+
+/* ---------- Dark mode: mảng màu sticker là "giấy sáng" (STYLE_GUIDE mục 9) ---------- */
+[data-theme="dark"] :is(
+    .ranking-me,
+    .ranking-private,
+    .ranking-row--you,
+    .ranking-row--top1 .ranking-row__rank,
+    .ranking-row--top2 .ranking-row__rank,
+    .ranking-row--top3 .ranking-row__rank,
+    .ranking-tabs__pill,
+    .ranking-avatar,
+    .ranking-profile__stats div
+) { --text-primary: var(--paper-text); --text-secondary: var(--paper-text-2); --bg-card: var(--paper-card); --border-strong: var(--paper-line); color: var(--paper-text); }
+
+[data-theme="dark"] .ranking-row--you .ranking-row__bar i { background: var(--paper-text); }
+[data-theme="dark"] :is(.ranking-me, .ranking-private) .btn--ink { border-color: var(--paper-text); color: var(--paper-card); background: var(--paper-text); box-shadow: 3px 3px 0 var(--paper-text); }
+[data-theme="dark"] .ranking-me[data-state="loading"] :is(.ranking-me__rank, .ranking-me__xp, .ranking-me__avatar) { background: color-mix(in srgb, var(--paper-text) 14%, transparent); }
+[data-theme="dark"] .ranking-profile.is-open::backdrop { background: rgb(0 0 0 / 65%); }
+[data-theme="dark"] .ranking-page ::selection { color: var(--paper-text); }

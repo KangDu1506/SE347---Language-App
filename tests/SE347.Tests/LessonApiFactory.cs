@@ -83,7 +83,7 @@ namespace SE347.Tests
             });
         });
 
-        private async Task WithDbAsync(Action<ApplicationDbContext> change)
+        public async Task WithDbAsync(Action<ApplicationDbContext> change)
         {
             using var scope = Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

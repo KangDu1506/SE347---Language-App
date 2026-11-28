@@ -1,24 +1,121 @@
 @page
+@*
+    Bảng xếp hạng tổng (SCRUM-95). Trang chỉ dựng khung, dữ liệu do wwwroot/js/ranking.js nạp từ
+    GET /api/rankings?period=week|month|all và GET /api/users/{username} (hồ sơ công khai).
+*@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "Bảng xếp hạng";
-    ViewData["NoticeSectionKey"] = "ui.leaderboard";
-    ViewData["NoticeSectionFallback"] = "Bảng xếp hạng";
-    ViewData["NoticeDescriptionKey"] = "ui.ranking_in_development_desc";
-    ViewData["NoticeDescriptionFallback"] = "Tính năng bảng xếp hạng đang được xây dựng và sẽ sớm ra mắt. Bạn hãy tiếp tục học tập và quay lại sau nhé!";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/Shared/UnderDevelopment.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Ranking.css" asp-append-version="true" />
 }
 
 @section Scripts {
     <partial name="_SupabaseClient" />
+    <script src="~/js/Shared/api.js" asp-append-version="true" defer></script>
     <script src="~/js/auth-guard.js" asp-append-version="true" defer></script>
     <script src="~/js/ranking.js" asp-append-version="true" defer></script>
 }
 
-<main class="ranking-page dev-notice-page">
-    <partial name="_UnderDevelopmentNotice" />
+<main class="ranking-page">
+    <div class="ranking-wrap">
+        <section class="ranking-head" aria-labelledby="ranking-heading">
+            <div class="ranking-head__text">
+                <h1 id="ranking-heading"><span data-i18n="ranking.title_a">Bảng</span> <span class="ranking-head__accent" data-i18n="ranking.title_b">xếp hạng</span></h1>
+                <p data-i18n="ranking.subtitle">Học đều mỗi ngày để ghi XP và leo hạng cùng mọi người.</p>
+            </div>
+
+            @* Thẻ "hạng của bạn": lấy từ block currentUser của /api/rankings *@
+            <section class="sticker ranking-me" aria-labelledby="ranking-me-label" data-ranking-me data-state="loading">
+                <span class="ranking-me__avatar" data-ranking-me-avatar aria-hidden="true"></span>
+                <div class="ranking-me__body">
+                    <p class="ranking-me__label" id="ranking-me-label">
+                        <span data-i18n="ranking.your_rank">Hạng của bạn</span>
+                        <span class="ranking-me__period" data-ranking-me-period></span>
+                    </p>
+                    <p class="ranking-me__rank" data-ranking-me-rank>&nbsp;</p>
+                    <p class="ranking-me__xp" data-ranking-me-xp>&nbsp;</p>
+                </div>
+            </section>
+        </section>
+
+        @* Banner nhắc bật công khai, chỉ hiện khi currentUser.profileVisibility = private *@
+        <aside class="sticker ranking-private" data-ranking-private hidden aria-labelledby="ranking-private-title">
+            <svg class="ranking-private__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 3l18 18" />
+                <path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c5 0 9 4.5 10 7a12.7 12.7 0 0 1-2.9 4" />
+                <path d="M6.6 6.6C4.3 8 2.7 10.2 2 12c1 2.5 5 7 10 7a10 10 0 0 0 5.4-1.6" />
+                <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+            </svg>
+            <div class="ranking-private__text">
+                <h2 id="ranking-private-title" data-i18n="ranking.private_title">Hồ sơ của bạn đang để riêng tư</h2>
+                <p data-i18n="ranking.private_desc">Người khác không thấy bạn trên bảng xếp hạng. Bật chế độ công khai trong Hồ sơ để thi đua cùng mọi người.</p>
+            </div>
+            <a class="btn btn--sm btn--ink ranking-private__cta" href="/Account/Profile" data-i18n="ranking.private_cta">Bật công khai</a>
+        </aside>
+
+        <section class="sticker ranking-board" aria-labelledby="ranking-board-title">
+            <div class="ranking-board__head">
+                <div>
+                    <h2 id="ranking-board-title" data-i18n="ui.top_learners">Top người học</h2>
+                    <p class="ranking-board__since" data-ranking-since></p>
+                </div>
+                <div class="ranking-tabs" role="tablist" aria-label="Phạm vi bảng xếp hạng" data-i18n-aria-label="ui.leaderboard_period" data-ranking-tabs>
+                    <span class="ranking-tabs__pill" aria-hidden="true"></span>
+                    <button class="ranking-tab" type="button" role="tab" id="ranking-tab-week" aria-controls="ranking-panel" aria-selected="true" data-period="week" data-i18n="ui.this_week">Tuần này</button>
+                    <button class="ranking-tab" type="button" role="tab" id="ranking-tab-month" aria-controls="ranking-panel" aria-selected="false" tabindex="-1" data-period="month" data-i18n="ui.this_month">Tháng này</button>
+                    <button class="ranking-tab" type="button" role="tab" id="ranking-tab-all" aria-controls="ranking-panel" aria-selected="false" tabindex="-1" data-period="all" data-i18n="ui.all">Tất cả</button>
+                </div>
+            </div>
+
+            <div class="ranking-panel" id="ranking-panel" role="tabpanel" aria-labelledby="ranking-tab-week" tabindex="-1" data-ranking-panel data-state="loading" aria-busy="true">
+                <ol class="ranking-skeleton" aria-hidden="true" data-ranking-skeleton>
+                    @for (var i = 0; i < 6; i++)
+                    {
+                        <li class="ranking-skeleton__row"><i></i><i></i><i></i><i></i></li>
+                    }
+                </ol>
+                <p class="visually-hidden" role="status" data-ranking-status>Đang tải bảng xếp hạng...</p>
+
+                <ol class="ranking-list" data-ranking-list hidden></ol>
+
+                <div class="ranking-state" data-ranking-empty hidden>
+                    <svg class="foxy ranking-state__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy" /></svg>
+                    <h3 data-i18n="ranking.empty_title">Chưa ai ghi XP trong kỳ này</h3>
+                    <p data-i18n="ranking.empty_desc">Hoàn thành một bài học để trở thành người đầu tiên trên bảng.</p>
+                    <a class="btn btn--primary" href="/Study" data-i18n="ranking.empty_cta">Vào học ngay</a>
+                </div>
+
+                <div class="ranking-state" data-ranking-error hidden>
+                    <svg class="foxy ranking-state__fox" aria-hidden="true"><use href="/images/mascot/foxy.svg#foxy-sad" /></svg>
+                    <h3 data-i18n="ranking.error_title">Chưa tải được bảng xếp hạng</h3>
+                    <p data-ranking-error-message></p>
+                    <button class="btn btn--primary" type="button" data-ranking-retry data-i18n="dash.retry">Thử lại</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    @* Hồ sơ công khai: native dialog (showModal) để nền phía sau bị inert, ranking.js lo hiệu ứng và trả focus *@
+    <dialog class="ranking-profile" aria-labelledby="ranking-profile-name" data-ranking-profile>
+        <div class="sticker ranking-profile__card t-modal" data-ranking-profile-card>
+            <button class="ranking-profile__close" type="button" aria-label="Đóng hồ sơ" data-i18n-aria-label="ranking.profile_close" data-ranking-profile-close>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
+            <div class="ranking-profile__hero">
+                <span class="ranking-profile__avatar" data-ranking-profile-avatar aria-hidden="true"></span>
+                <div class="ranking-profile__who">
+                    <h2 id="ranking-profile-name" data-ranking-profile-name></h2>
+                    <p class="ranking-profile__username" data-ranking-profile-username></p>
+                </div>
+            </div>
+            <dl class="ranking-profile__stats">
+                <div><dt data-i18n="ui.rank">Hạng</dt><dd data-ranking-profile-rank></dd></div>
+                <div><dt data-ranking-profile-xp-label></dt><dd data-ranking-profile-xp></dd></div>
+            </dl>
+            <div class="ranking-profile__bio" data-ranking-profile-bio aria-live="polite"></div>
+        </div>
+    </dialog>
 </main>

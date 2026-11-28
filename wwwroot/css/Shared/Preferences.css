@@ -145,9 +145,6 @@ html[lang="en"] .app-preferences__en { display: block; }
     .site-nav { order: 4; flex-basis: 100%; }
 }
 @media (max-width: 430px) {
-    .ranking-row { grid-template-columns: 30px minmax(0, 1fr) 60px; gap: 8px; padding-inline: 10px; }
-    .ranking-user b { white-space: normal; overflow: visible; }
-    .ranking-user { gap: 6px; }
     .profile-activity-list li { flex-wrap: wrap; }
     .trial-actions { flex-wrap: wrap; }
     .trial-actions button { flex: 1; min-width: 8rem; }
