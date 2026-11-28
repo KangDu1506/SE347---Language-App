@@ -82,7 +82,7 @@ namespace SE347.Services
 
         /// <summary>
         /// Lần nộp quiz gần nhất của bài (cùng shape với response POST .../quiz) cho trang Kết quả khi đã đóng tab.
-        /// LessonCompletedNow = lần nộp đó làm bài chuyển sang completed (chỉ lần đó được cộng XP).
+        /// LessonCompletedNow luôn là false vì đây là dữ liệu đọc lại, không phải lần vừa nộp. XpAwarded > 0 cho biết lần nộp đó đã hoàn thành bài.
         /// Questions rỗng với lần nộp trước khi có lưu chi tiết câu trả lời (S3-19).
         /// QuizAttemptNotFound nếu user chưa nộp lần nào.
         /// </summary>
